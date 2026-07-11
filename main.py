@@ -1,27 +1,129 @@
 import os
 import random
+
 from telegram import (
     Update,
     BotCommand,
     InlineKeyboardButton,
     InlineKeyboardMarkup
 )
+
 from telegram.ext import (
     Application,
     CommandHandler,
     ContextTypes
 )
 
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROUP_ID = -1004231485932
 OWNER_ID = 8880948641
 
+
 FRASES = [
-    "🔥 O que era bom agora ficou ainda mais intenso. Confira agora.",
-    "👀 Uma novidade acabou de chegar. Você vai querer ver.",
-    "🌑 Algo especial está esperando por você.",
-    "🚀 Atualização liberada. Aproveite essa novidade.",
-    "👑 Conteúdo exclusivo disponível agora."
+
+"""🚀 AS NOVIDADES CONTINUAM A TODO VAPOR! 🚀
+
+Nossa comunidade segue trazendo atualizações e melhorias para quem gosta de acompanhar tudo de perto. Estamos sempre buscando oferecer uma experiência organizada, rápida e cheia de novidades para todos que participam.
+
+🔥 Entre agora e veja tudo que está acontecendo!""",
+
+"""💎 UM ESPAÇO PREPARADO PARA QUEM GOSTA DE NOVIDADES! 💎
+
+Aqui você encontra uma comunidade em crescimento, com atualizações frequentes e novidades chegando constantemente. Cada detalhe é pensado para deixar sua experiência ainda melhor.
+
+⚡ Venha conhecer e faça parte!""",
+
+"""🔥 VOCÊ ESTÁ PERDENDO AS ÚLTIMAS NOVIDADES? 🔥
+
+Não fique de fora enquanto novas atualizações estão sendo liberadas. Nossa comunidade está sempre ativa e trazendo conteúdos renovados para quem acompanha de perto.
+
+🚀 Entre agora e confira!""",
+
+"""🚨 ATENÇÃO PARA ESSA NOVIDADE! 🚨
+
+Estamos trazendo melhorias e atualizações para deixar tudo mais completo. Quem participa acompanha de perto todas as novidades e fica sempre conectado com o que acontece por aqui.
+
+🌟 Faça parte agora!""",
+
+"""⚡ A MELHOR HORA PARA ENTRAR É AGORA! ⚡
+
+Nossa comunidade está crescendo todos os dias e novas novidades estão chegando constantemente. Não espere mais para conhecer um espaço feito para quem gosta de estar atualizado.
+
+🔥 Acesse e participe!""",
+
+]"""👑 FAÇA PARTE DE ALGO QUE ESTÁ CRESCENDO! 👑
+
+Cada vez mais pessoas estão chegando para acompanhar nossas atualizações e novidades. Junte-se a uma comunidade ativa e fique por dentro de tudo que está sendo preparado.
+
+🚀 Entre agora!""",
+
+"""💥 TEM SEMPRE UMA NOVIDADE ESPERANDO POR VOCÊ! 💥
+
+Nossa equipe trabalha para manter tudo atualizado e trazer conteúdos novos regularmente. Se você gosta de acompanhar novidades, esse é o momento de participar.
+
+⚡ Venha conferir!""",
+
+"""🌟 NOVIDADES, ATUALIZAÇÕES E MUITO MAIS! 🌟
+
+Nossa comunidade está preparada para quem gosta de acompanhar conteúdos renovados e estar sempre por dentro das novidades. Todos os dias buscamos trazer algo novo para nossos participantes.
+
+🚀 Junte-se agora!""",
+
+"""🚀 A COMUNIDADE QUE ESTÁ CHAMANDO ATENÇÃO! 🚀
+
+Com novidades chegando todos os dias e uma comunidade cada vez maior, esse é o momento perfeito para entrar e acompanhar tudo desde o início.
+
+👀 Descubra agora o que está disponível!""",
+
+"""🔥 CHEGAMOS A UM NOVO NÍVEL! 🔥
+
+Continuamos trazendo melhorias, atualizações e novidades para oferecer uma experiência cada vez mais completa. Quem participa acompanha tudo de perto e faz parte desse crescimento.
+
+💎 Entre agora e venha conhecer!""",
+
+"""🚨 TEM NOVIDADE CHEGANDO E VOCÊ NÃO PODE FICAR DE FORA! 🚨
+
+Nossa comunidade está sempre recebendo atualizações e novos conteúdos para quem gosta de acompanhar tudo de perto. Trabalhamos constantemente para manter tudo organizado e atualizado.
+
+🔥 Entre agora e descubra!""",
+
+"""⚡ A ATUALIZAÇÃO QUE VOCÊ ESTAVA ESPERANDO CHEGOU! ⚡
+
+Novidades estão sendo adicionadas e a comunidade continua crescendo todos os dias. Aqui você acompanha tudo de forma simples e rápida.
+
+🚀 Faça parte agora!""",
+
+"""🔥 NÃO SEJA O ÚLTIMO A DESCOBRIR! 🔥
+
+Enquanto muitos ainda estão procurando onde acompanhar novidades, nossa comunidade já está trazendo atualizações constantes.
+
+👀 Venha conferir agora!""",
+
+"""💎 UM ESPAÇO CRIADO PARA QUEM BUSCA NOVIDADES! 💎
+
+Nossa comunidade foi preparada para oferecer uma experiência completa, com organização, atualizações frequentes e novidades chegando sempre.
+
+🌟 Entre hoje e conheça!""",
+
+"""🚨 ATENÇÃO: TEM MUITA COISA NOVA POR AQUI! 🚨
+
+Estamos sempre trazendo novidades e melhorias para deixar a comunidade cada vez mais completa.
+
+🔥 Não fique de fora, participe agora!""",
+
+"""🌟 SEMPRE TEM ALGO NOVO PARA DESCOBRIR! 🌟
+
+Nossa comunidade está em constante movimento, com novidades chegando e atualizações sendo feitas regularmente. Um lugar para quem gosta de acompanhar tudo sem perder tempo.
+
+⚡ Acesse agora e confira!""",
+
+"""🚀 A COMUNIDADE ESTÁ CRESCENDO CADA VEZ MAIS! 🚀
+
+Cada atualização traz algo novo e cada dia é uma nova oportunidade de descobrir novidades. Estamos sempre buscando melhorar e trazer uma experiência diferenciada.
+
+💎 Venha fazer parte!"""
+
 ]
 
 
