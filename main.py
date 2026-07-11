@@ -16,8 +16,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "✅ Bot está online!\n\n"
-        "Envie uma postagem e responda com /divulgar para publicar."
+        "BOT ON ? ✅\n\n"
+        "Use /divulgar para enviar uma postagem para as prévias."
     )
 
 
@@ -46,8 +46,8 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def configurar_menu(app):
     comandos = [
-        BotCommand("start", "Ver se o bot está online"),
-        BotCommand("divulgar", "Divulgar postagem no grupo")
+        BotCommand("start", "BOT ON ? ✅"),
+        BotCommand("divulgar", "DIVULGAR NO PRÉVIAS 🔥")
     ]
 
     await app.bot.set_my_commands(comandos)
