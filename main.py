@@ -1,11 +1,9 @@
 import os
-from telegram import Update
+from telegram import Update, BotCommand
 from telegram.ext import (
     Application,
     CommandHandler,
-    MessageHandler,
-    ContextTypes,
-    filters
+    ContextTypes
 )
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -19,7 +17,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         "✅ Bot está online!\n\n"
-        "Envie uma postagem e responda ela com /divulgar para publicar."
+        "Envie uma postagem e responda com /divulgar para publicar."
     )
 
 
@@ -46,7 +44,16 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-app = Application.builder().token(BOT_TOKEN).build()
+async def configurar_menu(app):
+    comandos = [
+        BotCommand("start", "Ver se o bot está online"),
+        BotCommand("divulgar", "Divulgar postagem no grupo")
+    ]
+
+    await app.bot.set_my_commands(comandos)
+
+
+app = Application.builder().token(BOT_TOKEN).post_init(configurar_menu).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("divulgar", divulgar))
