@@ -36,25 +36,23 @@ FRASES = [
 
 Tem novidades chegando e muita coisa preparada para quem gosta de acompanhar conteúdos diferenciados.
 
-🔥 Entre agora e descubra o que está esperando por você!""",
+Confira agora!""",
 
 """🔥 ACESSO LIBERADO! 🔥
 
-Uma nova experiência está disponível. Estamos trazendo atualizações constantes para quem procura algo diferente e quer estar sempre por dentro das novidades.
+Uma nova experiência está disponível.
 
 🚀 Confira agora!""",
 
 """👀 CURIOSO PARA SABER O QUE TEM AQUI? 👀
 
-Muita gente já está acompanhando as novidades. Não fique de fora, venha conferir e descubra por que esse espaço está crescendo cada vez mais.
+Muita coisa nova chegando para quem acompanha.
 
 💎 Acesse agora!""",
 
 """🚀 NOVIDADES CHEGANDO TODOS OS DIAS! 🚀
 
-Um espaço atualizado, organizado e preparado para quem busca algo diferente.
-
-🔥 Entre agora e acompanhe tudo de perto!"""
+Um espaço atualizado, organizado e preparado para quem busca algo diferente."""
 ]
 
 albuns = {}
@@ -91,7 +89,7 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     mensagem = update.message.reply_to_message
 
-    legenda = random.choice(FRASES) + "\n\n" + MENSAGEM_EXTRA
+    legenda = random.choice(FRASES)
 
     await context.bot.copy_message(
         chat_id=GROUP_ID,
@@ -145,7 +143,7 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    legenda = random.choice(FRASES) + "\n\n" + MENSAGEM_EXTRA
+    legenda = random.choice(FRASES)
 
     midias = []
 
