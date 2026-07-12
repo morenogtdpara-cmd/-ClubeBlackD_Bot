@@ -27,11 +27,13 @@ OWNER_ID = 8880948641
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
 # ==============================
-# LEGENDA FIXA DO ÁLBUM
+# LEGENDA FIXA
 # ==============================
 
 LEGENDA_FIXA = """
-🔥 ACESSE NOSSO CANAL OFICIAL DE VENDAS:
+🔥 CONTEÚDO EXCLUSIVO LIBERADO 🔥
+
+🚀 Acesse nosso canal oficial:
 @ClubeBlackBot
 """
 
@@ -79,21 +81,11 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     mensagem = update.message.reply_to_message
 
-    legenda = ""
-
-    if mensagem.caption:
-        legenda = mensagem.caption
-
     await context.bot.copy_message(
         chat_id=GROUP_ID,
         from_chat_id=mensagem.chat.id,
         message_id=mensagem.message_id,
-        caption=legenda if legenda else None,
         reply_markup=botoes_vip()
-    )
-
-    await update.message.reply_text(
-        "✅ Divulgação enviada!"
     )
 
 # ==============================
@@ -139,11 +131,25 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    texto = " ".join(context.args).strip()
+    texto = ""
+
+    # procura a legenda que veio junto com as mídias
+    for item in albuns[grupo]:
+
+        if item.caption:
+            texto = item.caption.strip()
+            break
 
     if texto:
-        legenda = texto + "\n\n" + LEGENDA_FIXA.strip()
+
+        legenda = (
+            texto
+            + "\n\n"
+            + LEGENDA_FIXA.strip()
+        )
+
     else:
+
         legenda = LEGENDA_FIXA.strip()
 
     midias = []
@@ -168,10 +174,12 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
             )
 
-    await context.bot.send_media_group(
-        chat_id=GROUP_ID,
-        media=midias
-    )
+    if midias:
+
+        await context.bot.send_media_group(
+            chat_id=GROUP_ID,
+            media=midias
+        )
 
     del albuns[grupo]
 
