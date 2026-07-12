@@ -139,7 +139,7 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    texto = update.message.text.replace("/d_album", "").strip()
+    texto = " ".join(context.args).strip()
 
     if texto:
         legenda = texto + "\n\n" + LEGENDA_FIXA.strip()
