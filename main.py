@@ -290,7 +290,7 @@ async def entrarnovip(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=GROUP_ID,
-        text="🔥 ENTRAR NO VIP 🔥",
+        text="",
         reply_markup=botoes_vip()
     )
 
