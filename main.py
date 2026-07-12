@@ -25,12 +25,6 @@ OWNER_ID = 8880948641
 
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
-MENSAGEM_EXTRA = """
-🔥 ATUALIZAÇÃO DIÁRIA 🔥
-💎 CONTEÚDO EXCLUSIVO
-👑 ENTRE NO VIP 👑
-"""
-
 FRASES = [
 """🚨 VOCÊ AINDA NÃO VIU TUDO! 🚨
 
@@ -89,7 +83,14 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     mensagem = update.message.reply_to_message
 
-    legenda = random.choice(FRASES)
+    legenda_automatica = random.choice(FRASES)
+
+    legenda_manual = mensagem.caption if mensagem.caption else ""
+
+    if legenda_manual:
+        legenda = legenda_automatica + "\n\n" + legenda_manual
+    else:
+        legenda = legenda_automatica
 
     await context.bot.copy_message(
         chat_id=GROUP_ID,
@@ -143,7 +144,19 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    legenda = random.choice(FRASES)
+    legenda_automatica = random.choice(FRASES)
+
+    legenda_manual = ""
+
+    for item in albuns[grupo]:
+        if item.caption:
+            legenda_manual = item.caption
+            break
+
+    if legenda_manual:
+        legenda = legenda_automatica + "\n\n" + legenda_manual
+    else:
+        legenda = legenda_automatica
 
     midias = []
 
@@ -170,12 +183,6 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_media_group(
         chat_id=GROUP_ID,
         media=midias
-    )
-
-    await context.bot.send_message(
-        chat_id=GROUP_ID,
-        text="🔥 ENTRE NO VIP 🔥",
-        reply_markup=botoes_vip()
     )
 
     del albuns[grupo]
