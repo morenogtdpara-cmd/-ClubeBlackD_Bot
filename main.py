@@ -27,10 +27,13 @@ OWNER_ID = 8880948641
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
 # ==============================
-# LEGENDA FIXA
+# LEGENDA DO ÁLBUM
 # ==============================
 
-LEGENDA_FIXA = ""
+LEGENDA_FIXA = """
+🔥 ACESSE NOSSO CANAL OFICIAL DE VENDAS:
+@ClubeBlackBot
+"""
 
 albuns = {}
 
@@ -63,116 +66,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ==============================
-# GERENCIAR MENSAGENS
-# ==============================
-
-async def mensagens(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    if not MENSAGENS:
-        await update.message.reply_text(
-            "📝 Nenhuma mensagem cadastrada."
-        )
-        return
-
-    texto = "📝 Mensagens salvas:\n\n"
-
-    for numero, mensagem in MENSAGENS.items():
-        texto += f"{numero}️⃣ {mensagem[:60]}\n\n"
-
-    await update.message.reply_text(texto)
-
-async def adicionar_mensagem(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    if not context.args:
-        await update.message.reply_text(
-            "Use:\n/adicionar sua mensagem"
-        )
-        return
-
-    numero = str(len(MENSAGENS) + 1)
-
-    MENSAGENS[numero] = " ".join(context.args)
-
-    salvar_mensagens()
-
-    await update.message.reply_text(
-        f"✅ Mensagem {numero} adicionada!"
-    )
-
-async def editar_mensagem(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    if len(context.args) < 2:
-        await update.message.reply_text(
-            "Use:\n/editar número nova mensagem"
-        )
-        return
-
-    numero = context.args[0]
-
-    if numero not in MENSAGENS:
-        await update.message.reply_text(
-            "⚠️ Mensagem não encontrada."
-        )
-        return
-
-    MENSAGENS[numero] = " ".join(context.args[1:])
-
-    salvar_mensagens()
-
-    await update.message.reply_text(
-        "✅ Mensagem editada!"
-    )
-
-async def apagar_mensagem(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    if not context.args:
-        return
-
-    numero = context.args[0]
-
-    if numero in MENSAGENS:
-
-        del MENSAGENS[numero]
-
-        salvar_mensagens()
-
-        await update.message.reply_text(
-            "🗑️ Mensagem apagada!"
-        )
-
-async def usar_mensagem(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    global mensagem_escolhida
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    if not context.args:
-        return
-
-    numero = context.args[0]
-
-    if numero in MENSAGENS:
-
-        mensagem_escolhida = MENSAGENS[numero]
-
-        await update.message.reply_text(
-            f"✅ Mensagem {numero} selecionada!"
-        )
-
-# ==============================
 # DIVULGAR
 # ==============================
 
@@ -186,12 +79,10 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     mensagem = update.message.reply_to_message
 
-    legenda = LEGENDA_FIXA
+    legenda = ""
 
     if mensagem.caption:
-
-        if mensagem.caption:
-            legenda = (legenda + "\n\n" if legenda else "") + mensagem.caption
+        legenda = mensagem.caption
 
     await context.bot.copy_message(
         chat_id=GROUP_ID,
@@ -206,7 +97,7 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ==============================
-# ÁLBUM
+# RECEBER ÁLBUM
 # ==============================
 
 async def receber_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -226,7 +117,9 @@ async def receber_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     albuns[grupo].append(mensagem)
 
-    await asyncio.sleep(3)
+# ==============================
+# DIVULGAR ÁLBUM
+# ==============================
 
 async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -244,9 +137,14 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    midias = []
+    texto = " ".join(context.args)
 
-    legenda = LEGENDA_FIXA
+    if texto:
+        legenda = texto + "\n\n" + LEGENDA_FIXA.strip()
+    else:
+        legenda = LEGENDA_FIXA.strip()
+
+    midias = []
 
     for i, item in enumerate(albuns[grupo]):
 
@@ -280,6 +178,22 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ==============================
+# MENU
+# ==============================
+
+async def configurar_menu(app):
+
+    comandos = [
+
+        BotCommand("start", "BOT ON ✅"),
+        BotCommand("divulgar", "DIVULGAR 🔥"),
+        BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️")
+
+    ]
+
+    await app.bot.set_my_commands(comandos)
+
+# ==============================
 # VIP
 # ==============================
 
@@ -295,22 +209,6 @@ async def entrarnovip(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ==============================
-# MENU
-# ==============================
-
-async def configurar_menu(app):
-
-    comandos = [
-
-        BotCommand("start", "BOT ON ✅"),
-        BotCommand("divulgar", "DIVULGAR 🔥"),
-        BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️"),
-        BotCommand("entrarnovip", "🔥 VIP")
-    ]
-
-    await app.bot.set_my_commands(comandos)
-
-# ==============================
 # BOT
 # ==============================
 
@@ -323,9 +221,10 @@ app = (
 )
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("divulgar", divulgar))
-app.add_handler(CommandHandler("d_album", d_album))
 
+app.add_handler(CommandHandler("divulgar", divulgar))
+
+app.add_handler(CommandHandler("d_album", d_album))
 
 app.add_handler(CommandHandler("entrarnovip", entrarnovip))
 
