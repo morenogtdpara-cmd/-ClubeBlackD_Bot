@@ -1,5 +1,4 @@
 import os
-import random
 import asyncio
 
 from telegram import (
@@ -25,33 +24,26 @@ OWNER_ID = 8880948641
 
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
-FRASES = [
-"""🚨 VOCÊ AINDA NÃO VIU TUDO! 🚨
+# ==============================
+# MENSAGENS PERSONALIZADAS
+# ==============================
 
-Tem novidades chegando e muita coisa preparada para quem gosta de acompanhar conteúdos diferenciados.
+MENSAGENS = {
+    1: "🔥 NOVO CONTEÚDO LIBERADO 🔥\n\nConfira agora!",
+    2: "🚀 NOVIDADE CHEGANDO!\n\nAcesse agora!",
+    3: "💎 Conteúdo especial disponível."
+}
 
-Confira agora!""",
-
-"""🔥 ACESSO LIBERADO! 🔥
-
-Uma nova experiência está disponível.
-
-🚀 Confira agora!""",
-
-"""👀 CURIOSO PARA SABER O QUE TEM AQUI? 👀
-
-Muita coisa nova chegando para quem acompanha.
-
-💎 Acesse agora!""",
-
-"""🚀 NOVIDADES CHEGANDO TODOS OS DIAS! 🚀
-
-Um espaço atualizado, organizado e preparado para quem busca algo diferente."""
-]
+mensagem_atual = 1
 
 albuns = {}
 
+# ==============================
+# BOTÃO VIP
+# ==============================
+
 def botoes_vip():
+
     return InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
@@ -60,6 +52,10 @@ def botoes_vip():
             )
         ]
     ])
+
+# ==============================
+# START
+# ==============================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -70,12 +66,61 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "BOT ON ✅\n\nUse /divulgar ou /d_album para enviar uma postagem."
     )
 
+# ==============================
+# ESCOLHER MENSAGEM
+# ==============================
+
+async def escolher_mensagem(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    global mensagem_atual
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    comando = update.message.text.replace("/mensagem", "")
+
+    if comando.isdigit():
+
+        numero = int(comando)
+
+        if numero in MENSAGENS:
+
+            mensagem_atual = numero
+
+            await update.message.reply_text(
+                f"✅ Mensagem {numero} selecionada!"
+            )
+
+        else:
+
+            await update.message.reply_text(
+                "⚠️ Essa mensagem não existe."
+            )
+
+# ==============================
+# ENTRAR VIP
+# ==============================
+
+async def entrarvip(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    await update.message.reply_text(
+        f"🔥 ENTRAR NO VIP 🔥\n\n{VIP_LINK}"
+    )
+
+# ==============================
+# DIVULGAR
+# ==============================
+
 async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if update.effective_user.id != OWNER_ID:
         return
 
     if not update.message.reply_to_message:
+
         await update.message.reply_text(
             "⚠️ Responda uma foto ou vídeo usando /divulgar."
         )
@@ -83,14 +128,11 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     mensagem = update.message.reply_to_message
 
-    legenda_automatica = random.choice(FRASES)
+    legenda = MENSAGENS[mensagem_atual]
 
-    legenda_manual = mensagem.caption if mensagem.caption else ""
+    if mensagem.caption:
 
-    if legenda_manual:
-        legenda = legenda_automatica + "\n\n" + legenda_manual
-    else:
-        legenda = legenda_automatica
+        legenda += "\n\n" + mensagem.caption
 
     await context.bot.copy_message(
         chat_id=GROUP_ID,
@@ -103,6 +145,10 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "✅ Divulgação enviada!"
     )
+
+# ==============================
+# RECEBER ÁLBUM
+# ==============================
 
 async def receber_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -117,11 +163,16 @@ async def receber_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
     grupo = mensagem.media_group_id
 
     if grupo not in albuns:
+
         albuns[grupo] = []
 
     albuns[grupo].append(mensagem)
 
     await asyncio.sleep(3)
+
+# ==============================
+# DIVULGAR ÁLBUM
+# ==============================
 
 async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -144,19 +195,21 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    legenda_automatica = random.choice(FRASES)
+    legenda = MENSAGENS[mensagem_atual]
 
     legenda_manual = ""
 
     for item in albuns[grupo]:
+
         if item.caption:
+
             legenda_manual = item.caption
+
             break
 
     if legenda_manual:
-        legenda = legenda_automatica + "\n\n" + legenda_manual
-    else:
-        legenda = legenda_automatica
+
+        legenda += "\n\n" + legenda_manual
 
     midias = []
 
@@ -191,15 +244,55 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✅ Álbum divulgado!"
     )
 
+# ==============================
+# CONFIGURAR MENU
+# ==============================
+
 async def configurar_menu(app):
 
     comandos = [
-        BotCommand("start", "BOT ON ✅"),
-        BotCommand("divulgar", "DIVULGAR 🔥"),
-        BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️")
+
+        BotCommand(
+            "start",
+            "BOT ON ✅"
+        ),
+
+        BotCommand(
+            "divulgar",
+            "DIVULGAR 🔥"
+        ),
+
+        BotCommand(
+            "d_album",
+            "DIVULGAR ÁLBUM 🖼️"
+        ),
+
+        BotCommand(
+            "mensagem1",
+            "Usar mensagem 1"
+        ),
+
+        BotCommand(
+            "mensagem2",
+            "Usar mensagem 2"
+        ),
+
+        BotCommand(
+            "mensagem3",
+            "Usar mensagem 3"
+        ),
+
+        BotCommand(
+            "entrarvip",
+            "🔥 ENTRAR NO VIP 🔥"
+        )
     ]
 
     await app.bot.set_my_commands(comandos)
+
+# ==============================
+# CRIAR BOT
+# ==============================
 
 app = (
     Application
@@ -208,6 +301,10 @@ app = (
     .post_init(configurar_menu)
     .build()
 )
+
+# ==============================
+# COMANDOS
+# ==============================
 
 app.add_handler(
     CommandHandler(
@@ -229,6 +326,28 @@ app.add_handler(
         d_album
     )
 )
+
+app.add_handler(
+    CommandHandler(
+        "entrarvip",
+        entrarvip
+    )
+)
+
+# ==============================
+# MENSAGENS 1, 2, 3
+# ==============================
+
+app.add_handler(
+    MessageHandler(
+        filters.Regex("^/mensagem[0-9]+$"),
+        escolher_mensagem
+    )
+)
+
+# ==============================
+# RECEBER MÍDIAS
+# ==============================
 
 app.add_handler(
     MessageHandler(
