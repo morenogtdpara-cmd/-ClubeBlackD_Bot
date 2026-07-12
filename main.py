@@ -55,51 +55,18 @@ Muita gente já está acompanhando as novidades. Não fique de fora, venha confe
 
 Um espaço atualizado, organizado e preparado para quem busca algo diferente.
 
-🔥 Entre agora e acompanhe tudo de perto!""",
-
-"""💎 NÃO PERCA ESSA OPORTUNIDADE! 💎
-
-Estamos sempre trazendo novidades e melhorias para entregar uma experiência cada vez melhor para quem participa.
-
-⚡ Venha conhecer!""",
-
-"""⚡ VOCÊ ESTÁ A UM CLIQUE DE DESCOBRIR! ⚡
-
-Tudo preparado para quem gosta de novidades e quer acompanhar conteúdos atualizados em um só lugar.
-
-🚀 Confira agora!""",
-
-"""👑 UM ESPAÇO PARA QUEM PROCURA ALGO A MAIS! 👑
-
-Entre e conheça uma comunidade que está crescendo todos os dias com novidades e atualizações constantes.
-
-🔥 Faça parte!""",
-
-"""🔥 TEM MUITA COISA ACONTECENDO POR AQUI! 🔥
-
-Não deixe para depois. Confira agora as novidades e veja o que está disponível.
-
-👀 Entre agora!""",
-
-"""🚨 NOVAS ATUALIZAÇÕES DISPONÍVEIS! 🚨
-
-Estamos trazendo conteúdos renovados e deixando tudo ainda mais completo para quem acompanha.
-
-💎 Confira!""",
-
-"""🌟 A EXPERIÊNCIA QUE VOCÊ ESTAVA PROCURANDO! 🌟
-
-Organização, novidades e atualizações em um só lugar.
-
-🚀 Faça parte agora!"""
+🔥 Entre agora e acompanhe tudo de perto!"""
 ]
 
 
-albuns = {}def botoes_vip():
+albuns = {}
+
+
+def botoes_vip():
     return InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
-                "🔥ENTRAR NO VIP 🔥",
+                "🔥 ENTRAR NO VIP 🔥",
                 url=VIP_LINK
             )
         ]
@@ -107,6 +74,7 @@ albuns = {}def botoes_vip():
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     if update.effective_user.id != OWNER_ID:
         return
 
@@ -116,6 +84,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     if update.effective_user.id != OWNER_ID:
         return
 
@@ -143,6 +112,7 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def receber_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     if update.effective_user.id != OWNER_ID:
         return
 
@@ -151,35 +121,45 @@ async def receber_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not mensagem.media_group_id:
         return
 
-    if mensagem.media_group_id not in albuns:
-        albuns[mensagem.media_group_id] = []
+    grupo = mensagem.media_group_id
 
-    albuns[mensagem.media_group_id].append(mensagem)
+    if grupo not in albuns:
+        albuns[grupo] = []
 
-    await asyncio.sleep(2)
+    albuns[grupo].append(mensagem)
 
 
 async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     if update.effective_user.id != OWNER_ID:
         return
 
     if not update.message.reply_to_message:
+
         await update.message.reply_text(
             "⚠️ Responda o álbum usando /d_album."
         )
+
         return
+
 
     grupo = update.message.reply_to_message.media_group_id
 
+
     if not grupo or grupo not in albuns:
+
         await update.message.reply_text(
-            "⚠️ Álbum não encontrado. Envie o álbum e aguarde."
+            "⚠️ Álbum não encontrado. Envie o álbum, aguarde alguns segundos e responda usando /d_album."
         )
+
         return
+
 
     legenda = random.choice(FRASES) + "\n\n" + MENSAGEM_EXTRA
 
+
     for i, item in enumerate(albuns[grupo]):
+
         await context.bot.copy_message(
             chat_id=GROUP_ID,
             from_chat_id=item.chat.id,
@@ -188,35 +168,76 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=botoes_vip() if i == 0 else None
         )
 
+
     del albuns[grupo]
+
 
     await update.message.reply_text(
         "✅ Álbum divulgado!"
-    )async def configurar_menu(app):
+    )
+
+
+async def configurar_menu(app):
+
     comandos = [
+
         BotCommand("start", "BOT ON ✅"),
+
         BotCommand("divulgar", "DIVULGAR 🔥"),
+
         BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️")
+
     ]
 
     await app.bot.set_my_commands(comandos)
 
 
-app = Application.builder().token(BOT_TOKEN).post_init(configurar_menu).build()
+
+app = (
+    Application
+    .builder()
+    .token(BOT_TOKEN)
+    .post_init(configurar_menu)
+    .build()
+)
 
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("divulgar", divulgar))
-app.add_handler(CommandHandler("d_album", d_album))
+
+app.add_handler(
+    CommandHandler(
+        "start",
+        start
+    )
+)
+
+
+app.add_handler(
+    CommandHandler(
+        "divulgar",
+        divulgar
+    )
+)
+
+
+app.add_handler(
+    CommandHandler(
+        "d_album",
+        d_album
+    )
+)
+
+
 
 app.add_handler(
     MessageHandler(
-        filters.ALL,
+        filters.PHOTO | filters.VIDEO,
         receber_album
     )
 )
 
 
-print("Bot iniciado")
+
+print("Bot iniciado ✅")
+
 
 app.run_polling()
