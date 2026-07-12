@@ -1,5 +1,4 @@
 import os
-import json
 import asyncio
 
 from telegram import (
@@ -28,44 +27,10 @@ OWNER_ID = 8880948641
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
 # ==============================
-# BANCO DE MENSAGENS
+# LEGENDA FIXA
 # ==============================
 
-ARQUIVO_MENSAGENS = "mensagens.json"
-
-def carregar_mensagens():
-
-    try:
-        with open(
-            ARQUIVO_MENSAGENS,
-            "r",
-            encoding="utf-8"
-        ) as arquivo:
-
-            return json.load(arquivo)
-
-    except:
-
-        return {}
-
-def salvar_mensagens():
-
-    with open(
-        ARQUIVO_MENSAGENS,
-        "w",
-        encoding="utf-8"
-    ) as arquivo:
-
-        json.dump(
-            MENSAGENS,
-            arquivo,
-            ensure_ascii=False,
-            indent=4
-        )
-
-MENSAGENS = carregar_mensagens()
-
-mensagem_escolhida = None
+LEGENDA_FIXA = ""
 
 albuns = {}
 
@@ -221,14 +186,12 @@ async def divulgar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     mensagem = update.message.reply_to_message
 
-    legenda = mensagem_escolhida or ""
+    legenda = LEGENDA_FIXA
 
     if mensagem.caption:
 
-        if legenda:
-            legenda += "\n\n"
-
-        legenda += mensagem.caption
+        if mensagem.caption:
+            legenda = (legenda + "\n\n" if legenda else "") + mensagem.caption
 
     await context.bot.copy_message(
         chat_id=GROUP_ID,
@@ -283,7 +246,7 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     midias = []
 
-    legenda = mensagem_escolhida or ""
+    legenda = LEGENDA_FIXA
 
     for i, item in enumerate(albuns[grupo]):
 
@@ -342,11 +305,6 @@ async def configurar_menu(app):
         BotCommand("start", "BOT ON ✅"),
         BotCommand("divulgar", "DIVULGAR 🔥"),
         BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️"),
-        BotCommand("mensagens", "VER MENSAGENS 📝"),
-        BotCommand("adicionar", "➕ ADICIONAR"),
-        BotCommand("editar", "✏️ EDITAR"),
-        BotCommand("usar", "✅ USAR"),
-        BotCommand("apagar", "🗑️ APAGAR"),
         BotCommand("entrarnovip", "🔥 VIP")
     ]
 
@@ -368,11 +326,6 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("divulgar", divulgar))
 app.add_handler(CommandHandler("d_album", d_album))
 
-app.add_handler(CommandHandler("mensagens", mensagens))
-app.add_handler(CommandHandler("adicionar", adicionar_mensagem))
-app.add_handler(CommandHandler("editar", editar_mensagem))
-app.add_handler(CommandHandler("usar", usar_mensagem))
-app.add_handler(CommandHandler("apagar", apagar_mensagem))
 
 app.add_handler(CommandHandler("entrarnovip", entrarnovip))
 
