@@ -1,70 +1,3 @@
-import os
-import asyncio
-
-from telegram import (
-    Update,
-    BotCommand,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    InputMediaPhoto,
-    InputMediaVideo
-)
-
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    filters
-)
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-GROUP_ID = -1004231485932
-
-OWNER_ID = 8880948641
-
-VIP_LINK = "https://t.me/ClubeBlackBot"
-
-# ==============================
-# LEGENDA DO ÁLBUM
-# ==============================
-
-LEGENDA_FIXA = """
-🔥 ACESSE NOSSO CANAL OFICIAL DE VENDAS:
-@ClubeBlackBot
-"""
-
-albuns = {}
-
-# ==============================
-# BOTÃO VIP
-# ==============================
-
-def botoes_vip():
-
-    return InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton(
-                "🔥 ENTRAR NO VIP 🔥",
-                url=VIP_LINK
-            )
-        ]
-    ])
-
-# ==============================
-# START
-# ==============================
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    await update.message.reply_text(
-        "BOT ON ✅\n\nUse /divulgar ou /d_album."
-    )
-
 # ==============================
 # DIVULGAR
 # ==============================
@@ -137,7 +70,7 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    texto = " ".join(context.args)
+    texto = update.message.text.replace("/d_album", "").strip()
 
     if texto:
         legenda = texto + "\n\n" + LEGENDA_FIXA.strip()
