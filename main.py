@@ -1,5 +1,9 @@
 import os
 import asyncio
+import json
+
+from datetime import datetime
+from pathlib import Path
 
 from telegram import (
     Update,
@@ -40,6 +44,42 @@ LEGENDA_FIXA = """
 albuns = {}
 
 # ==============================
+# AGENDAMENTO AUTOMÁTICO
+# ==============================
+
+ARQUIVO_AGENDAMENTOS = "agendamentos.json"
+
+def carregar_agendamentos():
+
+    if not Path(ARQUIVO_AGENDAMENTOS).exists():
+        return []
+
+    with open(
+        ARQUIVO_AGENDAMENTOS,
+        "r",
+        encoding="utf-8"
+    ) as arquivo:
+
+        return json.load(arquivo)
+
+def salvar_agendamentos(lista):
+
+    with open(
+        ARQUIVO_AGENDAMENTOS,
+        "w",
+        encoding="utf-8"
+    ) as arquivo:
+
+        json.dump(
+            lista,
+            arquivo,
+            indent=4,
+            ensure_ascii=False
+        )
+
+agendamentos = carregar_agendamentos()
+
+# ==============================
 # BOTÃO VIP
 # ==============================
 
@@ -64,7 +104,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "BOT ON ✅\n\nUse /divulgar ou /d_album."
+        "BOT ON ✅\n\nUse /divulgar, /d_album ou /agendar."
     )
 
 # ==============================
@@ -126,17 +166,19 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
     grupo = update.message.reply_to_message.media_group_id
 
     if not grupo or grupo not in albuns:
+
         await update.message.reply_text(
             "⚠️ Álbum não encontrado."
         )
+
         return
 
     texto = ""
 
-    # procura a legenda que veio junto com as mídias
     for item in albuns[grupo]:
 
         if item.caption:
+
             texto = item.caption.strip()
             break
 
@@ -188,6 +230,106 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ==============================
+# AGENDAR PUBLICAÇÃO
+# ==============================
+
+async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    if not update.message.reply_to_message:
+
+        await update.message.reply_text(
+            "⚠️ Responda a publicação e use /agendar HH:MM"
+        )
+
+        return
+
+    if not context.args:
+
+        await update.message.reply_text(
+            "⚠️ Exemplo: /agendar 08:00"
+        )
+
+        return
+
+    horario = context.args[0]
+
+    try:
+
+        datetime.strptime(
+            horario,
+            "%H:%M"
+        )
+
+    except:
+
+        await update.message.reply_text(
+            "⚠️ Horário inválido."
+        )
+
+        return
+
+    mensagem = update.message.reply_to_message
+
+    agendamentos.append({
+
+        "horario": horario,
+        "chat_id": mensagem.chat.id,
+        "message_id": mensagem.message_id
+
+    })
+
+    salvar_agendamentos(
+        agendamentos
+    )
+
+    await update.message.reply_text(
+        f"✅ Agendado para {horario}"
+    )
+
+# ==============================
+# VERIFICAR AGENDAMENTOS
+# ==============================
+
+async def verificar_agendamentos(
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    agora = datetime.now().strftime("%H:%M")
+
+    enviados = []
+
+    for item in agendamentos.copy():
+
+        if item["horario"] == agora:
+
+            await context.bot.copy_message(
+
+                chat_id=GROUP_ID,
+
+                from_chat_id=item["chat_id"],
+
+                message_id=item["message_id"],
+
+                reply_markup=botoes_vip()
+
+            )
+
+            enviados.append(item)
+
+    for item in enviados:
+
+        agendamentos.remove(item)
+
+    if enviados:
+
+        salvar_agendamentos(
+            agendamentos
+        )
+
+# ==============================
 # MENU
 # ==============================
 
@@ -197,11 +339,15 @@ async def configurar_menu(app):
 
         BotCommand("start", "BOT ON ✅"),
         BotCommand("divulgar", "DIVULGAR 🔥"),
-        BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️")
+        BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️"),
+        BotCommand("entrarnovip", "BOTÃO VIP"),
+        BotCommand("agendar", "AGENDAR DIVULGAÇÃO ⏰")
 
     ]
 
-    await app.bot.set_my_commands(comandos)
+    await app.bot.set_my_commands(
+        comandos
+    )
 
 # ==============================
 # VIP
@@ -213,9 +359,13 @@ async def entrarnovip(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await context.bot.send_message(
+
         chat_id=GROUP_ID,
+
         text="",
+
         reply_markup=botoes_vip()
+
     )
 
 # ==============================
@@ -223,26 +373,74 @@ async def entrarnovip(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ==============================
 
 app = (
+
     Application
+
     .builder()
+
     .token(BOT_TOKEN)
+
     .post_init(configurar_menu)
+
     .build()
+
 )
 
-app.add_handler(CommandHandler("start", start))
-
-app.add_handler(CommandHandler("divulgar", divulgar))
-
-app.add_handler(CommandHandler("d_album", d_album))
-
-app.add_handler(CommandHandler("entrarnovip", entrarnovip))
+app.add_handler(
+    CommandHandler(
+        "start",
+        start
+    )
+)
 
 app.add_handler(
-    MessageHandler(
-        filters.PHOTO | filters.VIDEO,
-        receber_album
+    CommandHandler(
+        "divulgar",
+        divulgar
     )
+)
+
+app.add_handler(
+    CommandHandler(
+        "d_album",
+        d_album
+    )
+)
+
+app.add_handler(
+    CommandHandler(
+        "entrarnovip",
+        entrarnovip
+    )
+)
+
+app.add_handler(
+    CommandHandler(
+        "agendar",
+        agendar_publicacao
+    )
+)
+
+app.add_handler(
+
+    MessageHandler(
+
+        filters.PHOTO | filters.VIDEO,
+
+        receber_album
+
+    )
+
+)
+
+app.job_queue.run_repeating(
+
+    verificar_agendamentos,
+
+    interval=30,
+
+    first=10
+
 )
 
 print("Bot iniciado ✅")
