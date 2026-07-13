@@ -133,7 +133,6 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     texto = ""
 
-    # procura a legenda que veio junto com as mídias
     for item in albuns[grupo]:
 
         if item.caption:
@@ -188,6 +187,27 @@ async def d_album(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ==============================
+# DIVULGAÇÃO AUTOMÁTICA
+# ==============================
+
+MENSAGEM_TESTE = """
+🧪 TESTE DE DIVULGAÇÃO AUTOMÁTICA
+
+Se você está vendo esta mensagem, a automação está funcionando corretamente. ✅
+
+🔥 Entre no VIP:
+@ClubeBlackBot
+"""
+
+async def divulgacao_automatica(context: ContextTypes.DEFAULT_TYPE):
+
+    await context.bot.send_message(
+        chat_id=GROUP_ID,
+        text=MENSAGEM_TESTE.strip(),
+        reply_markup=botoes_vip()
+    )
+
+# ==============================
 # MENU
 # ==============================
 
@@ -202,6 +222,18 @@ async def configurar_menu(app):
     ]
 
     await app.bot.set_my_commands(comandos)
+
+    app.job_queue.run_daily(
+        divulgacao_automatica,
+        time=(18, 22),
+        name="teste_1822"
+    )
+
+    app.job_queue.run_daily(
+        divulgacao_automatica,
+        time=(18, 25),
+        name="teste_1825"
+    )
 
 # ==============================
 # VIP
@@ -231,11 +263,8 @@ app = (
 )
 
 app.add_handler(CommandHandler("start", start))
-
 app.add_handler(CommandHandler("divulgar", divulgar))
-
 app.add_handler(CommandHandler("d_album", d_album))
-
 app.add_handler(CommandHandler("entrarnovip", entrarnovip))
 
 app.add_handler(
