@@ -432,7 +432,7 @@ app.add_handler(
     )
 
 )
-
+print(app.job_queue)
 app.job_queue.run_repeating(
 
     verificar_agendamentos,
