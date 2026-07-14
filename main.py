@@ -378,7 +378,6 @@ async def configurar_menu(app):
         BotCommand("start", "BOT ON ✅"),
         BotCommand("divulgar", "DIVULGAR 🔥"),
         BotCommand("d_album", "DIVULGAR ÁLBUM 🖼️"),
-        BotCommand("entrarnovip", "BOTÃO VIP"),
         BotCommand("agendar", "AGENDAR DIVULGAÇÃO ⏰")
 
     ]
