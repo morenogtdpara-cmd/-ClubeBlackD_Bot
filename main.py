@@ -272,23 +272,86 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         return
 
+
     mensagem = update.message.reply_to_message
+
+
+    # ==============================
+    # ÁLBUM AGENDADO
+    # ==============================
+
+    if mensagem.media_group_id:
+
+        grupo = mensagem.media_group_id
+
+
+        if grupo not in albuns:
+
+            await update.message.reply_text(
+                "⚠️ Álbum não encontrado."
+            )
+
+            return
+
+
+        mensagens_album = []
+
+
+        for item in albuns[grupo]:
+
+            mensagens_album.append(
+                item.message_id
+            )
+
+
+        agendamentos.append({
+
+            "horario": horario,
+            "tipo": "album",
+            "chat_id": mensagem.chat.id,
+            "mensagens": mensagens_album
+
+        })
+
+
+        salvar_agendamentos(
+            agendamentos
+        )
+
+
+        await update.message.reply_text(
+            f"✅ Álbum agendado com sucesso!\n\n"
+            f"📅 Horário: {horario}\n"
+            f"🖼️ Tipo: Álbum"
+        )
+
+        return
+
+
+    # ==============================
+    # MÍDIA NORMAL
+    # ==============================
 
     agendamentos.append({
 
         "horario": horario,
+        "tipo": "publicacao",
         "chat_id": mensagem.chat.id,
         "message_id": mensagem.message_id
 
     })
-    salvar_agendamentos(agendamentos)
-    print("AGENDAMENTOS SALVOS:", agendamentos)
+
+
+    salvar_agendamentos(
+        agendamentos
+    )
+
 
     await update.message.reply_text(
-    f"✅ Agendado com sucesso!\n\n"
-    f"📅 Horário: {horario}\n"
-    f"📢 Tipo: Publicação"
-)
+        f"✅ Agendado com sucesso!\n\n"
+        f"📅 Horário: {horario}\n"
+        f"📢 Tipo: Publicação"
+    )
 
 # ==============================
 # VERIFICAR AGENDAMENTOS
