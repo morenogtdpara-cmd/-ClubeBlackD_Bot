@@ -288,7 +288,7 @@ salvar_agendamentos(
     agendamentos
 )
 
-print("AGENDAMENTOS SALVOS:", agendamentos)
+    print("AGENDAMENTOS SALVOS:", agendamentos)
     await update.message.reply_text(
         f"✅ Agendado para {horario}"
     )
