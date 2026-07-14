@@ -322,15 +322,17 @@ async def verificar_agendamentos(
 
                 )
 
-                print("PUBLICAÇÃO ENVIADA ✅")
+                                print("PUBLICAÇÃO ENVIADA ✅")
+
                 await context.bot.send_message(
-    chat_id=OWNER_ID,
-    text=(
-        "✅ Publicação enviada com sucesso!\n\n"
-        f"📅 Horário: {agora}\n"
-        "📢 Tipo: Publicação"
-    )
-)
+                    chat_id=OWNER_ID,
+                    text=(
+                        "✅ Publicação enviada com sucesso!\n\n"
+                        f"📅 Horário: {agora}\n"
+                        "📢 Tipo: Publicação"
+                    )
+                )
+
                 agendamentos.remove(item)
 
                 salvar_agendamentos(
