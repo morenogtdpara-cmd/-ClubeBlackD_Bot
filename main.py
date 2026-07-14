@@ -363,83 +363,96 @@ async def verificar_agendamentos(
 
     print("VERIFICANDO AGENDAMENTOS")
 
-    agora = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M")
-    
-    print("HORA ATUAL:", agora)
-    print("LISTA DE AGENDAMENTOS:", agendamentos)
+    agora = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    ).strftime("%H:%M")
+
+
     for item in agendamentos.copy():
 
-        if item["horario"] == agora:
+        if item["horario"] != agora:
+            continue
 
-            try:
+
+        try:
+
+            if item.get("tipo") == "album":
+
+                midias = []
+
+                for mensagem_id in item["mensagens"]:
+
+                    mensagem = await context.bot.forward_message(
+                        chat_id=OWNER_ID,
+                        from_chat_id=item["chat_id"],
+                        message_id=mensagem_id
+                    )
+
+                    if mensagem.photo:
+
+                        midias.append(
+                            InputMediaPhoto(
+                                media=mensagem.photo[-1].file_id
+                            )
+                        )
+
+                    elif mensagem.video:
+
+                        midias.append(
+                            InputMediaVideo(
+                                media=mensagem.video.file_id
+                            )
+                        )
+
+
+                if midias:
+
+                    midias[0].caption = LEGENDA_FIXA.strip()
+
+                    await context.bot.send_media_group(
+                        chat_id=GROUP_ID,
+                        media=midias
+                    )
+
+
+                print("ÁLBUM ENVIADO ✅")
+
+
+            else:
 
                 await context.bot.copy_message(
-
                     chat_id=GROUP_ID,
-
                     from_chat_id=item["chat_id"],
-
                     message_id=item["message_id"],
-
                     reply_markup=botoes_vip()
-
                 )
 
-                                
                 print("PUBLICAÇÃO ENVIADA ✅")
-                await context.bot.send_message(
-                    chat_id=OWNER_ID,
-                    text=(
-                        "✅ Publicação enviada com sucesso!\n\n"
-                        f"📅 Horário: {agora}\n"
-                        "📢 Tipo: Publicação"
-                    )
+
+
+            await context.bot.send_message(
+                chat_id=OWNER_ID,
+                text=(
+                    "✅ Publicação enviada com sucesso!\n\n"
+                    f"📅 Horário: {agora}\n"
+                    f"📢 Tipo: {item.get('tipo', 'publicacao')}"
                 )
-
-                agendamentos.remove(item)
-
-                salvar_agendamentos(
-                    agendamentos
-                )
-
-            except Exception as e:
-
-                print(
-                    "ERRO AO ENVIAR PUBLICAÇÃO:",
-                    e
-                )
-    print("VERIFICANDO AGENDAMENTOS")
-    agora = datetime.now().strftime("%H:%M")
-
-    enviados = []
-
-    for item in agendamentos.copy():
-
-        if item["horario"] == agora:
-
-            await context.bot.copy_message(
-
-                chat_id=GROUP_ID,
-
-                from_chat_id=item["chat_id"],
-
-                message_id=item["message_id"],
-
-                reply_markup=botoes_vip()
-
             )
 
-            enviados.append(item)
 
-    for item in enviados:
+            agendamentos.remove(item)
 
-        agendamentos.remove(item)
+            salvar_agendamentos(
+                agendamentos
+            )
 
-    if enviados:
 
-        salvar_agendamentos(
-            agendamentos
-        )
+        except Exception as e:
+
+            print(
+                "ERRO AO ENVIAR AGENDAMENTO:",
+                e
+            )
 
 # ==============================
 # MENU
