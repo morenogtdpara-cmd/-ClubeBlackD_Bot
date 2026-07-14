@@ -296,6 +296,43 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def verificar_agendamentos(
     context: ContextTypes.DEFAULT_TYPE
 ):
+
+    print("VERIFICANDO AGENDAMENTOS")
+
+    agora = datetime.now().strftime("%H:%M")
+
+    for item in agendamentos.copy():
+
+        if item["horario"] == agora:
+
+            try:
+
+                await context.bot.copy_message(
+
+                    chat_id=GROUP_ID,
+
+                    from_chat_id=item["chat_id"],
+
+                    message_id=item["message_id"],
+
+                    reply_markup=botoes_vip()
+
+                )
+
+                print("PUBLICAÇÃO ENVIADA ✅")
+
+                agendamentos.remove(item)
+
+                salvar_agendamentos(
+                    agendamentos
+                )
+
+            except Exception as e:
+
+                print(
+                    "ERRO AO ENVIAR PUBLICAÇÃO:",
+                    e
+                )
     print("VERIFICANDO AGENDAMENTOS")
     agora = datetime.now().strftime("%H:%M")
 
