@@ -494,65 +494,49 @@ async def verificar_agendamentos(
             # ÁLBUM AUTOMÁTICO
             # ==============================
 
-            if item.get("tipo") == "album":
+           if item.get("tipo") == "album":
 
+    midias = []
 
-                midias = []
+    for item_midia in item["midias"]:
 
+        if item_midia["tipo"] == "foto":
 
+            midias.append(
 
-                for item_midia in item["midias"]:
+                InputMediaPhoto(
 
+                    media=item_midia["file_id"],
+                    caption=LEGENDA_FIXA.strip() if len(midias) == 0 else None
 
-                    if item_midia["tipo"] == "foto":
+                )
 
+            )
 
-                        midias.append(
+        elif item_midia["tipo"] == "video":
 
-                            InputMediaPhoto(
+            midias.append(
 
-                                media=item_midia["file_id"]
+                InputMediaVideo(
 
-                            )
+                    media=item_midia["file_id"],
+                    caption=LEGENDA_FIXA.strip() if len(midias) == 0 else None
 
-                        )
+                )
 
+            )
 
+    if midias:
 
-                    elif item_midia["tipo"] == "video":
+        await context.bot.send_media_group(
 
+            chat_id=GROUP_ID,
 
-                        midias.append(
+            media=midias
 
-                            InputMediaVideo(
+        )
 
-                                media=item_midia["file_id"]
-
-                            )
-
-                        )
-
-
-
-
-                if midias:
-
-
-                    midias[0].caption = LEGENDA_FIXA.strip()
-
-
-
-                    await context.bot.send_media_group(
-
-                        chat_id=GROUP_ID,
-
-                        media=midias
-
-                    )
-
-
-
-                print("ÁLBUM ENVIADO ✅")
+    print("ÁLBUM ENVIADO ✅")
 
 
 
