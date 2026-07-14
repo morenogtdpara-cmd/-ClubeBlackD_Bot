@@ -296,7 +296,7 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def verificar_agendamentos(
     context: ContextTypes.DEFAULT_TYPE
 ):
-
+    print("VERIFICANDO AGENDAMENTOS")
     agora = datetime.now().strftime("%H:%M")
 
     enviados = []
