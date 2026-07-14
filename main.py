@@ -23,7 +23,6 @@ from telegram.ext import (
     filters
 )
 
-
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 GROUP_ID = -1004231485932
@@ -31,7 +30,6 @@ GROUP_ID = -1004231485932
 OWNER_ID = 8880948641
 
 VIP_LINK = "https://t.me/ClubeBlackBot"
-
 
 # ==============================
 # LEGENDA FIXA
@@ -44,9 +42,7 @@ LEGENDA_FIXA = """
 @ClubeBlackBot
 """
 
-
 albuns = {}
-
 
 # ==============================
 # AGENDAMENTOS
@@ -54,13 +50,11 @@ albuns = {}
 
 ARQUIVO_AGENDAMENTOS = "agendamentos.json"
 
-
 def carregar_agendamentos():
 
     if not Path(ARQUIVO_AGENDAMENTOS).exists():
 
         return []
-
 
     with open(
         ARQUIVO_AGENDAMENTOS,
@@ -69,8 +63,6 @@ def carregar_agendamentos():
     ) as arquivo:
 
         return json.load(arquivo)
-
-
 
 def salvar_agendamentos(lista):
 
@@ -87,10 +79,7 @@ def salvar_agendamentos(lista):
             ensure_ascii=False
         )
 
-
 agendamentos = carregar_agendamentos()
-
-
 
 # ==============================
 # BOTÃO VIP
@@ -99,15 +88,17 @@ agendamentos = carregar_agendamentos()
 def botoes_vip():
 
     return InlineKeyboardMarkup([
+
         [
+
             InlineKeyboardButton(
                 "🔥 ENTRAR NO VIP 🔥",
                 url=VIP_LINK
             )
+
         ]
+
     ])
-
-
 
 # ==============================
 # START
@@ -122,12 +113,11 @@ async def start(
 
         return
 
-
     await update.message.reply_text(
+
         "BOT ON ✅\n\nUse /divulgar, /d_album ou /agendar."
+
     )
-
-
 
 # ==============================
 # RECEBER ÁLBUM
@@ -142,28 +132,23 @@ async def receber_album(
 
         return
 
-
     mensagem = update.message
-
 
     if not mensagem.media_group_id:
 
         return
 
-
     grupo = mensagem.media_group_id
-
 
     if grupo not in albuns:
 
         albuns[grupo] = []
 
+    if len(albuns[grupo]) < 10:
 
-    albuns[grupo].append(mensagem)
-
+        albuns[grupo].append(mensagem)
 
     await asyncio.sleep(3)
-
 
 # ==============================
 # DIVULGAR
@@ -178,14 +163,11 @@ async def divulgar(
 
         return
 
-
     if not update.message.reply_to_message:
 
         return
 
-
     mensagem = update.message.reply_to_message
-
 
     await context.bot.copy_message(
 
@@ -198,8 +180,6 @@ async def divulgar(
         reply_markup=botoes_vip()
 
     )
-
-
 
 # ==============================
 # DIVULGAR ÁLBUM MANUAL
@@ -214,33 +194,25 @@ async def d_album(
 
         return
 
-
     if not update.message.reply_to_message:
 
         return
 
-
     grupo = update.message.reply_to_message.media_group_id
-
 
     if not grupo or grupo not in albuns:
 
         await update.message.reply_text(
+
             "⚠️ Álbum não encontrado."
+
         )
 
         return
 
-
-
-    legenda = LEGENDA_FIXA.strip()
-
-
     midias = []
 
-
     for item in albuns[grupo]:
-
 
         if item.photo:
 
@@ -250,12 +222,13 @@ async def d_album(
 
                     media=item.photo[-1].file_id,
 
-                    caption=legenda if len(midias) == 0 else None
+                    caption=LEGENDA_FIXA.strip()
+                    if len(midias) == 0
+                    else None
 
                 )
 
             )
-
 
         elif item.video:
 
@@ -265,13 +238,13 @@ async def d_album(
 
                     media=item.video.file_id,
 
-                    caption=legenda if len(midias) == 0 else None
+                    caption=LEGENDA_FIXA.strip()
+                    if len(midias) == 0
+                    else None
 
                 )
 
             )
-
-
 
     if midias:
 
@@ -283,15 +256,13 @@ async def d_album(
 
         )
 
-
     del albuns[grupo]
 
-
     await update.message.reply_text(
+
         "✅ Álbum divulgado!"
+
     )
-
-
 
 # ==============================
 # AGENDAR PUBLICAÇÃO
@@ -306,28 +277,27 @@ async def agendar_publicacao(
 
         return
 
-
     if not update.message.reply_to_message:
 
         await update.message.reply_text(
+
             "⚠️ Responda a publicação e use /agendar HH:MM"
+
         )
 
         return
-
 
     if not context.args:
 
         await update.message.reply_text(
+
             "⚠️ Exemplo: /agendar 08:00"
+
         )
 
         return
 
-
-
     horario = context.args[0]
-
 
     try:
 
@@ -336,46 +306,39 @@ async def agendar_publicacao(
             "%H:%M"
         )
 
-
     except:
 
         await update.message.reply_text(
+
             "⚠️ Horário inválido."
+
         )
 
         return
 
-
-
     mensagem = update.message.reply_to_message
-
-
 
     # ==============================
     # ÁLBUM AGENDADO
     # ==============================
 
-
     if mensagem.media_group_id:
 
         grupo = mensagem.media_group_id
 
-
         if grupo not in albuns:
 
             await update.message.reply_text(
+
                 "⚠️ Álbum não encontrado."
+
             )
 
             return
 
-
-
         midias_album = []
 
-
         for item in albuns[grupo]:
-
 
             if item.photo:
 
@@ -387,7 +350,6 @@ async def agendar_publicacao(
 
                 })
 
-
             elif item.video:
 
                 midias_album.append({
@@ -398,36 +360,33 @@ async def agendar_publicacao(
 
                 })
 
-
-
         agendamentos.append({
 
             "horario": horario,
 
             "tipo": "album",
 
-            "chat_id": mensagem.chat.id,
+            "chat_id": GROUP_ID,
 
             "midias": midias_album
 
         })
 
-
         salvar_agendamentos(
+
             agendamentos
+
         )
 
-
         await update.message.reply_text(
+
             f"✅ Álbum agendado com sucesso!\n\n"
             f"📅 Horário: {horario}\n"
             f"🖼️ Tipo: Álbum"
+
         )
 
-
         return
-
-
 
     # ==============================
     # PUBLICAÇÃO SOLO AGENDADA
@@ -445,19 +404,19 @@ async def agendar_publicacao(
 
     })
 
-
     salvar_agendamentos(
+
         agendamentos
+
     )
 
-
     await update.message.reply_text(
+
         f"✅ Agendado com sucesso!\n\n"
         f"📅 Horário: {horario}\n"
         f"📢 Tipo: Publicação"
+
     )
-
-
 
 # ==============================
 # VERIFICAR AGENDAMENTOS
@@ -469,85 +428,83 @@ async def verificar_agendamentos(
 
     print("VERIFICANDO AGENDAMENTOS")
 
-
     agora = datetime.now(
+
         ZoneInfo("America/Sao_Paulo")
+
     ).strftime("%H:%M")
-
-
 
     for item in agendamentos.copy():
 
-        print("AGENDAMENTO ENCONTRADO:", item)
+        print(
+
+            "AGENDAMENTO ENCONTRADO:",
+
+            item
+
+        )
 
         if item["horario"] != agora:
 
             continue
 
-
-
         try:
 
+            if item.get("tipo") == "album":
 
+                midias = []
 
-            # ==============================
-            # ÁLBUM AUTOMÁTICO
-            # ==============================
+                for item_midia in item["midias"]:
 
-           if item.get("tipo") == "album":
+                    if item_midia["tipo"] == "foto":
 
-    midias = []
+                        midias.append(
 
-    for item_midia in item["midias"]:
+                            InputMediaPhoto(
 
-        if item_midia["tipo"] == "foto":
+                                media=item_midia["file_id"],
 
-            midias.append(
+                                caption=LEGENDA_FIXA.strip()
+                                if len(midias) == 0
+                                else None
 
-                InputMediaPhoto(
+                            )
 
-                    media=item_midia["file_id"],
-                    caption=LEGENDA_FIXA.strip() if len(midias) == 0 else None
+                        )
 
-                )
+                    elif item_midia["tipo"] == "video":
 
-            )
+                        midias.append(
 
-        elif item_midia["tipo"] == "video":
+                            InputMediaVideo(
 
-            midias.append(
+                                media=item_midia["file_id"],
 
-                InputMediaVideo(
+                                caption=LEGENDA_FIXA.strip()
+                                if len(midias) == 0
+                                else None
 
-                    media=item_midia["file_id"],
-                    caption=LEGENDA_FIXA.strip() if len(midias) == 0 else None
+                            )
 
-                )
+                        )
 
-            )
+                if midias:
 
-    if midias:
+                    await context.bot.send_media_group(
 
-        await context.bot.send_media_group(
+                        chat_id=GROUP_ID,
 
-            chat_id=GROUP_ID,
+                        media=midias
 
-            media=midias
+                    )
 
-        )
-
-    print("ÁLBUM ENVIADO ✅")
-
-
+                print("ÁLBUM ENVIADO ✅")
 
             else:
-
-
 
                 # ==============================
                 # SOLO AUTOMÁTICO
                 # ==============================
-
 
                 await context.bot.copy_message(
 
@@ -561,10 +518,7 @@ async def verificar_agendamentos(
 
                 )
 
-
                 print("PUBLICAÇÃO ENVIADA ✅")
-
-
 
             await context.bot.send_message(
 
@@ -582,11 +536,7 @@ async def verificar_agendamentos(
 
             )
 
-
-
             agendamentos.remove(item)
-
-
 
             salvar_agendamentos(
 
@@ -594,10 +544,7 @@ async def verificar_agendamentos(
 
             )
 
-
-
         except Exception as e:
-
 
             print(
 
@@ -606,7 +553,6 @@ async def verificar_agendamentos(
                 e
 
             )
-
 
 # ==============================
 # MENU
@@ -638,12 +584,11 @@ async def configurar_menu(app):
 
     ]
 
-
     await app.bot.set_my_commands(
+
         comandos
+
     )
-
-
 
 # ==============================
 # VIP
@@ -658,7 +603,6 @@ async def entrarnovip(
 
         return
 
-
     await context.bot.send_message(
 
         chat_id=GROUP_ID,
@@ -668,8 +612,6 @@ async def entrarnovip(
         reply_markup=botoes_vip()
 
     )
-
-
 
 # ==============================
 # BOT
@@ -689,8 +631,6 @@ app = (
 
 )
 
-
-
 app.add_handler(
 
     CommandHandler(
@@ -699,8 +639,6 @@ app.add_handler(
     )
 
 )
-
-
 
 app.add_handler(
 
@@ -711,8 +649,6 @@ app.add_handler(
 
 )
 
-
-
 app.add_handler(
 
     CommandHandler(
@@ -721,8 +657,6 @@ app.add_handler(
     )
 
 )
-
-
 
 app.add_handler(
 
@@ -733,8 +667,6 @@ app.add_handler(
 
 )
 
-
-
 app.add_handler(
 
     CommandHandler(
@@ -743,8 +675,6 @@ app.add_handler(
     )
 
 )
-
-
 
 app.add_handler(
 
@@ -758,8 +688,6 @@ app.add_handler(
 
 )
 
-
-
 app.job_queue.run_repeating(
 
     verificar_agendamentos,
@@ -770,10 +698,6 @@ app.job_queue.run_repeating(
 
 )
 
-
-
 print("Bot iniciado ✅")
-
-
 
 app.run_polling()
