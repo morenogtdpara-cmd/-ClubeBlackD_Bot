@@ -280,7 +280,7 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # ÁLBUM AGENDADO
     # ==============================
 
-    if mensagem.media_group_id:
+   if mensagem.media_group_id:
 
     grupo = mensagem.media_group_id
 
