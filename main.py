@@ -299,7 +299,9 @@ async def verificar_agendamentos(
     print("VERIFICANDO AGENDAMENTOS")
 
     agora = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M")
-
+    
+    print("HORA ATUAL:", agora)
+    print("LISTA DE AGENDAMENTOS:", agendamentos)
     for item in agendamentos.copy():
 
         if item["horario"] == agora:
