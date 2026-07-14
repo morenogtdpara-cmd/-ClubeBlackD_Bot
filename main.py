@@ -3,6 +3,7 @@ import asyncio
 import json
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from telegram import (
