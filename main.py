@@ -376,17 +376,22 @@ async def verificar_agendamentos(
 
         try:
 
+            # ==============================
+            # ÁLBUM
+            # ==============================
+
             if item.get("tipo") == "album":
 
                 midias = []
 
+
                 for mensagem_id in item["mensagens"]:
 
-                    mensagem = await context.bot.forward_message(
-                        chat_id=OWNER_ID,
-                        from_chat_id=item["chat_id"],
+                    mensagem = await context.bot.get_messages(
+                        chat_id=item["chat_id"],
                         message_id=mensagem_id
                     )
+
 
                     if mensagem.photo:
 
@@ -395,6 +400,7 @@ async def verificar_agendamentos(
                                 media=mensagem.photo[-1].file_id
                             )
                         )
+
 
                     elif mensagem.video:
 
@@ -418,14 +424,24 @@ async def verificar_agendamentos(
                 print("ÁLBUM ENVIADO ✅")
 
 
+            # ==============================
+            # SOLO
+            # ==============================
+
             else:
 
                 await context.bot.copy_message(
+
                     chat_id=GROUP_ID,
+
                     from_chat_id=item["chat_id"],
+
                     message_id=item["message_id"],
+
                     reply_markup=botoes_vip()
+
                 )
+
 
                 print("PUBLICAÇÃO ENVIADA ✅")
 
