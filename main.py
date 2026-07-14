@@ -284,7 +284,11 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
     salvar_agendamentos(
         agendamentos
     )
+salvar_agendamentos(
+    agendamentos
+)
 
+print("AGENDAMENTOS SALVOS:", agendamentos)
     await update.message.reply_text(
         f"✅ Agendado para {horario}"
     )
