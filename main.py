@@ -285,8 +285,10 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
     print("AGENDAMENTOS SALVOS:", agendamentos)
 
     await update.message.reply_text(
-        f"✅ Agendado para {horario}"
-    )
+    f"✅ Agendado com sucesso!\n\n"
+    f"📅 Horário: {horario}\n"
+    f"📢 Tipo: Publicação"
+)
 
 # ==============================
 # VERIFICAR AGENDAMENTOS
