@@ -298,7 +298,7 @@ async def verificar_agendamentos(
 
     print("VERIFICANDO AGENDAMENTOS")
 
-    agora = datetime.now().strftime("%H:%M")
+    agora = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M")
 
     for item in agendamentos.copy():
 
