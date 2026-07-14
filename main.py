@@ -282,36 +282,65 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if mensagem.media_group_id:
 
-        grupo = mensagem.media_group_id
+    grupo = mensagem.media_group_id
 
 
-        if grupo not in albuns:
+    if grupo not in albuns:
 
-            await update.message.reply_text(
-                "⚠️ Álbum não encontrado."
-            )
+        await update.message.reply_text(
+            "⚠️ Álbum não encontrado."
+        )
 
-            return
-
-
-        mensagens_album = []
+        return
 
 
-        for item in albuns[grupo]:
-
-            mensagens_album.append(
-                item.message_id
-            )
+    midias_album = []
 
 
-        agendamentos.append({
+    for item in albuns[grupo]:
 
-            "horario": horario,
-            "tipo": "album",
-            "chat_id": mensagem.chat.id,
-            "mensagens": mensagens_album
+        if item.photo:
 
-        })
+            midias_album.append({
+
+                "tipo": "foto",
+                "file_id": item.photo[-1].file_id
+
+            })
+
+
+        elif item.video:
+
+            midias_album.append({
+
+                "tipo": "video",
+                "file_id": item.video.file_id
+
+            })
+
+
+    agendamentos.append({
+
+        "horario": horario,
+        "tipo": "album",
+        "chat_id": mensagem.chat.id,
+        "midias": midias_album
+
+    })
+
+
+    salvar_agendamentos(
+        agendamentos
+    )
+
+
+    await update.message.reply_text(
+        f"✅ Álbum agendado com sucesso!\n\n"
+        f"📅 Horário: {horario}\n"
+        f"🖼️ Tipo: Álbum"
+    )
+
+    return
 
 
         salvar_agendamentos(
