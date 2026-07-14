@@ -280,67 +280,53 @@ async def agendar_publicacao(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # ÁLBUM AGENDADO
     # ==============================
 
-   if mensagem.media_group_id:
+    if mensagem.media_group_id:
 
-    grupo = mensagem.media_group_id
-
-
-    if grupo not in albuns:
-
-        await update.message.reply_text(
-            "⚠️ Álbum não encontrado."
-        )
-
-        return
+        grupo = mensagem.media_group_id
 
 
-    midias_album = []
+        if grupo not in albuns:
+
+            await update.message.reply_text(
+                "⚠️ Álbum não encontrado."
+            )
+
+            return
 
 
-    for item in albuns[grupo]:
-
-        if item.photo:
-
-            midias_album.append({
-
-                "tipo": "foto",
-                "file_id": item.photo[-1].file_id
-
-            })
+        midias_album = []
 
 
-        elif item.video:
+        for item in albuns[grupo]:
 
-            midias_album.append({
+            if item.photo:
 
-                "tipo": "video",
-                "file_id": item.video.file_id
+                midias_album.append({
 
-            })
+                    "tipo": "foto",
+                    "file_id": item.photo[-1].file_id
 
-
-    agendamentos.append({
-
-        "horario": horario,
-        "tipo": "album",
-        "chat_id": mensagem.chat.id,
-        "midias": midias_album
-
-    })
+                })
 
 
-    salvar_agendamentos(
-        agendamentos
-    )
+            elif item.video:
+
+                midias_album.append({
+
+                    "tipo": "video",
+                    "file_id": item.video.file_id
+
+                })
 
 
-    await update.message.reply_text(
-        f"✅ Álbum agendado com sucesso!\n\n"
-        f"📅 Horário: {horario}\n"
-        f"🖼️ Tipo: Álbum"
-    )
+        agendamentos.append({
 
-    return
+            "horario": horario,
+            "tipo": "album",
+            "chat_id": mensagem.chat.id,
+            "midias": midias_album
+
+        })
 
 
         salvar_agendamentos(
