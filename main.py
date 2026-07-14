@@ -474,19 +474,19 @@ async def verificar_agendamentos(
 
                     elif item_midia["tipo"] == "video":
 
-                        midias.append(
+    midias.append(
 
-                            InputMediaVideo(
+        InputMediaVideo(
 
-                                media=item_midia["file_id"],
+            item_midia["file_id"],
 
-                                caption=LEGENDA_FIXA.strip()
-                                if len(midias) == 0
-                                else None
+            LEGENDA_FIXA.strip()
+            if len(midias) == 0
+            else None
 
-                            )
+        )
 
-                        )
+    )
 
                 if midias:
 
