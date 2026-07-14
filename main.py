@@ -478,11 +478,11 @@ async def verificar_agendamentos(
 
     for item in agendamentos.copy():
 
-    print("AGENDAMENTO ENCONTRADO:", item)
+        print("AGENDAMENTO ENCONTRADO:", item)
 
-    if item["horario"] != agora:
+        if item["horario"] != agora:
 
-        continue
+            continue
 
 
 
