@@ -32,6 +32,67 @@ OWNER_ID = 8880948641
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
 # ==============================
+# 🖤 BLACK SYSTEM - DADOS REAIS
+# ==============================
+
+INICIO_BOT = datetime.now(
+    ZoneInfo("America/Sao_Paulo")
+)
+
+STATUS_SISTEMA = {
+
+    "data": INICIO_BOT.strftime("%d/%m/%Y"),
+
+    "envios_hoje": 0,
+
+    "midias_hoje": 0,
+
+    "ultimo_envio": None,
+
+    "ultimo_tipo": None,
+
+    "ultimo_status": None
+
+}
+
+def atualizar_dia():
+
+    agora = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    )
+
+    data_atual = agora.strftime(
+        "%d/%m/%Y"
+    )
+
+    if STATUS_SISTEMA["data"] != data_atual:
+
+        STATUS_SISTEMA["data"] = data_atual
+
+        STATUS_SISTEMA["envios_hoje"] = 0
+
+        STATUS_SISTEMA["midias_hoje"] = 0
+
+def registrar_envio(
+    tipo,
+    quantidade=1
+):
+
+    atualizar_dia()
+
+    STATUS_SISTEMA["envios_hoje"] += 1
+
+    STATUS_SISTEMA["midias_hoje"] += quantidade
+
+    STATUS_SISTEMA["ultimo_envio"] = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    ).strftime("%H:%M")
+
+    STATUS_SISTEMA["ultimo_tipo"] = tipo
+
+    STATUS_SISTEMA["ultimo_status"] = "Sucesso"
+
+# ==============================
 # LEGENDA FIXA
 # ==============================
 
@@ -52,7 +113,9 @@ ARQUIVO_AGENDAMENTOS = "agendamentos.json"
 
 def carregar_agendamentos():
 
-    if not Path(ARQUIVO_AGENDAMENTOS).exists():
+    if not Path(
+        ARQUIVO_AGENDAMENTOS
+    ).exists():
 
         return []
 
@@ -111,10 +174,6 @@ def botoes_vip():
 # START
 # ==============================
 
-# ==============================
-# START
-# ==============================
-
 async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -136,20 +195,110 @@ async def start(
 
         "📋 HOJE\n\n"
 
-        "👑 Envios: --\n"
-        "📱 Mídias: --\n"
-        "⏰ Agendados: --\n\n"
+        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/7\n"
 
-        "━━━━━━━━━━━\n\n"
+        f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
 
-        "PRÓXIMO DISPARO ✔️\n\n"
-
-        "🕙 --:--\n\n"
+        f"⏰ Agendados: {len(agendamentos)}\n\n"
 
         "━━━━━━━━━━━\n\n"
 
         "🥷🏾 Controle total\n"
-        "⚡️ Sistema protegido ⚡️"
+
+        "⚡ Sistema protegido ⚡"
+
+    )
+
+# ==============================
+# STATUS REAL
+# ==============================
+
+async def status(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+    atualizar_dia()
+
+    agora = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    )
+
+    tempo = agora - INICIO_BOT
+
+    horas = tempo.seconds // 3600
+
+    minutos = (tempo.seconds % 3600) // 60
+
+    proximo = "--:--"
+
+    if agendamentos:
+
+        horarios = sorted(
+
+            [
+
+                item["horario"]
+
+                for item in agendamentos
+
+            ]
+
+        )
+
+        proximo = horarios[0]
+
+    ultimo = (
+
+        STATUS_SISTEMA["ultimo_envio"]
+
+        or "--:--"
+
+    )
+
+    await update.message.reply_text(
+
+        "🖤 BLACK SYSTEM\n\n"
+
+        "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
+
+        f"⚡ Sistema Ativo há: {horas}h {minutos}m\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "📋 HOJE\n\n"
+
+        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/7\n"
+
+        f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
+
+        f"⏰ Agendados: {len(agendamentos)}\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "⚡ PRÓXIMA DIVULGAÇÃO\n\n"
+
+        f"🕙 {proximo}\n"
+
+        "📢 Publicação\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "📌 ÚLTIMO ENVIO\n\n"
+
+        f"🕘 {ultimo}\n"
+
+        f"✅ {STATUS_SISTEMA['ultimo_status'] or '--'}\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "🥷🏾 Controle total\n"
+
+        "⚡ Sistema protegido ⚡"
 
     )
 
@@ -186,7 +335,9 @@ async def receber_album(
 
     if len(albuns[grupo]["mensagens"]) < 10:
 
-        albuns[grupo]["mensagens"].append(mensagem)
+        albuns[grupo]["mensagens"].append(
+            mensagem
+        )
 
     if mensagem.caption:
 
@@ -223,6 +374,10 @@ async def divulgar(
 
         reply_markup=botoes_vip()
 
+    )
+
+    registrar_envio(
+        "Publicação"
     )
 
 # ==============================
@@ -267,13 +422,9 @@ async def d_album(
 
             legenda_usuario.strip()
 
-            +
+            + "\n\n"
 
-            "\n\n"
-
-            +
-
-            LEGENDA_FIXA.strip()
+            + LEGENDA_FIXA.strip()
 
         )
 
@@ -325,6 +476,14 @@ async def d_album(
 
         )
 
+    registrar_envio(
+
+        "Álbum",
+
+        len(midias)
+
+    )
+
     del albuns[grupo]
 
     await update.message.reply_text(
@@ -371,8 +530,11 @@ async def agendar_publicacao(
     try:
 
         datetime.strptime(
+
             horario,
+
             "%H:%M"
+
         )
 
     except:
@@ -386,10 +548,6 @@ async def agendar_publicacao(
         return
 
     mensagem = update.message.reply_to_message
-
-# ==============================
-# ÁLBUM AGENDADO
-# ==============================
 
     if mensagem.media_group_id:
 
@@ -440,8 +598,11 @@ async def agendar_publicacao(
             "midias": midias_album,
 
             "legenda": albuns[grupo].get(
+
                 "legenda",
+
                 ""
+
             )
 
         })
@@ -455,16 +616,14 @@ async def agendar_publicacao(
         await update.message.reply_text(
 
             f"✅ Álbum agendado com sucesso!\n\n"
+
             f"📅 Horário: {horario}\n"
+
             f"🖼️ Tipo: Álbum"
 
         )
 
         return
-
-# ==============================
-# PUBLICAÇÃO SOLO
-# ==============================
 
     agendamentos.append({
 
@@ -487,7 +646,9 @@ async def agendar_publicacao(
     await update.message.reply_text(
 
         f"✅ Agendado com sucesso!\n\n"
+
         f"📅 Horário: {horario}\n"
+
         f"📢 Tipo: Publicação"
 
     )
@@ -521,8 +682,11 @@ async def verificar_agendamentos(
                 midias = []
 
                 legenda_usuario = item.get(
+
                     "legenda",
+
                     ""
+
                 )
 
                 if legenda_usuario:
@@ -531,13 +695,9 @@ async def verificar_agendamentos(
 
                         legenda_usuario.strip()
 
-                        +
+                        + "\n\n"
 
-                        "\n\n"
-
-                        +
-
-                        LEGENDA_FIXA.strip()
+                        + LEGENDA_FIXA.strip()
 
                     )
 
@@ -556,7 +716,9 @@ async def verificar_agendamentos(
                                 media=item_midia["file_id"],
 
                                 caption=legenda_final
+
                                 if len(midias) == 0
+
                                 else None
 
                             )
@@ -572,7 +734,9 @@ async def verificar_agendamentos(
                                 media=item_midia["file_id"],
 
                                 caption=legenda_final
+
                                 if len(midias) == 0
+
                                 else None
 
                             )
@@ -589,6 +753,14 @@ async def verificar_agendamentos(
 
                     )
 
+                registrar_envio(
+
+                    "Álbum",
+
+                    len(midias)
+
+                )
+
                 print("ÁLBUM ENVIADO ✅")
 
             else:
@@ -602,6 +774,12 @@ async def verificar_agendamentos(
                     message_id=item["message_id"],
 
                     reply_markup=botoes_vip()
+
+                )
+
+                registrar_envio(
+
+                    "Publicação"
 
                 )
 
@@ -650,23 +828,43 @@ async def configurar_menu(app):
     comandos = [
 
         BotCommand(
+
             "start",
+
             "BLACK SYSTEM 👑"
+
         ),
 
         BotCommand(
+
+            "status",
+
+            "STATUS DO SISTEMA 🖤"
+
+        ),
+
+        BotCommand(
+
             "divulgar",
+
             "DIVULGAR 🔥"
+
         ),
 
         BotCommand(
+
             "d_album",
+
             "DIVULGAR ÁLBUM 🖼️"
+
         ),
 
         BotCommand(
+
             "agendar",
+
             "AGENDAR DIVULGAÇÃO ⏰"
+
         )
 
     ]
@@ -721,8 +919,11 @@ app = (
 app.add_handler(
 
     CommandHandler(
+
         "start",
+
         start
+
     )
 
 )
@@ -730,8 +931,23 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
+        "status",
+
+        status
+
+    )
+
+)
+
+app.add_handler(
+
+    CommandHandler(
+
         "divulgar",
+
         divulgar
+
     )
 
 )
@@ -739,8 +955,11 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
         "d_album",
+
         d_album
+
     )
 
 )
@@ -748,8 +967,11 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
         "entrarnovip",
+
         entrarnovip
+
     )
 
 )
@@ -757,8 +979,11 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
         "agendar",
+
         agendar_publicacao
+
     )
 
 )
