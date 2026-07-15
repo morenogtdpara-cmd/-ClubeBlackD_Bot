@@ -111,34 +111,47 @@ def botoes_vip():
 # START
 # ==============================
 
-await update.message.reply_text(
+# ==============================
+# START
+# ==============================
 
-    "🖤 BLACK SYSTEM\n\n"
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
-    "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
+    if update.effective_user.id != OWNER_ID:
 
-    "⚡ Sistema Ativo ⚡\n\n"
+        return
 
-    "━━━━━━━━━━━\n\n"
+    await update.message.reply_text(
 
-    "📋 HOJE\n\n"
+        "🖤 BLACK SYSTEM\n\n"
 
-    "👑 Envios: --\n"
-    "📱 Mídias: --\n"
-    "⏰ Agendados: --\n\n"
+        "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
 
-    "━━━━━━━━━━━\n\n"
+        "⚡ Sistema Ativo ⚡\n\n"
 
-    "PRÓXIMO DISPARO ✔️\n\n"
+        "━━━━━━━━━━━\n\n"
 
-    "🕙 --:--\n\n"
+        "📋 HOJE\n\n"
 
-    "━━━━━━━━━━━\n\n"
+        "👑 Envios: --\n"
+        "📱 Mídias: --\n"
+        "⏰ Agendados: --\n\n"
 
-    "🥷🏾 Controle total\n"
-    "⚡️ Sistema protegido ⚡️"
+        "━━━━━━━━━━━\n\n"
 
-)
+        "PRÓXIMO DISPARO ✔️\n\n"
+
+        "🕙 --:--\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "🥷🏾 Controle total\n"
+        "⚡️ Sistema protegido ⚡️"
+
+    )
 
 # ==============================
 # RECEBER ÁLBUM
