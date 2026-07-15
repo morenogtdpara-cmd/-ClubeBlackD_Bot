@@ -111,20 +111,34 @@ def botoes_vip():
 # START
 # ==============================
 
-async def start(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
+await update.message.reply_text(
 
-    if update.effective_user.id != OWNER_ID:
+    "🖤 BLACK SYSTEM\n\n"
 
-        return
+    "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
 
-    await update.message.reply_text(
+    "⚡ Sistema Ativo ⚡\n\n"
 
-        "BOT ON ✅\n\nUse /divulgar, /d_album ou /agendar."
+    "━━━━━━━━━━━\n\n"
 
-    )
+    "📋 HOJE\n\n"
+
+    "👑 Envios: --\n"
+    "📱 Mídias: --\n"
+    "⏰ Agendados: --\n\n"
+
+    "━━━━━━━━━━━\n\n"
+
+    "PRÓXIMO DISPARO ✔️\n\n"
+
+    "🕙 --:--\n\n"
+
+    "━━━━━━━━━━━\n\n"
+
+    "🥷🏾 Controle total\n"
+    "⚡️ Sistema protegido ⚡️"
+
+)
 
 # ==============================
 # RECEBER ÁLBUM
