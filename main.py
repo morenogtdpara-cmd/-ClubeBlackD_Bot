@@ -651,7 +651,7 @@ async def configurar_menu(app):
 
         BotCommand(
             "start",
-            "BOT ON ✅"
+            "BLACK SYSTEM 👑"
         ),
 
         BotCommand(
