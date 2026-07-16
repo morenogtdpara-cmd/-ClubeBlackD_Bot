@@ -1040,6 +1040,7 @@ async def botoes_feedback(
 
     await query.answer()
 
+
     if query.data == "feedback_adicionar":
 
         aguardando_feedback.add(
@@ -1049,6 +1050,49 @@ async def botoes_feedback(
         await query.message.reply_text(
 
             "📸 Envie o print do feedback."
+
+        )
+
+
+    elif query.data == "feedback_imediato":
+
+        if not feedbacks:
+
+            await query.message.reply_text(
+
+                "❌ Nenhum feedback disponível."
+
+            )
+
+            return
+
+
+        feedback = feedbacks[0]
+
+
+        await context.bot.send_photo(
+
+            chat_id=GROUP_ID,
+
+            photo=feedback["file_id"],
+
+            caption=LEGENDA_FIXA,
+
+            reply_markup=botoes_vip()
+
+        )
+
+
+        registrar_envio(
+
+            "Feedback"
+
+        )
+
+
+        await query.message.reply_text(
+
+            "✅ Feedback enviado com sucesso!"
 
         )
 async def receber_feedback(
