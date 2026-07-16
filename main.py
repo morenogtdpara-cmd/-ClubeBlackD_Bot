@@ -1085,7 +1085,8 @@ async def botoes_feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
+    print("RECEBEU FOTO FEEDBACK")
+    print(aguardando_feedback)
     query = update.callback_query
 
     await query.answer()
