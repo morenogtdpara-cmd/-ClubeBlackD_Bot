@@ -183,7 +183,11 @@ def salvar_feedbacks(lista):
 
 
 feedbacks = carregar_feedbacks()
+# ==============================
+# CONTROLE DE ENVIO DE FEEDBACK
+# ==============================
 
+aguardando_feedback = set()
 
 def gerar_id_feedback():
 
