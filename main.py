@@ -1307,6 +1307,7 @@ app.add_handler(
     )
 
 )
+
 app.add_handler(
 
     CommandHandler(
@@ -1318,11 +1319,13 @@ app.add_handler(
     )
 
 )
+
+# FOTO ÚNICA = FEEDBACK
 app.add_handler(
 
     MessageHandler(
 
-        filters.PHOTO,
+        filters.PHOTO & ~filters.MediaGroup,
 
         receber_feedback
 
@@ -1330,6 +1333,7 @@ app.add_handler(
 
 )
 
+# ÁLBUM = RECEBER ÁLBUM
 app.add_handler(
 
     MessageHandler(
@@ -1351,6 +1355,7 @@ app.add_handler(
     )
 
 )
+
 app.job_queue.run_repeating(
 
     verificar_agendamentos,
