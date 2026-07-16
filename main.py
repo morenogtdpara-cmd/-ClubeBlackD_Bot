@@ -1292,7 +1292,15 @@ app.add_handler(
     )
 
 )
+app.add_handler(
 
+    CallbackQueryHandler(
+
+        botoes_feedback_callback
+
+    )
+
+)
 
 
 app.add_handler(
