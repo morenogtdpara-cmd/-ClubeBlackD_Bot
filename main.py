@@ -471,6 +471,10 @@ async def status(
 # RECEBER ÁLBUM
 # ==============================
 
+# ==============================
+# RECEBER ÁLBUM
+# ==============================
+
 async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -494,21 +498,17 @@ async def receber_album(
 
             "mensagens": [],
 
-            "legenda": mensagem.caption or ""
+            "legenda": ""
 
         }
 
-    if len(albuns[grupo]["mensagens"]) < 10:
-
-        albuns[grupo]["mensagens"].append(
-            mensagem
-        )
+    albuns[grupo]["mensagens"].append(
+        mensagem
+    )
 
     if mensagem.caption:
 
         albuns[grupo]["legenda"] = mensagem.caption
-
-    await asyncio.sleep(3)
 
 # ==============================
 # DIVULGAR
