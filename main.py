@@ -196,6 +196,43 @@ def salvar_feedbacks(lista):
 
 
 feedbacks = carregar_feedbacks()
+ARQUIVO_FEEDBACKS_AGENDADOS = "feedbacks_agendados.json"
+
+
+def carregar_feedbacks_agendados():
+
+    if not Path(
+        ARQUIVO_FEEDBACKS_AGENDADOS
+    ).exists():
+
+        return []
+
+    with open(
+        ARQUIVO_FEEDBACKS_AGENDADOS,
+        "r",
+        encoding="utf-8"
+    ) as arquivo:
+
+        return json.load(arquivo)
+
+
+def salvar_feedbacks_agendados(lista):
+
+    with open(
+        ARQUIVO_FEEDBACKS_AGENDADOS,
+        "w",
+        encoding="utf-8"
+    ) as arquivo:
+
+        json.dump(
+            lista,
+            arquivo,
+            indent=4,
+            ensure_ascii=False
+        )
+
+
+feedbacks_agendados = carregar_feedbacks_agendados()
 # ==============================
 # CONTROLE DE ENVIO DE FEEDBACK
 # ==============================
