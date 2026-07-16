@@ -169,7 +169,72 @@ def botoes_vip():
         ]
 
     )
+# ==============================
+# 📝 SISTEMA DE FEEDBACK
+# ==============================
 
+def painel_feedback():
+
+    return InlineKeyboardMarkup(
+        [
+
+            [
+                InlineKeyboardButton(
+                    "⚡ Envio Imediato",
+                    callback_data="feedback_imediato"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "➕ Adicionar Feedback",
+                    callback_data="feedback_adicionar"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "⏰ Agendar Feedback",
+                    callback_data="feedback_agendar"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📊 Estatísticas",
+                    callback_data="feedback_stats"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "🔄 Resetar Feedbacks",
+                    callback_data="feedback_reset"
+                )
+            ]
+
+        ]
+    )
+
+
+async def feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+    await update.message.reply_text(
+
+        "📝 SISTEMA DE FEEDBACK\n\n"
+
+        "Escolha uma opção:",
+
+        reply_markup=painel_feedback()
+
+    )
 # ==============================
 # START
 # ==============================
