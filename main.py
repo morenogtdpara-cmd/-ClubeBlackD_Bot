@@ -104,6 +104,19 @@ LEGENDA_FIXA = """
 @ClubeBlackBot
 """
 
+
+LEGENDA_FEEDBACK = """
+⭐ FEEDBACKS REAIS ⭐
+
+👑 A satisfação dos nossos membros fala por si
+
+🔥 Conteúdo exclusivo liberado
+💎 Atualizações constantes no VIP
+⚡ Experiência de alto nível
+
+🖤 Clube Black VIP
+"""
+
 albuns = {}
 
 # ==============================
