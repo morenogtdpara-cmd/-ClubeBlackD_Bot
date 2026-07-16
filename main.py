@@ -1097,7 +1097,7 @@ async def botoes_feedback(
         aguardando_feedback.add(
             query.from_user.id
         )
-
+    print("AGUARDANDO:", aguardando_feedback)
         await query.message.reply_text(
 
             "📸 Envie o print do feedback."
