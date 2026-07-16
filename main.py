@@ -1157,7 +1157,8 @@ async def receber_feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-    if update.message.media_group_id:
+
+    if update.effective_user.id not in aguardando_feedback:
 
         return
     
