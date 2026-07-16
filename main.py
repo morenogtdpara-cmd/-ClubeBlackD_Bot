@@ -1134,7 +1134,49 @@ async def configurar_menu(app):
         comandos
 
     )
+# ==============================
+# BOTÕES FEEDBACK
+# ==============================
 
+async def botoes_feedback_callback(
+
+    update: Update,
+
+    context: ContextTypes.DEFAULT_TYPE
+
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    if query.data == "feedback_imediato":
+
+        await query.message.reply_text(
+
+            "⚡ Envio Imediato\n\n"
+
+            "Responda uma FOTO e use /feedback"
+
+        )
+
+    elif query.data == "stats_feedback":
+
+        await query.message.reply_text(
+
+            "📊 ESTATÍSTICAS\n\n"
+
+            f"⭐ Feedbacks hoje: {STATUS_SISTEMA['feedbacks_hoje']}"
+
+        )
+
+    else:
+
+        await query.message.reply_text(
+
+            "🚧 Função em desenvolvimento."
+
+        )
 
 
 # ==============================
