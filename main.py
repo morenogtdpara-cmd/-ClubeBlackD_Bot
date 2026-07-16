@@ -1162,7 +1162,15 @@ app.add_handler(
     )
 
 )
+app.add_handler(
 
+    CallbackQueryHandler(
+
+        botoes_feedback
+
+    )
+
+)
 app.job_queue.run_repeating(
 
     verificar_agendamentos,
