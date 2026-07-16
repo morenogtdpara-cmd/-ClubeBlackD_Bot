@@ -1161,11 +1161,11 @@ async def botoes_feedback_callback(
 
         await query.message.reply_text(
 
-            "⚡ Envio Imediato\n\n"
+    "⚡ Envio Imediato\n\n"
 
-            "Responda uma FOTO e use /feedback"
+    "Responda uma FOTO e use /feedback_imediato"
 
-        )
+)
 
     elif query.data == "stats_feedback":
 
