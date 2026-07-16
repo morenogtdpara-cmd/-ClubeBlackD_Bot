@@ -1089,7 +1089,7 @@ async def botoes_feedback(
 
             photo=feedback["file_id"],
 
-            caption=LEGENDA_FIXA,
+            caption=LEGENDA_FEEDBACK,
 
             reply_markup=botoes_vip()
 
