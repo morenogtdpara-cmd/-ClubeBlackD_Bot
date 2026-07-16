@@ -1073,7 +1073,6 @@ async def verificar_agendamentos(
 # ==============================
 # MENU
 # ==============================
-
 async def configurar_menu(app):
 
     comandos = [
@@ -1117,10 +1116,15 @@ async def configurar_menu(app):
             "FEEDBACK VIP ⭐"
 
         ),
+
         BotCommand(
-           "feedback_imediato",
-           "ENVIO IMEDIATO ⚡"
+
+            "feedback_imediato",
+
+            "ENVIO IMEDIATO ⚡"
+
         ),
+
         BotCommand(
 
             "agendar",
