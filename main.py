@@ -513,7 +513,7 @@ def botoes_feedback():
 
 
 
-async def feedback(
+async def feedback_imediato(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
