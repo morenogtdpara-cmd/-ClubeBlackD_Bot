@@ -1,4 +1,5 @@
 import os
+import asyncio
 import json
 
 from datetime import datetime
@@ -9,7 +10,9 @@ from telegram import (
     Update,
     BotCommand,
     InlineKeyboardButton,
-    InlineKeyboardMarkup
+    InlineKeyboardMarkup,
+    InputMediaPhoto,
+    InputMediaVideo
 )
 
 from telegram.ext import (
@@ -21,6 +24,7 @@ from telegram.ext import (
     filters
 )
 
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 GROUP_ID = -1004231485932
@@ -29,21 +33,34 @@ OWNER_ID = 8880948641
 
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
+
 # ==============================
-# 🖤 SISTEMA
+# 🖤 BLACK SYSTEM
 # ==============================
 
 INICIO_BOT = datetime.now(
     ZoneInfo("America/Sao_Paulo")
 )
 
+
 STATUS_SISTEMA = {
 
     "data": INICIO_BOT.strftime("%d/%m/%Y"),
 
-    "feedbacks_hoje": 0
+    "envios_hoje": 0,
+
+    "midias_hoje": 0,
+
+    "feedbacks_hoje": 0,
+
+    "ultimo_envio": None,
+
+    "ultimo_tipo": None,
+
+    "ultimo_status": None
 
 }
+
 
 def atualizar_dia():
 
@@ -51,75 +68,142 @@ def atualizar_dia():
         ZoneInfo("America/Sao_Paulo")
     )
 
-    data = agora.strftime(
-        "%d/%m/%Y"
-    )
+    data_atual = agora.strftime("%d/%m/%Y")
 
-    if STATUS_SISTEMA["data"] != data:
 
-        STATUS_SISTEMA["data"] = data
+    if STATUS_SISTEMA["data"] != data_atual:
+
+        STATUS_SISTEMA["data"] = data_atual
+
+        STATUS_SISTEMA["envios_hoje"] = 0
+
+        STATUS_SISTEMA["midias_hoje"] = 0
 
         STATUS_SISTEMA["feedbacks_hoje"] = 0
 
+
+
+def registrar_envio(
+    tipo,
+    quantidade=1
+):
+
+    atualizar_dia()
+
+    STATUS_SISTEMA["envios_hoje"] += 1
+
+    STATUS_SISTEMA["midias_hoje"] += quantidade
+
+    STATUS_SISTEMA["ultimo_envio"] = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    ).strftime("%H:%M")
+
+    STATUS_SISTEMA["ultimo_tipo"] = tipo
+
+    STATUS_SISTEMA["ultimo_status"] = "Sucesso"
+
+
+
 # ==============================
-# ⭐ FEEDBACKS
+# ⭐ FEEDBACK SYSTEM
 # ==============================
 
 ARQUIVO_FEEDBACKS = "feedbacks.json"
 
-ARQUIVO_AGENDADOS_FEEDBACK = "feedbacks_agendados.json"
 
-def carregar_json(
-    arquivo
-):
+def carregar_feedbacks():
 
-    if not Path(arquivo).exists():
-
-        return []
-
-    try:
-
-        with open(
-            arquivo,
-            "r",
-            encoding="utf-8"
-        ) as f:
-
-            return json.load(f)
-
-    except:
+    if not Path(
+        ARQUIVO_FEEDBACKS
+    ).exists():
 
         return []
 
-def salvar_json(
-    arquivo,
-    dados
-):
 
     with open(
-        arquivo,
+        ARQUIVO_FEEDBACKS,
+        "r",
+        encoding="utf-8"
+    ) as arquivo:
+
+        return json.load(arquivo)
+
+
+
+def salvar_feedbacks(lista):
+
+    with open(
+        ARQUIVO_FEEDBACKS,
         "w",
         encoding="utf-8"
-    ) as f:
+    ) as arquivo:
 
         json.dump(
-            dados,
-            f,
+            lista,
+            arquivo,
             indent=4,
             ensure_ascii=False
         )
 
-feedbacks = carregar_json(
-    ARQUIVO_FEEDBACKS
-)
 
-feedbacks_agendados = carregar_json(
-    ARQUIVO_AGENDADOS_FEEDBACK
-)
 
-modo_feedback = {}
+feedbacks = carregar_feedbacks()
 
-def botao_vip():
+
+albuns = {}
+
+
+# ==============================
+# 📌 AGENDAMENTOS
+# ==============================
+
+ARQUIVO_AGENDAMENTOS = "agendamentos.json"
+
+
+def carregar_agendamentos():
+
+    if not Path(
+        ARQUIVO_AGENDAMENTOS
+    ).exists():
+
+        return []
+
+
+    with open(
+        ARQUIVO_AGENDAMENTOS,
+        "r",
+        encoding="utf-8"
+    ) as arquivo:
+
+        return json.load(arquivo)
+
+
+
+def salvar_agendamentos(lista):
+
+    with open(
+        ARQUIVO_AGENDAMENTOS,
+        "w",
+        encoding="utf-8"
+    ) as arquivo:
+
+        json.dump(
+            lista,
+            arquivo,
+            indent=4,
+            ensure_ascii=False
+        )
+
+
+agendamentos = carregar_agendamentos()
+
+
+
+# ==============================
+# 🔥 BOTÃO VIP
+# ==============================
+
+def botoes_vip():
 
     return InlineKeyboardMarkup(
 
@@ -141,6 +225,20 @@ def botao_vip():
 
     )
 
+
+
+# ==============================
+# 📝 LEGENDAS
+# ==============================
+
+LEGENDA_FIXA = """
+🔥 CONTEÚDO EXCLUSIVO LIBERADO 🔥
+
+🚀 Acesse nosso VIP:
+@ClubeBlackBot
+"""
+
+
 LEGENDA_FEEDBACK = """
 🖤 FEEDBACK REAL DE MEMBRO VIP
 
@@ -150,6 +248,205 @@ LEGENDA_FEEDBACK = """
 💎 Acesso exclusivo
 🚀 Entre para o VIP
 """
+
+
+
+# ==============================
+# ▶️ START
+# ==============================
+
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+
+    await update.message.reply_text(
+
+        "🖤 BLACK SYSTEM\n\n"
+
+        "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
+
+        "⚡ Sistema Ativo ⚡\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "📋 HOJE\n\n"
+
+        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/∞\n"
+
+        f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
+
+        f"⭐ Feedbacks: {STATUS_SISTEMA['feedbacks_hoje']}\n"
+
+        f"⏰ Agendados: {len(agendamentos)}\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "🥷🏾 Controle total\n"
+
+        "⚡ Sistema protegido ⚡"
+
+    )
+
+
+# ==============================
+# 📊 STATUS REAL
+# ==============================
+
+async def status(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+
+    atualizar_dia()
+
+
+    agora = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    )
+
+
+    tempo = agora - INICIO_BOT
+
+
+    horas = tempo.seconds // 3600
+
+    minutos = (tempo.seconds % 3600) // 60
+
+
+
+    await update.message.reply_text(
+
+        "🖤 BLACK SYSTEM\n\n"
+
+        f"⚡ Sistema Ativo há: {horas}h {minutos}m\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "📋 HOJE\n\n"
+
+        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/∞\n"
+
+        f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
+
+        f"⭐ Feedbacks: {STATUS_SISTEMA['feedbacks_hoje']}\n"
+
+        f"⏰ Agendados: {len(agendamentos)}\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "🥷🏾 Sistema protegido ⚡"
+
+    )
+
+
+
+# ==============================
+# 📸 RECEBER ÁLBUM
+# ==============================
+
+async def receber_album(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+
+    mensagem = update.message
+
+
+    if not mensagem.media_group_id:
+
+        return
+
+
+    grupo = mensagem.media_group_id
+
+
+    if grupo not in albuns:
+
+        albuns[grupo] = {
+
+            "mensagens": [],
+
+            "legenda": mensagem.caption or ""
+
+        }
+
+
+
+    if len(
+        albuns[grupo]["mensagens"]
+    ) < 10:
+
+        albuns[grupo]["mensagens"].append(
+            mensagem
+        )
+
+
+    if mensagem.caption:
+
+        albuns[grupo]["legenda"] = mensagem.caption
+
+
+
+# ==============================
+# 📢 DIVULGAR NORMAL
+# ==============================
+
+async def divulgar(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+
+    if not update.message.reply_to_message:
+
+        return
+
+
+    mensagem = update.message.reply_to_message
+
+
+    await context.bot.copy_message(
+
+        chat_id=GROUP_ID,
+
+        from_chat_id=mensagem.chat.id,
+
+        message_id=mensagem.message_id,
+
+        reply_markup=botoes_vip()
+
+    )
+
+
+    registrar_envio(
+        "Publicação"
+    )
+
+
+
+# ==============================
+# ⭐ CENTRAL DE FEEDBACKS
+# ==============================
 
 def botoes_feedback():
 
@@ -161,7 +458,7 @@ def botoes_feedback():
 
                 InlineKeyboardButton(
                     "⚡ Envio Imediato",
-                    callback_data="envio_imediato"
+                    callback_data="feedback_imediato"
                 )
 
             ],
@@ -188,7 +485,7 @@ def botoes_feedback():
 
                 InlineKeyboardButton(
                     "📊 Estatísticas",
-                    callback_data="estatisticas_feedback"
+                    callback_data="stats_feedback"
                 )
 
             ],
@@ -206,17 +503,21 @@ def botoes_feedback():
 
     )
 
+
+
+# ==============================
+# /feedback - PAINEL
+# ==============================
+
 async def feedback(
-
     update: Update,
-
     context: ContextTypes.DEFAULT_TYPE
-
 ):
 
     if update.effective_user.id != OWNER_ID:
 
         return
+
 
     disponiveis = len(
 
@@ -224,11 +525,12 @@ async def feedback(
 
             f for f in feedbacks
 
-            if not f.get("usado")
+            if f.get("usado") == False
 
         ]
 
     )
+
 
     usados = len(
 
@@ -236,11 +538,12 @@ async def feedback(
 
             f for f in feedbacks
 
-            if f.get("usado")
+            if f.get("usado") == True
 
         ]
 
     )
+
 
     await update.message.reply_text(
 
@@ -258,81 +561,35 @@ async def feedback(
 
     )
 
-async def salvar_feedback(
 
-    update: Update,
-
-    context: ContextTypes.DEFAULT_TYPE
-
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    if modo_feedback.get("acao") != "adicionar":
-
-        return
-
-    if not update.message.photo:
-
-        return
-
-    feedbacks.append(
-
-        {
-
-            "file_id": update.message.photo[-1].file_id,
-
-            "usado": False
-
-        }
-
-    )
-
-    salvar_json(
-
-        ARQUIVO_FEEDBACKS,
-
-        feedbacks
-
-    )
-
-    modo_feedback.clear()
-
-    await update.message.reply_text(
-
-        "✅ Feedback salvo!"
-
-    )
 
 # ==============================
 # ⚡ ENVIO IMEDIATO
 # ==============================
 
-async def enviar_feedback(
-
+async def enviar_feedback_imediato(
     update: Update,
-
     context: ContextTypes.DEFAULT_TYPE
-
 ):
 
     if update.effective_user.id != OWNER_ID:
 
         return
 
+
     if not update.message.reply_to_message:
 
         await update.message.reply_text(
 
-            "⚠️ Responda uma FOTO."
+            "⚠️ Responda uma FOTO para enviar."
 
         )
 
         return
 
+
     mensagem = update.message.reply_to_message
+
 
     if not mensagem.photo:
 
@@ -344,6 +601,8 @@ async def enviar_feedback(
 
         return
 
+
+
     await context.bot.send_photo(
 
         chat_id=GROUP_ID,
@@ -352,11 +611,20 @@ async def enviar_feedback(
 
         caption=LEGENDA_FEEDBACK,
 
-        reply_markup=botao_vip()
+        reply_markup=botoes_vip()
 
     )
 
+
     STATUS_SISTEMA["feedbacks_hoje"] += 1
+
+
+    registrar_envio(
+
+        "Feedback"
+
+    )
+
 
     await update.message.reply_text(
 
@@ -364,209 +632,35 @@ async def enviar_feedback(
 
     )
 
+
+
 # ==============================
-# ⚡ MODO ENVIO IMEDIATO PELO BOTÃO
+# 📊 CALLBACK DOS BOTÕES
 # ==============================
 
-async def receber_feedback_imediato(
-
+async def botoes_feedback_callback(
     update: Update,
-
     context: ContextTypes.DEFAULT_TYPE
-
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    if modo_feedback.get("acao") != "imediato":
-
-        return
-
-    if not update.message.photo:
-
-        return
-
-    await context.bot.send_photo(
-
-        chat_id=GROUP_ID,
-
-        photo=update.message.photo[-1].file_id,
-
-        caption=LEGENDA_FEEDBACK,
-
-        reply_markup=botao_vip()
-
-    )
-
-    STATUS_SISTEMA["feedbacks_hoje"] += 1
-
-    modo_feedback.clear()
-
-    await update.message.reply_text(
-
-        "✅ Feedback publicado!"
-
-    )
-
-async def receber_horario_feedback(
-
-    update: Update,
-
-    context: ContextTypes.DEFAULT_TYPE
-
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    if modo_feedback.get("acao") != "agendar":
-
-        return
-
-    horario = update.message.text.strip()
-
-    try:
-
-        datetime.strptime(
-
-            horario,
-
-            "%H:%M"
-
-        )
-
-    except:
-
-        await update.message.reply_text(
-
-            "⚠️ Horário inválido.\nExemplo: 22:00"
-
-        )
-
-        return
-
-    disponivel = None
-
-    for item in feedbacks:
-
-        if not item.get("usado"):
-
-            disponivel = item
-
-            break
-
-    if not disponivel:
-
-        await update.message.reply_text(
-
-            "⚠️ Nenhum feedback disponível."
-
-        )
-
-        modo_feedback.clear()
-
-        return
-
-    feedbacks_agendados.append(
-
-        {
-
-            "horario": horario,
-
-            "file_id": disponivel["file_id"]
-
-        }
-
-    )
-
-    disponivel["usado"] = True
-
-    salvar_json(
-
-        ARQUIVO_FEEDBACKS,
-
-        feedbacks
-
-    )
-
-    salvar_json(
-
-        ARQUIVO_AGENDADOS_FEEDBACK,
-
-        feedbacks_agendados
-
-    )
-
-    modo_feedback.clear()
-
-    await update.message.reply_text(
-
-        "✅ Feedback agendado!\n\n"
-
-        f"⏰ Horário: {horario}"
-
-    )
-
-# ==============================
-# 📊 CALLBACKS PAINEL
-# ==============================
-
-async def callback_feedback(
-
-    update: Update,
-
-    context: ContextTypes.DEFAULT_TYPE
-
 ):
 
     query = update.callback_query
 
-    if update.effective_user.id != OWNER_ID:
-
-        await query.answer()
-
-        return
-
     await query.answer()
 
-    if query.data == "adicionar_feedback":
 
-        modo_feedback["acao"] = "adicionar"
-
-        await query.message.reply_text(
-
-            "➕ Envie a foto do feedback."
-
-        )
-
-    elif query.data == "agendar_feedback":
-
-        modo_feedback["acao"] = "agendar"
+    if query.data == "feedback_imediato":
 
         await query.message.reply_text(
 
-            "⏰ Envie o horário.\n\n"
+            "⚡ Envio Imediato\n\n"
 
-            "Exemplo: 22:00"
-
-        )
-
-    elif query.data == "envio_imediato":
-
-        modo_feedback["acao"] = "imediato"
-
-        await query.message.reply_text(
-
-            "⚡ Envio Imediato ativado.\n\n"
-
-            "Envie a FOTO agora."
+            "Responda uma FOTO e use o botão novamente."
 
         )
 
-    elif query.data == "estatisticas_feedback":
+
+    elif query.data == "stats_feedback":
+
 
         disponiveis = len(
 
@@ -580,6 +674,7 @@ async def callback_feedback(
 
         )
 
+
         usados = len(
 
             [
@@ -592,6 +687,7 @@ async def callback_feedback(
 
         )
 
+
         await query.message.reply_text(
 
             "📊 ESTATÍSTICAS\n\n"
@@ -600,33 +696,22 @@ async def callback_feedback(
 
             f"✅ Disponíveis: {disponiveis}\n"
 
-            f"♻️ Usados: {usados}\n"
-
-            f"⏰ Agendados: {len(feedbacks_agendados)}"
+            f"♻️ Usados: {usados}"
 
         )
 
+
     elif query.data == "reset_feedback":
+
 
         feedbacks.clear()
 
-        feedbacks_agendados.clear()
-
-        salvar_json(
-
-            ARQUIVO_FEEDBACKS,
+        salvar_feedbacks(
 
             feedbacks
 
         )
 
-        salvar_json(
-
-            ARQUIVO_AGENDADOS_FEEDBACK,
-
-            feedbacks_agendados
-
-        )
 
         await query.message.reply_text(
 
@@ -634,219 +719,116 @@ async def callback_feedback(
 
         )
 
-async def verificar_feedbacks_agendados(
 
-    context: ContextTypes.DEFAULT_TYPE
+    elif query.data == "adicionar_feedback":
 
-):
 
-    agora = datetime.now(
+        await query.message.reply_text(
 
-        ZoneInfo("America/Sao_Paulo")
+            "➕ Adicionar Feedback\n\n"
 
-    ).strftime("%H:%M")
+            "Envie a FOTO que deseja salvar."
 
-    for item in feedbacks_agendados.copy():
+        )
 
-        if item["horario"] != agora:
 
-            continue
+    elif query.data == "agendar_feedback":
 
-        try:
 
-            await context.bot.send_photo(
+        await query.message.reply_text(
 
-                chat_id=GROUP_ID,
+            "⏰ Agendar Feedback\n\n"
 
-                photo=item["file_id"],
+            "Use o horário desejado.\n"
 
-                caption=LEGENDA_FEEDBACK,
+            "Exemplo: 22:00"
 
-                reply_markup=botao_vip()
+        )
 
-            )
 
-            STATUS_SISTEMA["feedbacks_hoje"] += 1
+    else:
 
-            feedbacks_agendados.remove(
 
-                item
+        await query.message.reply_text(
 
-            )
+            "⚠️ Função não configurada."
 
-            salvar_json(
+        )
 
-                ARQUIVO_AGENDADOS_FEEDBACK,
 
-                feedbacks_agendados
-
-            )
-
-            await context.bot.send_message(
-
-                chat_id=OWNER_ID,
-
-                text=(
-
-                    "✅ Feedback enviado!\n\n"
-
-                    f"⏰ Horário: {agora}\n"
-
-                    "⭐ Tipo: Feedback"
-
-                )
-
-            )
-
-        except Exception as erro:
-
-            print(
-
-                "ERRO FEEDBACK AGENDADO:",
-
-                erro
-
-            )
 
 # ==============================
-# ▶️ START
+# 👑 VIP
 # ==============================
 
-async def start(
-
+async def entrarnovip(
     update: Update,
-
     context: ContextTypes.DEFAULT_TYPE
-
 ):
 
     if update.effective_user.id != OWNER_ID:
 
         return
 
-    await update.message.reply_text(
 
-        "🖤 BLACK SYSTEM\n\n"
+    await context.bot.send_message(
 
-        "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
+        chat_id=GROUP_ID,
 
-        "⭐ Sistema de Feedback Ativo\n\n"
+        text="🔥 ENTRE NO VIP 🔥",
 
-        "━━━━━━━━━━━\n\n"
-
-        f"⭐ Feedbacks: {len(feedbacks)}\n"
-
-        f"⏰ Agendados: {len(feedbacks_agendados)}\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "⚡ Sistema protegido"
+        reply_markup=botoes_vip()
 
     )
 
-# ==============================
-# 📊 STATUS
-# ==============================
 
-async def status(
-
-    update: Update,
-
-    context: ContextTypes.DEFAULT_TYPE
-
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    atualizar_dia()
-
-    await update.message.reply_text(
-
-        "🖤 BLACK SYSTEM\n\n"
-
-        "📊 STATUS\n\n"
-
-        f"⭐ Feedbacks hoje: {STATUS_SISTEMA['feedbacks_hoje']}\n"
-
-        f"📦 Salvos: {len(feedbacks)}\n"
-
-        f"⏰ Agendados: {len(feedbacks_agendados)}"
-
-    )
-
-async def comando_enviar_feedback(
-
-    update: Update,
-
-    context: ContextTypes.DEFAULT_TYPE
-
-):
-
-    await enviar_feedback(
-
-        update,
-
-        context
-
-    )
 
 # ==============================
-# 🤖 CONFIGURAÇÃO MENU
+# 🤖 INICIAR BOT
 # ==============================
 
-async def configurar_menu(
-
-    app
-
-):
+async def configurar_menu(app):
 
     comandos = [
 
         BotCommand(
-
             "start",
-
             "BLACK SYSTEM 👑"
-
         ),
 
         BotCommand(
-
             "status",
-
-            "STATUS 🖤"
-
+            "STATUS DO SISTEMA 🖤"
         ),
 
         BotCommand(
+            "divulgar",
+            "DIVULGAR 🔥"
+        ),
 
+        BotCommand(
+            "d_album",
+            "DIVULGAR ÁLBUM 🖼️"
+        ),
+
+        BotCommand(
             "feedback",
-
-            "PAINEL DE FEEDBACK ⭐"
-
+            "FEEDBACK VIP ⭐"
         ),
 
         BotCommand(
-
-            "enviar_feedback",
-
-            "ENVIAR FEEDBACK ⚡"
-
+            "agendar",
+            "AGENDAR DIVULGAÇÃO ⏰"
         )
 
     ]
 
+
     await app.bot.set_my_commands(
-
         comandos
-
     )
 
-# ==============================
-# 🚀 APLICAÇÃO
-# ==============================
+
 
 app = (
 
@@ -862,140 +844,87 @@ app = (
 
 )
 
+
+
 app.add_handler(
 
     CommandHandler(
-
         "start",
-
         start
-
     )
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
-
         "status",
-
         status
-
     )
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
+        "divulgar",
+        divulgar
+    )
 
+)
+
+
+app.add_handler(
+
+    CommandHandler(
         "feedback",
-
         feedback
-
     )
 
 )
 
-app.add_handler(
-
-    CommandHandler(
-
-        "enviar_feedback",
-
-        comando_enviar_feedback
-
-    )
-
-)
 
 app.add_handler(
 
     CallbackQueryHandler(
-
-        callback_feedback
-
+        botoes_feedback_callback
     )
 
 )
+
+
+app.add_handler(
+
+    CommandHandler(
+        "entrarnovip",
+        entrarnovip
+    )
+
+)
+
 
 app.add_handler(
 
     MessageHandler(
 
-        filters.PHOTO,
+        filters.PHOTO | filters.VIDEO,
 
-        receber_feedback_imediato
-
-    )
-
-)
-
-app.add_handler(
-
-    MessageHandler(
-
-        filters.PHOTO,
-
-        salvar_feedback
+        receber_album
 
     )
 
 )
 
-app.add_handler(
 
-    MessageHandler(
-
-        filters.TEXT & ~filters.COMMAND,
-
-        receber_horario_feedback
-
-    )
-
-)
-
-app.job_queue.run_repeating(
-
-    verificar_feedbacks_agendados,
-
-    interval=30,
-
-    first=10
-
-)
-
-# ==============================
-# 🛡️ PROTEÇÃO FINAL
-# ==============================
-
-async def erro_global(
-
-    update: object,
-
-    context: ContextTypes.DEFAULT_TYPE
-
-):
-
-    print(
-
-        "ERRO NO BOT:",
-
-        context.error
-
-    )
-
-app.add_error_handler(
-
-    erro_global
-
-)
 
 print(
 
-    "🖤 BLACK SYSTEM ONLINE ✅"
+    "Bot iniciado ✅"
 
 )
+
+
 
 app.run_polling()
