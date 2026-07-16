@@ -1307,9 +1307,9 @@ app.add_handler(
 
     MessageHandler(
 
-        filters.PHOTO,
+        filters.PHOTO | filters.VIDEO,
 
-        receber_feedback
+        receber_album
 
     )
 
