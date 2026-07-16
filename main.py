@@ -934,13 +934,21 @@ async def configurar_menu(app):
 
         BotCommand(
 
-            "agendar",
+    "agendar",
 
-            "AGENDAR DIVULGAÇÃO ⏰"
+    "AGENDAR DIVULGAÇÃO ⏰"
 
-        )
+),
 
-    ]
+BotCommand(
+
+    "feedback",
+
+    "SISTEMA DE FEEDBACK 📝"
+
+)
+
+]
 
     await app.bot.set_my_commands(
 
