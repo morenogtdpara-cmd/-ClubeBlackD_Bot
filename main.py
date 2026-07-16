@@ -444,8 +444,74 @@ async def divulgar(
 
 
 # ==============================
-# FEEDBACK MANUAL
+# CENTRAL DE FEEDBACKS
 # ==============================
+
+def botoes_feedback():
+
+    return InlineKeyboardMarkup(
+
+        [
+
+            [
+
+                InlineKeyboardButton(
+                    "⚡ Envio Imediato",
+                    callback_data="feedback_imediato"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "➕ Adicionar Feedback",
+                    callback_data="adicionar_feedback"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "🚀 Publicar Feedback",
+                    callback_data="publicar_feedback"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "⏰ Agendar Feedback",
+                    callback_data="agendar_feedback"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "📊 Estatísticas",
+                    callback_data="stats_feedback"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "🔄 Resetar Feedbacks",
+                    callback_data="reset_feedback"
+                )
+
+            ]
+
+        ]
+
+    )
+
+
 
 async def feedback(
     update: Update,
@@ -457,79 +523,22 @@ async def feedback(
         return
 
 
-    if not update.message.reply_to_message:
-
-        await update.message.reply_text(
-
-            "⚠️ Responda a mensagem do feedback usando /feedback"
-
-        )
-
-        return
-
-
-    mensagem = update.message.reply_to_message
-
-
-    if mensagem.photo:
-
-        await context.bot.send_photo(
-
-            chat_id=GROUP_ID,
-
-            photo=mensagem.photo[-1].file_id,
-
-            caption=LEGENDA_FEEDBACK,
-
-            reply_markup=botoes_vip()
-
-        )
-
-
-    elif mensagem.video:
-
-        await context.bot.send_video(
-
-            chat_id=GROUP_ID,
-
-            video=mensagem.video.file_id,
-
-            caption=LEGENDA_FEEDBACK,
-
-            reply_markup=botoes_vip()
-
-        )
-
-
-    else:
-
-        await context.bot.copy_message(
-
-            chat_id=GROUP_ID,
-
-            from_chat_id=mensagem.chat.id,
-
-            message_id=mensagem.message_id,
-
-            reply_markup=botoes_vip()
-
-        )
-
-
-
-    STATUS_SISTEMA["feedbacks_hoje"] += 1
-
-
-    registrar_envio(
-
-        "Feedback"
-
-    )
+    total = len(feedbacks)
 
 
     await update.message.reply_text(
 
-        "✅ Feedback publicado!"
+        "⭐ SISTEMA DE FEEDBACKS\n\n"
+
+        f"📦 Total: {total}\n"
+
+        f"✅ Disponíveis: {total}\n"
+
+        "♻️ Usados: 0\n\n"
+
+        "━━━━━━━━━━━",
+
+        reply_markup=botoes_feedback()
 
     )
 
