@@ -1205,6 +1205,17 @@ app.add_handler(
 
     MessageHandler(
 
+        filters.PHOTO,
+
+        receber_feedback
+
+    )
+
+)
+app.add_handler(
+
+    MessageHandler(
+
         filters.PHOTO | filters.VIDEO,
 
         receber_album
