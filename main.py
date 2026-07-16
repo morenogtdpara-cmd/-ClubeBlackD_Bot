@@ -1090,7 +1090,6 @@ async def botoes_feedback(
 
     await query.answer()
 
-
     if query.data == "feedback_adicionar":
 
         aguardando_feedback.add(
@@ -1102,7 +1101,6 @@ async def botoes_feedback(
             "📸 Envie o print do feedback."
 
         )
-
 
     elif query.data == "feedback_imediato":
 
@@ -1116,9 +1114,7 @@ async def botoes_feedback(
 
             return
 
-
         feedback = feedbacks[0]
-
 
         await context.bot.send_photo(
 
@@ -1132,15 +1128,29 @@ async def botoes_feedback(
 
         )
 
-
         registrar_envio(
 
             "Feedback"
 
         )
 
+        await query.message.reply_text(
+
+            "✅ Feedback enviado com sucesso!"
+
+        )
+
+    elif query.data == "feedback_agendar":
 
         await query.message.reply_text(
+
+            "⏰ Envie o horário do feedback.\n\n"
+
+            "Exemplo:\n"
+
+            "18:30"
+
+        )
 
             "✅ Feedback enviado com sucesso!"
 
