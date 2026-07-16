@@ -1117,7 +1117,10 @@ async def configurar_menu(app):
             "FEEDBACK VIP ⭐"
 
         ),
-
+        BotCommand(
+           "feedback_imediato",
+           "ENVIO IMEDIATO ⚡"
+        ),
         BotCommand(
 
             "agendar",
