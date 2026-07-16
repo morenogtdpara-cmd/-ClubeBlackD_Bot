@@ -1051,6 +1051,56 @@ async def botoes_feedback(
             "📸 Envie o print do feedback."
 
         )
+async def receber_feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id not in aguardando_feedback:
+
+        return
+
+    if not update.message.photo:
+
+        return
+
+    foto = update.message.photo[-1].file_id
+
+    novo_feedback = {
+
+        "id": gerar_id_feedback(),
+
+        "file_id": foto,
+
+        "data": datetime.now(
+            ZoneInfo("America/Sao_Paulo")
+        ).strftime("%d/%m/%Y %H:%M"),
+
+        "status": "disponivel"
+
+    }
+
+    feedbacks.append(
+        novo_feedback
+    )
+
+    salvar_feedbacks(
+        feedbacks
+    )
+
+    aguardando_feedback.remove(
+        update.effective_user.id
+    )
+
+    await update.message.reply_text(
+
+        "✅ Feedback adicionado com sucesso!\n\n"
+
+        f"📝 ID: {novo_feedback['id']}\n"
+
+        f"📊 Total disponível: {len(feedbacks)}"
+
+    )
 # ==============================
 # BOT
 # ==============================
