@@ -1152,9 +1152,7 @@ async def botoes_feedback(
 
         )
 
-            "✅ Feedback enviado com sucesso!"
-
-        )
+        
 async def receber_feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
