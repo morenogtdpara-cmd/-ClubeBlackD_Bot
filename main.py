@@ -1068,7 +1068,7 @@ app.add_handler(
     )
 
 )
-    app.add_handler(
+app.add_handler(
 
     CommandHandler(
 
