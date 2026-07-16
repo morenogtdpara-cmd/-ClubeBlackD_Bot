@@ -1085,9 +1085,7 @@ async def botoes_feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-    print("PASSOU NO RECEBER FEEDBACK")
-    print("RECEBEU FOTO FEEDBACK")
-    print(aguardando_feedback)
+
     query = update.callback_query
 
     await query.answer()
@@ -1097,12 +1095,18 @@ async def botoes_feedback(
         aguardando_feedback.add(
             query.from_user.id
         )
-    print("AGUARDANDO:", aguardando_feedback)
+
+        print(
+            "AGUARDANDO:",
+            aguardando_feedback
+        )
+
         await query.message.reply_text(
 
             "📸 Envie o print do feedback."
 
         )
+
 
     elif query.data == "feedback_imediato":
 
@@ -1116,7 +1120,9 @@ async def botoes_feedback(
 
             return
 
+
         feedback = feedbacks[0]
+
 
         await context.bot.send_photo(
 
@@ -1130,17 +1136,20 @@ async def botoes_feedback(
 
         )
 
+
         registrar_envio(
 
             "Feedback"
 
         )
 
+
         await query.message.reply_text(
 
             "✅ Feedback enviado com sucesso!"
 
         )
+
 
     elif query.data == "feedback_agendar":
 
