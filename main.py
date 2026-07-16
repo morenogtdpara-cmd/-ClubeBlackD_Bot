@@ -542,7 +542,64 @@ async def feedback(
 
     )
 
+# ==============================
+# ENVIO IMEDIATO DE FEEDBACK
+# ==============================
 
+async def enviar_feedback_imediato(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+
+    if not update.message.reply_to_message:
+
+        await update.message.reply_text(
+            "⚠️ Responda uma FOTO e use o envio imediato."
+        )
+
+        return
+
+
+    mensagem = update.message.reply_to_message
+
+
+    if not mensagem.photo:
+
+        await update.message.reply_text(
+            "⚠️ Apenas fotos são permitidas."
+        )
+
+        return
+
+
+    await context.bot.send_photo(
+
+        chat_id=GROUP_ID,
+
+        photo=mensagem.photo[-1].file_id,
+
+        caption=LEGENDA_FEEDBACK,
+
+        reply_markup=botoes_vip()
+
+    )
+
+
+    STATUS_SISTEMA["feedbacks_hoje"] += 1
+
+
+    registrar_envio(
+        "Feedback"
+    )
+
+
+    await update.message.reply_text(
+        "✅ Feedback publicado!"
+    )
 
 # ==============================
 # DIVULGAR ÁLBUM MANUAL
