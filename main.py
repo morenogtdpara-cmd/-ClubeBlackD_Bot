@@ -1320,12 +1320,12 @@ app.add_handler(
 
 )
 
-# FOTO ÚNICA = FEEDBACK
+# FEEDBACK - FOTO ÚNICA
 app.add_handler(
 
     MessageHandler(
 
-        filters.PHOTO & ~filters.MediaGroup,
+        filters.PHOTO,
 
         receber_feedback
 
@@ -1333,7 +1333,7 @@ app.add_handler(
 
 )
 
-# ÁLBUM = RECEBER ÁLBUM
+# ÁLBUM - FOTO E VÍDEO
 app.add_handler(
 
     MessageHandler(
