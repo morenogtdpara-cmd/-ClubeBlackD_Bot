@@ -1294,7 +1294,7 @@ app.add_handler(
 
         "feedback",
 
-        feedback
+        feedback_imediato
 
     )
 
