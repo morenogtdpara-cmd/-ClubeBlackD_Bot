@@ -1027,7 +1027,30 @@ async def entrarnovip(
         reply_markup=botoes_vip()
 
     )
+# ==============================
+# BOTÕES DE FEEDBACK
+# ==============================
 
+async def botoes_feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    if query.data == "feedback_adicionar":
+
+        aguardando_feedback.add(
+            query.from_user.id
+        )
+
+        await query.message.reply_text(
+
+            "📸 Envie o print do feedback."
+
+        )
 # ==============================
 # BOT
 # ==============================
