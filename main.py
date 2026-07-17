@@ -999,7 +999,8 @@ async def botoes_feedback(
             query.from_user.id
 
         )
-
+    print("BOTAO FEEDBACK CLICADO")
+    print("ID SALVO:", query.from_user.id)
 
         await query.message.reply_text(
 
