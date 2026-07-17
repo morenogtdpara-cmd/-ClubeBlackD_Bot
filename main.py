@@ -950,6 +950,44 @@ async def botoes_feedback(
             "📸 Envie o print do feedback."
 
         )
+async def receber_feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    if update.effective_user.id not in aguardando_feedback:
+        return
+
+    if not update.message.photo:
+        return
+
+    foto = update.message.photo[-1].file_id
+
+    feedbacks.append({
+
+        "file_id": foto,
+
+        "data": datetime.now(
+            ZoneInfo("America/Sao_Paulo")
+        ).strftime("%d/%m/%Y %H:%M")
+
+    })
+
+    salvar_feedbacks(feedbacks)
+
+    aguardando_feedback.remove(
+        update.effective_user.id
+    )
+
+    await update.message.reply_text(
+
+        "✅ Feedback salvo com sucesso!\n\n"
+        "📸 Print recebido."
+
+    )
 # ==============================
 # MENU
 # ==============================
