@@ -922,11 +922,6 @@ async def feedback(
     reply_markup=painel_feedback()
 
 )
-async def feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
     if update.effective_user.id != OWNER_ID:
 
         return
