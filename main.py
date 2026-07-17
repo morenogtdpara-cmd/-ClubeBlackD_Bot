@@ -1021,7 +1021,7 @@ async def receber_feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-print("🔥 RECEBER_FEEDBACK FOI CHAMADO")
+    print("🔥 RECEBER_FEEDBACK FOI CHAMADO")
     if update.effective_user.id not in aguardando_feedback:
         return
 
