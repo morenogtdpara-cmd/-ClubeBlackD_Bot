@@ -916,7 +916,7 @@ def painel_feedback():
     )
 
 
-async def feedback(
+async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -925,7 +925,11 @@ async def feedback(
 
         return
 
-    await update.message.reply_text(
+    if update.effective_user.id in aguardando_feedback:
+
+        return
+
+    mensagem = update.message
 
         "📝 SISTEMA DE FEEDBACK\n\n"
         "Escolha uma opção:",
