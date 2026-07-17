@@ -1050,26 +1050,40 @@ async def receber_feedback(
     context: ContextTypes.DEFAULT_TYPE
 ):
 
+    print("🔥 RECEBER_FEEDBACK FOI CHAMADO")
+
+    usuario = update.effective_user.id
+
+    print("ID USUARIO:", usuario)
+
     print(
-        "FEEDBACK CHAMADO"
+        "AGUARDANDO:",
+        aguardando_feedback
     )
 
-
-    if update.message.media_group_id:
+    if usuario not in aguardando_feedback:
 
         print(
-            "IGNORADO: É ALBUM"
+            "USUARIO NAO ESTA AGUARDANDO"
         )
 
         return
 
 
-    if update.effective_user.id not in aguardando_feedback:
+    if update.message.media_group_id:
+
+        print(
+            "IGNORADO: FAZ PARTE DE ALBUM"
+        )
 
         return
 
 
     if not update.message.photo:
+
+        print(
+            "MENSAGEM SEM FOTO"
+        )
 
         return
 
@@ -1082,25 +1096,25 @@ async def receber_feedback(
         "file_id": file_id,
 
         "data": datetime.now(
-
             ZoneInfo("America/Sao_Paulo")
-
         ).strftime("%d/%m/%Y %H:%M")
 
     })
 
 
     salvar_feedbacks(
-
         feedbacks
-
     )
 
 
     aguardando_feedback.remove(
+        usuario
+    )
 
-        update.effective_user.id
 
+    print(
+        "FEEDBACK SALVO:",
+        file_id
     )
 
 
