@@ -350,18 +350,18 @@ async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-    print("ALBUM RECEBEU MIDIA")
-    if update.effective_user.id != OWNER_ID:
 
+    if update.effective_user.id != OWNER_ID:
         return
 
     mensagem = update.message
 
     if not mensagem.media_group_id:
-
         return
 
     grupo = mensagem.media_group_id
+
+    print(f"ALBUM ID: {grupo}")
 
     if grupo not in albuns:
 
@@ -373,17 +373,31 @@ async def receber_album(
 
         }
 
+        print("NOVO ALBUM CRIADO")
+
     if len(albuns[grupo]["mensagens"]) < 10:
 
         albuns[grupo]["mensagens"].append(
             mensagem
         )
 
+        print(
+            f"MIDIAS NO ALBUM: {len(albuns[grupo]['mensagens'])}"
+        )
+
+    if mensagem.photo:
+        print("FOTO CAPTURADA")
+
+    if mensagem.video:
+        print("VIDEO CAPTURADO")
+
     if mensagem.caption:
 
         albuns[grupo]["legenda"] = mensagem.caption
 
-    await asyncio.sleep(3)
+        print(
+            f"LEGENDA: {mensagem.caption}"
+        )
 
 # ==============================
 # DIVULGAR
