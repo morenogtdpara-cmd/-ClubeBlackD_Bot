@@ -110,6 +110,11 @@ LEGENDA_FIXA = """
 
 albuns = {}
 
+# ==============================
+# FEEDBACK - ESTADO
+# ==============================
+
+AGUARDANDO_FEEDBACK = 1
 
 # ==============================
 # AGENDAMENTOS
