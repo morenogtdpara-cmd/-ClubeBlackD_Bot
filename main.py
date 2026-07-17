@@ -1055,10 +1055,13 @@ async def receber_feedback(
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    print("🔥 RECEBER_FEEDBACK FOI CHAMADO")
+    print("FEEDBACK CHAMADO")
 
-    if update.effective_user.id not in aguardando_feedback:
-        return
+if update.message.media_group_id:
+    print("IGNORADO: É ALBUM")
+    return
+
+    print("🔥 RECEBER_FEEDBACK FOI CHAMADO")
 
     if not update.message.photo:
         return
