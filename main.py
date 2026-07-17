@@ -351,8 +351,28 @@ async def receber_feedback(
 
     foto = update.message.photo[-1].file_id
 
+    legenda = """
+⭐ FEEDBACK REAL ⭐
+
+🔥 Cliente satisfeito com nosso conteúdo.
+
+🖤 Clube Black VIP
+"""
+
+    await context.bot.send_photo(
+
+        chat_id=GROUP_ID,
+
+        photo=foto,
+
+        caption=legenda,
+
+        reply_markup=botoes_vip()
+
+    )
+
     await update.message.reply_text(
-        "✅ Feedback recebido!"
+        "✅ Feedback enviado com sucesso!"
     )
 
     return ConversationHandler.END
