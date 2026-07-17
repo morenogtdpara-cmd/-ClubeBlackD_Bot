@@ -104,7 +104,46 @@ LEGENDA_FIXA = """
 """
 
 albuns = {}
+# ==============================
+# FEEDBACKS
+# ==============================
 
+ARQUIVO_FEEDBACKS = "feedbacks.json"
+
+def carregar_feedbacks():
+
+    if not Path(ARQUIVO_FEEDBACKS).exists():
+
+        return []
+
+    with open(
+        ARQUIVO_FEEDBACKS,
+        "r",
+        encoding="utf-8"
+    ) as arquivo:
+
+        return json.load(arquivo)
+
+
+def salvar_feedbacks(lista):
+
+    with open(
+        ARQUIVO_FEEDBACKS,
+        "w",
+        encoding="utf-8"
+    ) as arquivo:
+
+        json.dump(
+            lista,
+            arquivo,
+            indent=4,
+            ensure_ascii=False
+        )
+
+
+feedbacks = carregar_feedbacks()
+
+aguardando_feedback = set()
 # ==============================
 # AGENDAMENTOS
 # ==============================
