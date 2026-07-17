@@ -988,6 +988,49 @@ async def receber_feedback(
         "📸 Print recebido."
 
     )
+async def enviar_feedback_imediato(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    if not feedbacks:
+
+        await update.callback_query.message.reply_text(
+            "⚠️ Nenhum feedback salvo."
+        )
+
+        return
+
+    enviados = 0
+
+    for feedback in feedbacks:
+
+        try:
+
+            await context.bot.send_photo(
+                chat_id=GROUP_ID,
+                photo=feedback["file_id"]
+            )
+
+            enviados += 1
+
+        except Exception as e:
+
+            print(
+                "ERRO AO ENVIAR FEEDBACK:",
+                e
+            )
+
+
+    await update.callback_query.message.reply_text(
+
+        f"⚡ Feedbacks enviados com sucesso!\n\n"
+        f"📸 Quantidade: {enviados}"
+
+    )
 # ==============================
 # MENU
 # ==============================
