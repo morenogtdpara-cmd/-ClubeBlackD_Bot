@@ -917,25 +917,18 @@ def painel_feedback():
 
 
 async def receber_album(
+   async def feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
     if update.effective_user.id != OWNER_ID:
-
         return
 
-    if update.effective_user.id in aguardando_feedback:
-
-        return
-
-    mensagem = update.message
-
+    await update.message.reply_text(
         "📝 SISTEMA DE FEEDBACK\n\n"
         "Escolha uma opção:",
-
         reply_markup=painel_feedback()
-
     )
 
 
