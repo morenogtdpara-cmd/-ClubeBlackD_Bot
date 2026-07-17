@@ -921,6 +921,43 @@ async def feedback(
     reply_markup=painel_feedback()
 
 )
+async def feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+    await update.message.reply_text(
+
+        "📝 SISTEMA DE FEEDBACK\n\n"
+        "Escolha uma opção:",
+
+        reply_markup=painel_feedback()
+
+    )
+
+
+async def botoes_feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    if query.data == "feedback_adicionar":
+
+        aguardando_feedback.add(
+            query.from_user.id
+        )
+
+        await query.message.reply_text(
+            "📸 Envie o print do feedback."
+        )
 # ==============================
 # MENU
 # ==============================
