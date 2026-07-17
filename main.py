@@ -992,15 +992,18 @@ async def botoes_feedback(
     await query.answer()
 
 
-    if query.data == "feedback_adicionar":
+    elif query.data == "feedback_adicionar":
 
-        aguardando_feedback.add(
+    aguardando_feedback.add(
+        query.from_user.id
+    )
 
-            query.from_user.id
-
-        )
     print("BOTAO FEEDBACK CLICADO")
     print("ID SALVO:", query.from_user.id)
+
+    await query.message.reply_text(
+        "📸 Envie o print do feedback."
+    )
 
         await query.message.reply_text(
 
