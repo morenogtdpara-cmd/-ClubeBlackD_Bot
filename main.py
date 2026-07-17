@@ -868,6 +868,10 @@ async def verificar_agendamentos(
 # ==============================
 # FEEDBACK
 # ==============================
+# ==============================
+# FEEDBACK
+# ==============================
+
 def painel_feedback():
 
     return InlineKeyboardMarkup(
@@ -905,23 +909,13 @@ def painel_feedback():
         ]
 
     )
+
+
 async def feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    await update.message.reply_text(
-
-    "📝 SISTEMA DE FEEDBACK\n\n"
-    "Escolha uma opção:",
-
-    reply_markup=painel_feedback()
-
-)
     if update.effective_user.id != OWNER_ID:
 
         return
@@ -952,7 +946,9 @@ async def botoes_feedback(
         )
 
         await query.message.reply_text(
+
             "📸 Envie o print do feedback."
+
         )
 # ==============================
 # MENU
