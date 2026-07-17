@@ -350,7 +350,7 @@ async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
+    print("ALBUM RECEBEU MIDIA")
     if update.effective_user.id != OWNER_ID:
 
         return
