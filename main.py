@@ -986,7 +986,12 @@ async def receber_feedback(
 
         "✅ Feedback salvo com sucesso!\n\n"
         "📸 Print recebido."
+    elif query.data == "feedback_imediato":
 
+        await enviar_feedback_imediato(
+            update,
+            context
+        )
     )
 async def enviar_feedback_imediato(
     update: Update,
