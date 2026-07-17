@@ -1172,16 +1172,19 @@ app.add_handler(
         botoes_feedback
     )
 )
+
 app.add_handler(
-
     MessageHandler(
-
-        filters.PHOTO | filters.VIDEO,
-
-        receber_album
-
+        filters.PHOTO,
+        receber_feedback
     )
+)
 
+app.add_handler(
+    MessageHandler(
+        filters.PHOTO | filters.VIDEO,
+        receber_album
+    )
 )
 
 app.job_queue.run_repeating(
