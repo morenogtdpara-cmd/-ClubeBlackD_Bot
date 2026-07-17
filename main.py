@@ -406,7 +406,64 @@ async def receber_album(
         print(
             f"LEGENDA: {mensagem.caption}"
         )
+# ==============================
+# NOVO RECEBER ÁLBUM
+# ==============================
 
+async def receber_album_novo(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    global ultimo_album
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    mensagem = update.message
+
+    if not mensagem.media_group_id:
+        return
+
+    if not ultimo_album["midias"]:
+        ultimo_album["midias"] = []
+        ultimo_album["legenda"] = ""
+
+    if len(ultimo_album["midias"]) >= 10:
+        return
+
+    if mensagem.photo:
+
+        ultimo_album["midias"].append({
+
+            "tipo": "foto",
+            "file_id": mensagem.photo[-1].file_id
+
+        })
+
+        print("NOVO ALBUM: FOTO SALVA")
+
+
+    elif mensagem.video:
+
+        ultimo_album["midias"].append({
+
+            "tipo": "video",
+            "file_id": mensagem.video.file_id
+
+        })
+
+        print("NOVO ALBUM: VIDEO SALVO")
+
+
+    if mensagem.caption:
+
+        ultimo_album["legenda"] = mensagem.caption
+
+        print(
+            "NOVA LEGENDA:",
+            mensagem.caption
+        )
 # ==============================
 # DIVULGAR
 # ==============================
