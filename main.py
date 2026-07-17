@@ -1022,8 +1022,8 @@ async def configurar_menu(app):
     comandos = [
 
     BotCommand(
-        "status",
-        "STATUS DO SISTEMA 🖤"
+        "start",
+        "BLACK SYSTEM 👑"
     ),
 
     BotCommand(
@@ -1046,13 +1046,11 @@ async def configurar_menu(app):
         "ADICIONAR FEEDBACK 📸"
     )
 
-]
+    ]
 
 
     await app.bot.set_my_commands(
-
         comandos
-
     )
 
 
