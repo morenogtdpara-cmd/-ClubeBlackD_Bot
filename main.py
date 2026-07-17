@@ -462,7 +462,7 @@ async def receber_feedback(
         reply_markup=botoes_vip()
 
     )
-
+    registrar_feedback()
     await update.message.reply_text(
         "✅ Feedback enviado com sucesso!"
     )
