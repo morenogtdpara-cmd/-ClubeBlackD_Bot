@@ -369,7 +369,7 @@ async def receber_feedback(
 
         photo=foto,
 
-        caption=legenda,
+        caption=LEGENDA_FEEDBACK,
 
         reply_markup=botoes_vip()
 
