@@ -1138,6 +1138,11 @@ app.add_handler(
 
 )
 app.add_handler(
+    CallbackQueryHandler(
+        botoes_feedback
+    )
+)
+app.add_handler(
 
     MessageHandler(
 
