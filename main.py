@@ -338,6 +338,25 @@ async def feedback(
 
     return AGUARDANDO_FEEDBACK
 # ==============================
+# RECEBER FEEDBACK
+# ==============================
+
+async def receber_feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    foto = update.message.photo[-1].file_id
+
+    await update.message.reply_text(
+        "✅ Feedback recebido!"
+    )
+
+    return ConversationHandler.END
+# ==============================
 # RECEBER ÁLBUM
 # ==============================
 
