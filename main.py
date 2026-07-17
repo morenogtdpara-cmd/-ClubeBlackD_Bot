@@ -287,6 +287,7 @@ async def start(
 
         return
 
+
     await update.message.reply_text(
 
         "🖤 BLACK SYSTEM\n\n"
@@ -299,11 +300,21 @@ async def start(
 
         "📋 HOJE\n\n"
 
-        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/∞\n"
+        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/𝟐𝟎\n"
 
         f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
 
         f"⏰ Agendados: {len(agendamentos)}\n\n"
+
+        "━━━━━━━━━━━\n\n"
+
+        "📊 ESTATÍSTICAS TOTAIS\n\n"
+
+        f"📤 Divulgações: {STATUS_SISTEMA['divulgacoes']}\n"
+
+        f"📚 Álbuns: {STATUS_SISTEMA['albuns']}\n"
+
+        f"📨 Feedbacks: {STATUS_SISTEMA['feedbacks']}\n\n"
 
         "━━━━━━━━━━━\n\n"
 
