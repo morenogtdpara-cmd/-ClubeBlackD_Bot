@@ -20,7 +20,6 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
     MessageHandler,
-    CallbackQueryHandler,
     filters
 )
 
@@ -31,6 +30,7 @@ GROUP_ID = -1004231485932
 OWNER_ID = 8880948641
 
 VIP_LINK = "https://t.me/ClubeBlackBot"
+
 
 # ==============================
 # 🖤 BLACK SYSTEM - DADOS REAIS
@@ -56,6 +56,7 @@ STATUS_SISTEMA = {
 
 }
 
+
 def atualizar_dia():
 
     agora = datetime.now(
@@ -73,6 +74,7 @@ def atualizar_dia():
         STATUS_SISTEMA["envios_hoje"] = 0
 
         STATUS_SISTEMA["midias_hoje"] = 0
+
 
 def registrar_envio(
     tipo,
@@ -93,6 +95,7 @@ def registrar_envio(
 
     STATUS_SISTEMA["ultimo_status"] = "Sucesso"
 
+
 # ==============================
 # LEGENDA FIXA
 # ==============================
@@ -104,60 +107,16 @@ LEGENDA_FIXA = """
 @ClubeBlackBot
 """
 
+
 albuns = {}
-# ==============================
-# NOVO SISTEMA DE ÁLBUM
-# ==============================
-
-ultimo_album = {
-    "midias": [],
-    "legenda": ""
-}
-# ==============================
-# FEEDBACKS
-# ==============================
-
-ARQUIVO_FEEDBACKS = "feedbacks.json"
-
-def carregar_feedbacks():
-
-    if not Path(ARQUIVO_FEEDBACKS).exists():
-
-        return []
-
-    with open(
-        ARQUIVO_FEEDBACKS,
-        "r",
-        encoding="utf-8"
-    ) as arquivo:
-
-        return json.load(arquivo)
 
 
-def salvar_feedbacks(lista):
-
-    with open(
-        ARQUIVO_FEEDBACKS,
-        "w",
-        encoding="utf-8"
-    ) as arquivo:
-
-        json.dump(
-            lista,
-            arquivo,
-            indent=4,
-            ensure_ascii=False
-        )
-
-
-feedbacks = carregar_feedbacks()
-
-aguardando_feedback = set()
 # ==============================
 # AGENDAMENTOS
 # ==============================
 
 ARQUIVO_AGENDAMENTOS = "agendamentos.json"
+
 
 def carregar_agendamentos():
 
@@ -175,6 +134,7 @@ def carregar_agendamentos():
 
         return json.load(arquivo)
 
+
 def salvar_agendamentos(lista):
 
     with open(
@@ -190,7 +150,9 @@ def salvar_agendamentos(lista):
             ensure_ascii=False
         )
 
+
 agendamentos = carregar_agendamentos()
+
 
 # ==============================
 # BOTÃO VIP
@@ -217,6 +179,7 @@ def botoes_vip():
         ]
 
     )
+
 
 # ==============================
 # START
@@ -256,6 +219,7 @@ async def start(
         "⚡ Sistema protegido ⚡"
 
     )
+
 
 # ==============================
 # STATUS REAL
@@ -350,6 +314,7 @@ async def status(
 
     )
 
+
 # ==============================
 # RECEBER ÁLBUM
 # ==============================
@@ -360,16 +325,16 @@ async def receber_album(
 ):
 
     if update.effective_user.id != OWNER_ID:
+
         return
 
     mensagem = update.message
 
     if not mensagem.media_group_id:
+
         return
 
     grupo = mensagem.media_group_id
-
-    print(f"ALBUM ID: {grupo}")
 
     if grupo not in albuns:
 
@@ -381,89 +346,20 @@ async def receber_album(
 
         }
 
-        print("NOVO ALBUM CRIADO")
-
     if len(albuns[grupo]["mensagens"]) < 10:
 
         albuns[grupo]["mensagens"].append(
             mensagem
         )
 
-        print(
-            f"MIDIAS NO ALBUM: {len(albuns[grupo]['mensagens'])}"
-        )
-
-    if mensagem.photo:
-        print("FOTO CAPTURADA")
-
-    if mensagem.video:
-        print("VIDEO CAPTURADO")
-
     if mensagem.caption:
 
         albuns[grupo]["legenda"] = mensagem.caption
 
-        print(
-            f"LEGENDA: {mensagem.caption}"
-        )
-# ==============================
-# NOVO RECEBER ÁLBUM
-# ==============================
 
-async def receber_album_novo(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    global ultimo_album
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    mensagem = update.message
-
-    if not mensagem.media_group_id:
-        return
-
-    if not ultimo_album["midias"]:
-        ultimo_album["midias"] = []
-        ultimo_album["legenda"] = ""
-
-    if len(ultimo_album["midias"]) >= 10:
-        return
-
-    if mensagem.photo:
-
-        ultimo_album["midias"].append({
-
-            "tipo": "foto",
-            "file_id": mensagem.photo[-1].file_id
-
-        })
-
-        print("NOVO ALBUM: FOTO SALVA")
+    await asyncio.sleep(3)
 
 
-    elif mensagem.video:
-
-        ultimo_album["midias"].append({
-
-            "tipo": "video",
-            "file_id": mensagem.video.file_id
-
-        })
-
-        print("NOVO ALBUM: VIDEO SALVO")
-
-
-    if mensagem.caption:
-
-        ultimo_album["legenda"] = mensagem.caption
-
-        print(
-            "NOVA LEGENDA:",
-            mensagem.caption
-        )
 # ==============================
 # DIVULGAR
 # ==============================
@@ -498,6 +394,7 @@ async def divulgar(
     registrar_envio(
         "Publicação"
     )
+
 
 # ==============================
 # DIVULGAR ÁLBUM MANUAL
@@ -554,6 +451,7 @@ async def d_album(
 
         legenda_final = LEGENDA_FIXA.strip()
 
+
     for item in albuns[grupo]["mensagens"]:
 
         if item.photo:
@@ -574,6 +472,7 @@ async def d_album(
 
             )
 
+
         elif item.video:
 
             midias.append(
@@ -592,6 +491,7 @@ async def d_album(
 
             )
 
+
     if midias:
 
         await context.bot.send_media_group(
@@ -602,6 +502,7 @@ async def d_album(
 
         )
 
+
     registrar_envio(
 
         "Álbum",
@@ -610,13 +511,16 @@ async def d_album(
 
     )
 
+
     del albuns[grupo]
+
 
     await update.message.reply_text(
 
         "✅ Álbum divulgado!"
 
     )
+
 
 # ==============================
 # AGENDAR PUBLICAÇÃO
@@ -651,7 +555,9 @@ async def agendar_publicacao(
 
         return
 
+
     horario = context.args[0]
+
 
     try:
 
@@ -673,11 +579,14 @@ async def agendar_publicacao(
 
         return
 
+
     mensagem = update.message.reply_to_message
+
 
     if mensagem.media_group_id:
 
         grupo = mensagem.media_group_id
+
 
         if grupo not in albuns:
 
@@ -689,7 +598,9 @@ async def agendar_publicacao(
 
             return
 
+
         midias_album = []
+
 
         for item in albuns[grupo]["mensagens"]:
 
@@ -703,6 +614,7 @@ async def agendar_publicacao(
 
                 })
 
+
             elif item.video:
 
                 midias_album.append({
@@ -712,6 +624,7 @@ async def agendar_publicacao(
                     "file_id": item.video.file_id
 
                 })
+
 
         agendamentos.append({
 
@@ -733,11 +646,13 @@ async def agendar_publicacao(
 
         })
 
+
         salvar_agendamentos(
 
             agendamentos
 
         )
+
 
         await update.message.reply_text(
 
@@ -749,7 +664,9 @@ async def agendar_publicacao(
 
         )
 
+
         return
+
 
     agendamentos.append({
 
@@ -763,11 +680,13 @@ async def agendar_publicacao(
 
     })
 
+
     salvar_agendamentos(
 
         agendamentos
 
     )
+
 
     await update.message.reply_text(
 
@@ -779,6 +698,7 @@ async def agendar_publicacao(
 
     )
 
+
 # ==============================
 # VERIFICAR AGENDAMENTOS
 # ==============================
@@ -789,11 +709,13 @@ async def verificar_agendamentos(
 
     print("VERIFICANDO AGENDAMENTOS")
 
+
     agora = datetime.now(
 
         ZoneInfo("America/Sao_Paulo")
 
     ).strftime("%H:%M")
+
 
     for item in agendamentos.copy():
 
@@ -801,11 +723,13 @@ async def verificar_agendamentos(
 
             continue
 
+
         try:
 
             if item.get("tipo") == "album":
 
                 midias = []
+
 
                 legenda_usuario = item.get(
 
@@ -814,6 +738,7 @@ async def verificar_agendamentos(
                     ""
 
                 )
+
 
                 if legenda_usuario:
 
@@ -830,6 +755,7 @@ async def verificar_agendamentos(
                 else:
 
                     legenda_final = LEGENDA_FIXA.strip()
+
 
                 for item_midia in item["midias"]:
 
@@ -851,6 +777,7 @@ async def verificar_agendamentos(
 
                         )
 
+
                     elif item_midia["tipo"] == "video":
 
                         midias.append(
@@ -869,6 +796,7 @@ async def verificar_agendamentos(
 
                         )
 
+
                 if midias:
 
                     await context.bot.send_media_group(
@@ -879,6 +807,7 @@ async def verificar_agendamentos(
 
                     )
 
+
                 registrar_envio(
 
                     "Álbum",
@@ -887,7 +816,9 @@ async def verificar_agendamentos(
 
                 )
 
+
                 print("ÁLBUM ENVIADO ✅")
+
 
             else:
 
@@ -903,13 +834,16 @@ async def verificar_agendamentos(
 
                 )
 
+
                 registrar_envio(
 
                     "Publicação"
 
                 )
 
+
                 print("PUBLICAÇÃO ENVIADA ✅")
+
 
             await context.bot.send_message(
 
@@ -927,13 +861,16 @@ async def verificar_agendamentos(
 
             )
 
+
             agendamentos.remove(item)
+
 
             salvar_agendamentos(
 
                 agendamentos
 
             )
+
 
         except Exception as e:
 
@@ -944,251 +881,8 @@ async def verificar_agendamentos(
                 e
 
             )
-# ==============================
-# FEEDBACK
-# ==============================
 
-# ==============================
-# FEEDBACK
-# ==============================
 
-def painel_feedback():
-
-    return InlineKeyboardMarkup(
-
-        [
-
-            [
-
-                InlineKeyboardButton(
-                    "➕ Adicionar Feedback",
-                    callback_data="feedback_adicionar"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    "⚡ Envio Imediato",
-                    callback_data="feedback_imediato"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    "📊 Estatísticas",
-                    callback_data="feedback_stats"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    "⏰ Agendar Feedback",
-                    callback_data="feedback_agendar"
-                )
-
-            ]
-
-        ]
-
-    )
-
-
-async def feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    await update.message.reply_text(
-
-        "📝 SISTEMA DE FEEDBACK\n\n"
-        "Escolha uma opção:",
-
-        reply_markup=painel_feedback()
-
-    )
-
-
-async def enviar_feedback_imediato(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if not feedbacks:
-
-        await update.callback_query.message.reply_text(
-
-            "⚠️ Nenhum feedback salvo."
-
-        )
-
-        return
-
-    enviados = 0
-
-    for item in feedbacks:
-
-        try:
-
-            await context.bot.send_photo(
-
-                chat_id=GROUP_ID,
-
-                photo=item["file_id"]
-
-            )
-
-            enviados += 1
-
-        except Exception as e:
-
-            print(
-                "ERRO AO ENVIAR FEEDBACK:",
-                e
-            )
-
-
-    await update.callback_query.message.reply_text(
-
-        f"⚡ Feedbacks enviados com sucesso!\n\n"
-        f"📸 Quantidade: {enviados}"
-
-    )
-
-
-async def botoes_feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    query = update.callback_query
-
-    await query.answer()
-
-
-    if query.data == "feedback_adicionar":
-
-        aguardando_feedback.add(
-
-            query.from_user.id
-
-        )
-
-        print(
-            "BOTAO FEEDBACK CLICADO"
-        )
-
-        print(
-            "ID SALVO:",
-            query.from_user.id
-        )
-
-
-        await query.message.reply_text(
-
-            "📸 Envie o print do feedback."
-
-        )
-
-
-    elif query.data == "feedback_imediato":
-
-        await enviar_feedback_imediato(
-
-            update,
-
-            context
-
-        )
-
-
-async def receber_feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    print("🔥 RECEBER_FEEDBACK FOI CHAMADO")
-
-    usuario = update.effective_user.id
-
-    print("ID USUARIO:", usuario)
-
-    print(
-        "AGUARDANDO:",
-        aguardando_feedback
-    )
-
-    if usuario not in aguardando_feedback:
-
-        print(
-            "USUARIO NAO ESTA AGUARDANDO"
-        )
-
-        return
-
-
-    if update.message.media_group_id:
-
-        print(
-            "IGNORADO: FAZ PARTE DE ALBUM"
-        )
-
-        return
-
-
-    if not update.message.photo:
-
-        print(
-            "MENSAGEM SEM FOTO"
-        )
-
-        return
-
-
-    file_id = update.message.photo[-1].file_id
-
-
-    feedbacks.append({
-
-        "file_id": file_id,
-
-        "data": datetime.now(
-            ZoneInfo("America/Sao_Paulo")
-        ).strftime("%d/%m/%Y %H:%M")
-
-    })
-
-
-    salvar_feedbacks(
-        feedbacks
-    )
-
-
-    aguardando_feedback.remove(
-        usuario
-    )
-
-
-    print(
-        "FEEDBACK SALVO:",
-        file_id
-    )
-
-
-    await update.message.reply_text(
-
-        "✅ Feedback salvo com sucesso!\n\n"
-        "📸 Print recebido."
-
-    )
 # ==============================
 # MENU
 # ==============================
@@ -1239,11 +933,13 @@ async def configurar_menu(app):
 
     ]
 
+
     await app.bot.set_my_commands(
 
         comandos
 
     )
+
 
 # ==============================
 # VIP
@@ -1268,6 +964,7 @@ async def entrarnovip(
 
     )
 
+
 # ==============================
 # BOT
 # ==============================
@@ -1286,6 +983,7 @@ app = (
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
@@ -1297,6 +995,7 @@ app.add_handler(
     )
 
 )
+
 
 app.add_handler(
 
@@ -1310,6 +1009,7 @@ app.add_handler(
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
@@ -1321,6 +1021,7 @@ app.add_handler(
     )
 
 )
+
 
 app.add_handler(
 
@@ -1334,6 +1035,7 @@ app.add_handler(
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
@@ -1346,6 +1048,7 @@ app.add_handler(
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
@@ -1357,37 +1060,20 @@ app.add_handler(
     )
 
 )
-app.add_handler(
 
-    CommandHandler(
-
-        "feedback",
-
-        feedback
-
-    )
-
-)
-app.add_handler(
-    CallbackQueryHandler(
-        botoes_feedback
-    )
-)
 
 app.add_handler(
+
     MessageHandler(
-        filters.PHOTO,
-        receber_feedback
-    )
-)
 
-
-app.add_handler(
-    MessageHandler(
         filters.PHOTO | filters.VIDEO,
-        receber_album_novo
+
+        receber_album
+
     )
+
 )
+
 
 app.job_queue.run_repeating(
 
@@ -1399,6 +1085,8 @@ app.job_queue.run_repeating(
 
 )
 
+
 print("Bot iniciado ✅")
+
 
 app.run_polling()
