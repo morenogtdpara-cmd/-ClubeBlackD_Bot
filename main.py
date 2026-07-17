@@ -1056,19 +1056,6 @@ app.add_handler(
 
     CommandHandler(
 
-        "status",
-
-        status
-
-    )
-
-)
-
-
-app.add_handler(
-
-    CommandHandler(
-
         "divulgar",
 
         divulgar
@@ -1116,6 +1103,7 @@ app.add_handler(
 
 )
 
+
 app.add_handler(
 
     ConversationHandler(
@@ -1147,6 +1135,8 @@ app.add_handler(
     )
 
 )
+
+
 app.add_handler(
 
     MessageHandler(
