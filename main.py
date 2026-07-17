@@ -867,7 +867,43 @@ async def verificar_agendamentos(
 # ==============================
 # FEEDBACK
 # ==============================
+def painel_feedback():
 
+    return InlineKeyboardMarkup(
+
+        [
+
+            [
+                InlineKeyboardButton(
+                    "➕ Adicionar Feedback",
+                    callback_data="feedback_adicionar"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "⚡ Envio Imediato",
+                    callback_data="feedback_imediato"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📊 Estatísticas",
+                    callback_data="feedback_stats"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "⏰ Agendar Feedback",
+                    callback_data="feedback_agendar"
+                )
+            ]
+
+        ]
+
+    )
 async def feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
