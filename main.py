@@ -990,6 +990,7 @@ async def enviar_feedback_imediato(
                 e
             )
 
+
     await update.callback_query.message.reply_text(
 
         f"⚡ Feedbacks enviados com sucesso!\n\n"
@@ -1007,20 +1008,31 @@ async def botoes_feedback(
 
     await query.answer()
 
+
     if query.data == "feedback_adicionar":
 
         aguardando_feedback.add(
+
+            query.from_user.id
+
+        )
+
+        print(
+            "BOTAO FEEDBACK CLICADO"
+        )
+
+        print(
+            "ID SALVO:",
             query.from_user.id
         )
 
-        print("BOTAO FEEDBACK CLICADO")
-        print("ID SALVO:", query.from_user.id)
 
         await query.message.reply_text(
 
             "📸 Envie o print do feedback."
 
         )
+
 
     elif query.data == "feedback_imediato":
 
@@ -1032,59 +1044,65 @@ async def botoes_feedback(
 
         )
 
-    elif query.data == "feedback_stats":
-
-        await query.message.reply_text(
-
-            f"📊 Estatísticas\n\n"
-            f"📸 Feedbacks salvos: {len(feedbacks)}"
-
-        )
-
-    elif query.data == "feedback_agendar":
-
-        await query.message.reply_text(
-
-            "⏰ Sistema de agendamento ainda não configurado."
-
-        )
-
 
 async def receber_feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    print("FEEDBACK CHAMADO")
+    print(
+        "FEEDBACK CHAMADO"
+    )
 
-if update.message.media_group_id:
-    print("IGNORADO: É ALBUM")
-    return
 
-    print("🔥 RECEBER_FEEDBACK FOI CHAMADO")
+    if update.message.media_group_id:
 
-    if not update.message.photo:
+        print(
+            "IGNORADO: É ALBUM"
+        )
+
         return
 
+
+    if update.effective_user.id not in aguardando_feedback:
+
+        return
+
+
+    if not update.message.photo:
+
+        return
+
+
     file_id = update.message.photo[-1].file_id
+
 
     feedbacks.append({
 
         "file_id": file_id,
 
         "data": datetime.now(
+
             ZoneInfo("America/Sao_Paulo")
+
         ).strftime("%d/%m/%Y %H:%M")
 
     })
 
+
     salvar_feedbacks(
+
         feedbacks
+
     )
 
+
     aguardando_feedback.remove(
+
         update.effective_user.id
+
     )
+
 
     await update.message.reply_text(
 
