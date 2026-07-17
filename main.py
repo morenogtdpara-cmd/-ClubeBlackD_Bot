@@ -915,9 +915,12 @@ async def feedback(
 
     await update.message.reply_text(
 
-        "📝 Sistema de Feedback carregado."
+    "📝 SISTEMA DE FEEDBACK\n\n"
+    "Escolha uma opção:",
 
-    )
+    reply_markup=painel_feedback()
+
+)
 # ==============================
 # MENU
 # ==============================
