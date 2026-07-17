@@ -869,6 +869,10 @@ async def verificar_agendamentos(
 # FEEDBACK
 # ==============================
 
+# ==============================
+# FEEDBACK
+# ==============================
+
 def painel_feedback():
 
     return InlineKeyboardMarkup(
@@ -916,8 +920,7 @@ def painel_feedback():
     )
 
 
-async def receber_album(
-   async def feedback(
+async def feedback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -947,9 +950,7 @@ async def enviar_feedback_imediato(
 
         return
 
-
     enviados = 0
-
 
     for item in feedbacks:
 
@@ -964,7 +965,6 @@ async def enviar_feedback_imediato(
             )
 
             enviados += 1
-
 
         except Exception as e:
 
