@@ -858,9 +858,7 @@ async def verificar_agendamentos(
 
 
     agora = datetime.now(
-
         ZoneInfo("America/Sao_Paulo")
-
     ).strftime("%H:%M")
 
 
@@ -879,11 +877,8 @@ async def verificar_agendamentos(
 
 
                 legenda_usuario = item.get(
-
                     "legenda",
-
                     ""
-
                 )
 
 
@@ -955,12 +950,8 @@ async def verificar_agendamentos(
                     )
 
 
-                registrar_envio(
-
-                    "Álbum",
-
+                registrar_album(
                     len(midias)
-
                 )
 
 
@@ -982,11 +973,7 @@ async def verificar_agendamentos(
                 )
 
 
-                registrar_envio(
-
-                    "Publicação"
-
-                )
+                registrar_divulgacao()
 
 
                 print("PUBLICAÇÃO ENVIADA ✅")
@@ -1013,20 +1000,15 @@ async def verificar_agendamentos(
 
 
             salvar_agendamentos(
-
                 agendamentos
-
             )
 
 
         except Exception as e:
 
             print(
-
                 "ERRO AO ENVIAR AGENDAMENTO:",
-
                 e
-
             )
 
 
