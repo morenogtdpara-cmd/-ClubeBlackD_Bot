@@ -868,9 +868,6 @@ async def verificar_agendamentos(
 # ==============================
 # FEEDBACK
 # ==============================
-# ==============================
-# FEEDBACK
-# ==============================
 
 def painel_feedback():
 
@@ -879,31 +876,39 @@ def painel_feedback():
         [
 
             [
+
                 InlineKeyboardButton(
                     "➕ Adicionar Feedback",
                     callback_data="feedback_adicionar"
                 )
+
             ],
 
             [
+
                 InlineKeyboardButton(
                     "⚡ Envio Imediato",
                     callback_data="feedback_imediato"
                 )
+
             ],
 
             [
+
                 InlineKeyboardButton(
                     "📊 Estatísticas",
                     callback_data="feedback_stats"
                 )
+
             ],
 
             [
+
                 InlineKeyboardButton(
                     "⏰ Agendar Feedback",
                     callback_data="feedback_agendar"
                 )
+
             ]
 
         ]
@@ -930,97 +935,39 @@ async def feedback(
     )
 
 
-async def botoes_feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    query = update.callback_query
-
-    await query.answer()
-
-    if query.data == "feedback_adicionar":
-
-        aguardando_feedback.add(
-            query.from_user.id
-        )
-
-        await query.message.reply_text(
-
-            "📸 Envie o print do feedback."
-
-        )
-async def receber_feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    if update.effective_user.id not in aguardando_feedback:
-        return
-
-    if not update.message.photo:
-        return
-
-    foto = update.message.photo[-1].file_id
-
-    feedbacks.append({
-
-        "file_id": foto,
-
-        "data": datetime.now(
-            ZoneInfo("America/Sao_Paulo")
-        ).strftime("%d/%m/%Y %H:%M")
-
-    })
-
-    salvar_feedbacks(feedbacks)
-
-    aguardando_feedback.remove(
-        update.effective_user.id
-    )
-
-    await update.message.reply_text(
-
-        "✅ Feedback salvo com sucesso!\n\n"
-        "📸 Print recebido."
-    elif query.data == "feedback_imediato":
-
-        await enviar_feedback_imediato(
-            update,
-            context
-        )
-    )
 async def enviar_feedback_imediato(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    if update.effective_user.id != OWNER_ID:
-        return
-
     if not feedbacks:
 
         await update.callback_query.message.reply_text(
+
             "⚠️ Nenhum feedback salvo."
+
         )
 
         return
 
+
     enviados = 0
 
-    for feedback in feedbacks:
+
+    for item in feedbacks:
 
         try:
 
             await context.bot.send_photo(
+
                 chat_id=GROUP_ID,
-                photo=feedback["file_id"]
+
+                photo=item["file_id"]
+
             )
 
             enviados += 1
+
 
         except Exception as e:
 
@@ -1036,6 +983,43 @@ async def enviar_feedback_imediato(
         f"📸 Quantidade: {enviados}"
 
     )
+
+
+async def botoes_feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+
+    if query.data == "feedback_adicionar":
+
+        aguardando_feedback.add(
+
+            query.from_user.id
+
+        )
+
+
+        await query.message.reply_text(
+
+            "📸 Envie o print do feedback."
+
+        )
+
+
+    elif query.data == "feedback_imediato":
+
+        await enviar_feedback_imediato(
+
+            update,
+
+            context
+
+        )
 # ==============================
 # MENU
 # ==============================
