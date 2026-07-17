@@ -1050,7 +1050,17 @@ app.add_handler(
     )
 
 )
+app.add_handler(
 
+    CommandHandler(
+
+        "feedback",
+
+        feedback
+
+    )
+
+)
 app.add_handler(
 
     MessageHandler(
