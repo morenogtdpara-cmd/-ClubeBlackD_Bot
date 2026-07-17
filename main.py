@@ -319,7 +319,24 @@ async def status(
 
     )
 
+# ==============================
+# INICIAR FEEDBACK
+# ==============================
 
+async def feedback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+
+        return
+
+    await update.message.reply_text(
+        "📸 Envie a foto do feedback."
+    )
+
+    return AGUARDANDO_FEEDBACK
 # ==============================
 # RECEBER ÁLBUM
 # ==============================
