@@ -1381,10 +1381,11 @@ app.add_handler(
     )
 )
 
+
 app.add_handler(
     MessageHandler(
         filters.PHOTO | filters.VIDEO,
-        receber_album
+        receber_album_novo
     )
 )
 
