@@ -126,39 +126,62 @@ def atualizar_dia():
 
 
 
-def registrar_envio(
-    tipo,
-    quantidade=1
-):
+# ==============================
+# REGISTROS DO SISTEMA
+# ==============================
 
-    atualizar_dia()
-
+def atualizar_ultimo_envio(tipo, quantidade=1):
 
     STATUS_SISTEMA["envios_hoje"] += 1
 
     STATUS_SISTEMA["midias_hoje"] += quantidade
 
-
     STATUS_SISTEMA["ultimo_envio"] = datetime.now(
         ZoneInfo("America/Sao_Paulo")
     ).strftime("%H:%M")
-
 
     STATUS_SISTEMA["ultimo_tipo"] = tipo
 
     STATUS_SISTEMA["ultimo_status"] = "Sucesso"
 
+    salvar_sistema(
+        STATUS_SISTEMA
+    )
+
+
+def registrar_divulgacao():
+
+    atualizar_dia()
 
     STATUS_SISTEMA["divulgacoes"] += 1
 
+    atualizar_ultimo_envio(
+        "Publicação",
+        1
+    )
 
-    if tipo == "Álbum":
 
-        STATUS_SISTEMA["albuns"] += 1
+def registrar_album(quantidade):
+
+    atualizar_dia()
+
+    STATUS_SISTEMA["albuns"] += 1
+
+    atualizar_ultimo_envio(
+        "Álbum",
+        quantidade
+    )
 
 
-    salvar_sistema(
-        STATUS_SISTEMA
+def registrar_feedback():
+
+    atualizar_dia()
+
+    STATUS_SISTEMA["feedbacks"] += 1
+
+    atualizar_ultimo_envio(
+        "Feedback",
+        1
     )
 
 # ==============================
