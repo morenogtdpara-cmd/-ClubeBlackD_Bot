@@ -1102,7 +1102,37 @@ app.add_handler(
 
 )
 
+app.add_handler(
 
+    ConversationHandler(
+
+        entry_points=[
+
+            CommandHandler(
+                "feedback",
+                feedback
+            )
+
+        ],
+
+        states={
+
+            AGUARDANDO_FEEDBACK: [
+
+                MessageHandler(
+                    filters.PHOTO,
+                    receber_feedback
+                )
+
+            ]
+
+        },
+
+        fallbacks=[]
+
+    )
+
+)
 app.add_handler(
 
     MessageHandler(
