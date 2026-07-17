@@ -654,13 +654,9 @@ async def d_album(
         )
 
 
-    registrar_envio(
-
-        "Álbum",
-
-        len(midias)
-
-    )
+    registrar_album(
+    len(midias)
+)
 
 
     del albuns[grupo]
