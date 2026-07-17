@@ -36,25 +36,69 @@ VIP_LINK = "https://t.me/ClubeBlackBot"
 # 🖤 BLACK SYSTEM - DADOS REAIS
 # ==============================
 
-INICIO_BOT = datetime.now(
-    ZoneInfo("America/Sao_Paulo")
-)
+ARQUIVO_SISTEMA = "black_system.json"
 
-STATUS_SISTEMA = {
 
-    "data": INICIO_BOT.strftime("%d/%m/%Y"),
+def carregar_sistema():
 
-    "envios_hoje": 0,
+    if not Path(ARQUIVO_SISTEMA).exists():
 
-    "midias_hoje": 0,
+        dados = {
 
-    "ultimo_envio": None,
+            "data": "",
 
-    "ultimo_tipo": None,
+            "envios_hoje": 0,
 
-    "ultimo_status": None
+            "midias_hoje": 0,
 
-}
+            "ultimo_envio": None,
+
+            "ultimo_tipo": None,
+
+            "ultimo_status": None,
+
+            "feedbacks": 0,
+
+            "albuns": 0,
+
+            "divulgacoes": 0
+
+        }
+
+        salvar_sistema(dados)
+
+        return dados
+
+
+    with open(
+        ARQUIVO_SISTEMA,
+        "r",
+        encoding="utf-8"
+    ) as arquivo:
+
+        return json.load(arquivo)
+
+
+
+def salvar_sistema(dados):
+
+    with open(
+        ARQUIVO_SISTEMA,
+        "w",
+        encoding="utf-8"
+    ) as arquivo:
+
+        json.dump(
+            dados,
+            arquivo,
+            indent=4,
+            ensure_ascii=False
+        )
+
+
+
+STATUS_SISTEMA = carregar_sistema()
+
 
 
 def atualizar_dia():
@@ -67,6 +111,7 @@ def atualizar_dia():
         "%d/%m/%Y"
     )
 
+
     if STATUS_SISTEMA["data"] != data_atual:
 
         STATUS_SISTEMA["data"] = data_atual
@@ -74,6 +119,11 @@ def atualizar_dia():
         STATUS_SISTEMA["envios_hoje"] = 0
 
         STATUS_SISTEMA["midias_hoje"] = 0
+
+        salvar_sistema(
+            STATUS_SISTEMA
+        )
+
 
 
 def registrar_envio(
@@ -83,18 +133,33 @@ def registrar_envio(
 
     atualizar_dia()
 
+
     STATUS_SISTEMA["envios_hoje"] += 1
 
     STATUS_SISTEMA["midias_hoje"] += quantidade
+
 
     STATUS_SISTEMA["ultimo_envio"] = datetime.now(
         ZoneInfo("America/Sao_Paulo")
     ).strftime("%H:%M")
 
+
     STATUS_SISTEMA["ultimo_tipo"] = tipo
 
     STATUS_SISTEMA["ultimo_status"] = "Sucesso"
 
+
+    STATUS_SISTEMA["divulgacoes"] += 1
+
+
+    if tipo == "Álbum":
+
+        STATUS_SISTEMA["albuns"] += 1
+
+
+    salvar_sistema(
+        STATUS_SISTEMA
+    )
 
 # ==============================
 # LEGENDA FIXA
