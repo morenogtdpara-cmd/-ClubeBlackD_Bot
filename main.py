@@ -932,47 +932,37 @@ async def configurar_menu(app):
 
     comandos = [
 
-        BotCommand(
+    BotCommand(
+        "start",
+        "BLACK SYSTEM 👑"
+    ),
 
-            "start",
+    BotCommand(
+        "status",
+        "STATUS DO SISTEMA 🖤"
+    ),
 
-            "BLACK SYSTEM 👑"
+    BotCommand(
+        "divulgar",
+        "DIVULGAR 🔥"
+    ),
 
-        ),
+    BotCommand(
+        "d_album",
+        "DIVULGAR ÁLBUM 🖼️"
+    ),
 
-        BotCommand(
+    BotCommand(
+        "agendar",
+        "AGENDAR DIVULGAÇÃO ⏰"
+    ),
 
-            "status",
+    BotCommand(
+        "feedback",
+        "ADICIONAR FEEDBACK 📸"
+    )
 
-            "STATUS DO SISTEMA 🖤"
-
-        ),
-
-        BotCommand(
-
-            "divulgar",
-
-            "DIVULGAR 🔥"
-
-        ),
-
-        BotCommand(
-
-            "d_album",
-
-            "DIVULGAR ÁLBUM 🖼️"
-
-        ),
-
-        BotCommand(
-
-            "agendar",
-
-            "AGENDAR DIVULGAÇÃO ⏰"
-
-        )
-
-    ]
+]
 
 
     await app.bot.set_my_commands(
