@@ -351,12 +351,16 @@ async def receber_feedback(
 
     foto = update.message.photo[-1].file_id
 
-    legenda = """
+    LEGENDA_FEEDBACK = """
 ⭐ FEEDBACK REAL ⭐
 
-🔥 Cliente satisfeito com nosso conteúdo.
+🔥 Mais um cliente satisfeito com o Clube Black VIP.
 
-🖤 Clube Black VIP
+💎 Conteúdo exclusivo.
+⚡ Acesso rápido.
+🖤 Experiência premium.
+
+🚀 Entre para o VIP agora!
 """
 
     await context.bot.send_photo(
