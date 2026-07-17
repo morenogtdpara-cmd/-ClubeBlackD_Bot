@@ -544,9 +544,7 @@ async def divulgar(
 
     )
 
-    registrar_envio(
-        "Publicação"
-    )
+    registrar_divulgacao()
 
 
 # ==============================
