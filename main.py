@@ -1244,15 +1244,15 @@ app.add_handler(
 
 app.add_handler(
     MessageHandler(
-        filters.PHOTO,
-        receber_feedback
+        filters.PHOTO | filters.VIDEO,
+        receber_album
     )
 )
 
 app.add_handler(
     MessageHandler(
-        filters.PHOTO | filters.VIDEO,
-        receber_album
+        filters.PHOTO,
+        receber_feedback
     )
 )
 
