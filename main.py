@@ -1240,6 +1240,70 @@ if query.data == "command_divulgacao":
             "⏰ Responda uma publicação e use o agendamento."
         )
 # ==============================
+# ⚙️ BLACK MANAGER
+# ==============================
+
+async def manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+
+    teclado = InlineKeyboardMarkup(
+        [
+
+            [
+                InlineKeyboardButton(
+                    "📢 DIVULGAÇÃO",
+                    callback_data="manager_divulgacao"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📚 ÁLBUNS",
+                    callback_data="manager_album"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "⏰ AGENDAMENTOS",
+                    callback_data="manager_agenda"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📸 FEEDBACKS",
+                    callback_data="manager_feedback"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📊 STATUS",
+                    callback_data="manager_status"
+                )
+            ]
+
+        ]
+    )
+
+
+    await update.message.reply_text(
+
+        "⚙️ BLACK MANAGER\n\n"
+        "👑 CONTROLE DE OPERAÇÕES\n\n"
+        "ESCOLHA UMA OPÇÃO:",
+
+        reply_markup=teclado
+
+    )
+# ==============================
 # BOT
 # ==============================
 
