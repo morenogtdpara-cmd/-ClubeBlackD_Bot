@@ -1168,12 +1168,11 @@ async def menu_manager(
 
     await query.answer()
 
-
     if query.data == "manager_status":
 
-    await query.message.reply_text(
-        "📊 STATUS FUNCIONANDO"
-    )
+        await query.message.reply_text(
+            "📊 STATUS FUNCIONANDO"
+        )
 
 # ==============================
 # BOT
