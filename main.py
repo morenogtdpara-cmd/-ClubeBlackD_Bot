@@ -504,6 +504,7 @@ async def receber_album(
 
     grupo = mensagem.media_group_id
 
+
     if grupo not in albuns:
 
         albuns[grupo] = {
@@ -514,116 +515,143 @@ async def receber_album(
 
         }
 
+
     if len(albuns[grupo]["mensagens"]) < 10:
 
         albuns[grupo]["mensagens"].append(
             mensagem
         )
 
+
     if mensagem.caption:
 
         albuns[grupo]["legenda"] = mensagem.caption
 
-    await asyncio.sleep(10)
+
+    # espera o restante do álbum chegar
+
+    await asyncio.sleep(3)
+
+
+    # evita duplicar envio
 
     if grupo in albuns_processados:
 
         return
 
-    if update.effective_user.id in modo_album:
 
-        albuns_processados.add(
-            grupo
+    # só continua se veio pelo botão
+
+    if update.effective_user.id not in modo_album:
+
+        return
+
+
+    albuns_processados.add(
+        grupo
+    )
+
+
+    modo_album.remove(
+        update.effective_user.id
+    )
+
+
+    midias = []
+
+
+    legenda_usuario = albuns[grupo].get(
+        "legenda",
+        ""
+    )
+
+
+    if legenda_usuario:
+
+        legenda_final = (
+
+            legenda_usuario.strip()
+
+            + "\n\n"
+
+            + LEGENDA_FIXA.strip()
+
         )
 
-        modo_album.remove(
-            update.effective_user.id
-        )
+    else:
 
-        await asyncio.sleep(3)
+        legenda_final = LEGENDA_FIXA.strip()
 
-        midias = []
 
-        legenda_usuario = albuns[grupo].get(
-            "legenda",
-            ""
-        )
 
-        if legenda_usuario:
+    for item in albuns[grupo]["mensagens"]:
 
-            legenda_final = (
 
-                legenda_usuario.strip()
+        if item.photo:
 
-                + "\n\n"
+            midias.append(
 
-                + LEGENDA_FIXA.strip()
+                InputMediaPhoto(
 
-            )
+                    media=item.photo[-1].file_id,
 
-        else:
-
-            legenda_final = LEGENDA_FIXA.strip()
-
-        for item in albuns[grupo]["mensagens"]:
-
-            if item.photo:
-
-                midias.append(
-
-                    InputMediaPhoto(
-
-                        media=item.photo[-1].file_id,
-
-                        caption=legenda_final
-                        if len(midias) == 0
-                        else None
-
-                    )
+                    caption=legenda_final
+                    if len(midias) == 0
+                    else None
 
                 )
 
-            elif item.video:
+            )
 
-                midias.append(
 
-                    InputMediaVideo(
+        elif item.video:
 
-                        media=item.video.file_id,
+            midias.append(
 
-                        caption=legenda_final
-                        if len(midias) == 0
-                        else None
+                InputMediaVideo(
 
-                    )
+                    media=item.video.file_id,
+
+                    caption=legenda_final
+                    if len(midias) == 0
+                    else None
 
                 )
 
-        if midias:
-
-            await context.bot.send_media_group(
-
-                chat_id=GROUP_ID,
-
-                media=midias
-
             )
 
-            registrar_album(
-                len(midias)
-            )
 
-        del albuns[grupo]
 
-        albuns_processados.remove(
-            grupo
-        )
+    if midias:
 
-        await update.message.reply_text(
+        await context.bot.send_media_group(
 
-            f"✅ Álbum divulgado! ({len(midias)} mídias)"
+            chat_id=GROUP_ID,
+
+            media=midias
 
         )
+
+
+        registrar_album(
+            len(midias)
+        )
+
+
+
+    del albuns[grupo]
+
+
+    albuns_processados.remove(
+        grupo
+    )
+
+
+    await update.message.reply_text(
+
+        f"✅ Álbum divulgado! ({len(midias)} mídias)"
+
+    )
 
 
 # ==============================
