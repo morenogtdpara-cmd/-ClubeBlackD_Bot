@@ -1189,7 +1189,17 @@ async def manager(
 # BOT
 # ==============================
 
-app = (
+app.add_handler(
+
+    CommandHandler(
+
+        "manager",
+
+        manager
+
+    )
+
+)
 
     Application
 
