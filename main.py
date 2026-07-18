@@ -507,7 +507,7 @@ async def receber_album(
 
     grupo = mensagem.media_group_id
 
-    if grupo not in albuns:
+        if grupo not in albuns:
 
         albuns[grupo] = {
 
@@ -517,11 +517,23 @@ async def receber_album(
 
         }
 
-        context.job_queue.run_once(
-            divulgar_album_completo,
-            5,
-            data=grupo
-        )
+        if update.effective_user.id in modo_album:
+
+            context.job_queue.run_once(
+
+                divulgar_album_completo,
+
+                5,
+
+                data=grupo
+
+            )
+
+        elif update.effective_user.id in modo_album_agendar:
+
+            album_agendar_temp[
+                update.effective_user.id
+            ] = grupo
 
     albuns[grupo]["mensagens"].append(
         mensagem
@@ -530,7 +542,6 @@ async def receber_album(
     if mensagem.caption:
 
         albuns[grupo]["legenda"] = mensagem.caption
-
 
 # ==============================
 # DIVULGAR ÁLBUM COMPLETO
