@@ -1273,38 +1273,46 @@ async def menu_manager(
 
     if query.data == "manager_status":
 
-        await status(update, context)
+        await status(
+            update,
+            context
+        )
 
-    elif query.data == "divulgar_agora":
 
-    await divulgar(update, context)
     elif query.data == "manager_divulgacao":
 
         teclado = InlineKeyboardMarkup(
             [
 
                 [
+
                     InlineKeyboardButton(
                         "📤 DIVULGAR AGORA",
                         callback_data="divulgar_agora"
                     )
+
                 ],
 
                 [
+
                     InlineKeyboardButton(
                         "⏰ AGENDAR",
                         callback_data="agendar_divulgacao"
                     )
+
                 ],
 
                 [
+
                     InlineKeyboardButton(
                         "🔙 VOLTAR",
                         callback_data="voltar_manager"
                     )
+
                 ]
 
             ]
+
         )
 
 
@@ -1318,40 +1326,79 @@ async def menu_manager(
         )
 
 
-    elif query.data == "manager_album":
+    elif query.data == "divulgar_agora":
+
+        await query.answer(
+            "BOTÃO FUNCIONOU ✅"
+        )
+
+        await query.message.reply_text(
+
+            "📢 Responda a mensagem que deseja divulgar."
+
+        )
+
+
+    elif query.data == "voltar_manager":
 
         teclado = InlineKeyboardMarkup(
             [
 
                 [
+
                     InlineKeyboardButton(
-                        "📤 DIVULGAR ÁLBUM AGORA",
-                        callback_data="album_agora"
+                        "📢 DIVULGAÇÃO",
+                        callback_data="manager_divulgacao"
                     )
+
                 ],
 
                 [
+
                     InlineKeyboardButton(
-                        "⏰ AGENDAR ÁLBUM",
-                        callback_data="album_agendar"
+                        "📚 ÁLBUNS",
+                        callback_data="manager_album"
                     )
+
                 ],
 
                 [
+
                     InlineKeyboardButton(
-                        "🔙 VOLTAR",
-                        callback_data="voltar_manager"
+                        "⏰ AGENDAMENTOS",
+                        callback_data="manager_agenda"
                     )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "📸 FEEDBACKS",
+                        callback_data="manager_feedback"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "📊 STATUS",
+                        callback_data="manager_status"
+                    )
+
                 ]
 
             ]
+
         )
 
 
         await query.edit_message_text(
 
-            "📚 ÁLBUNS\n\n"
-            "Escolha uma opção:",
+            "⚙️ BLACK MANAGER\n\n"
+            "👑 CONTROLE DE OPERAÇÕES\n\n"
+            "ESCOLHA UMA OPÇÃO:",
 
             reply_markup=teclado
 
