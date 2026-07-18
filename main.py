@@ -385,20 +385,19 @@ if agendamentos:
 
     )
 
-    proximo = fonte_numero(
-        horarios[0]
+            proximo = fonte_numero(
+            horarios[0]
+        )
+
+    ultimo = fonte_numero(
+
+        STATUS_SISTEMA["ultimo_envio"]
+
+        or "--:--"
+
     )
 
-ultimo = fonte_numero(
-
-    STATUS_SISTEMA["ultimo_envio"]
-
-    or "--:--"
-
-)
-
-await update.callback_query.message.reply_text(
-
+    await update.callback_query.message.reply_text(
         "🖤 BLACK SYSTEM\n\n"
 
         "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
