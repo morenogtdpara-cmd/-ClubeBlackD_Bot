@@ -393,7 +393,7 @@ async def status(
 
         "📋 HOJE\n\n"
 
-        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/∞\n"
+        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/30\n"
 
         f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
 
