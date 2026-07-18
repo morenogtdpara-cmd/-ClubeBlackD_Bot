@@ -204,10 +204,12 @@ LEGENDA_FIXA = """
 albuns = {}
 
 # ==============================
-# FEEDBACK - ESTADO
+# ESTADOS DO SISTEMA
 # ==============================
 
 AGUARDANDO_FEEDBACK = 1
+
+AGUARDANDO_DIVULGACAO_NOVA = 2
 
 # ==============================
 # AGENDAMENTOS
