@@ -1454,7 +1454,45 @@ async def receber_horario_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-    pass
+        usuario = update.effective_user.id
+
+    if usuario not in album_agendar_temp:
+
+        return
+
+    horario = update.message.text.strip()
+
+    try:
+
+        datetime.strptime(
+
+            horario,
+
+            "%H:%M"
+
+        )
+
+    except:
+
+        await update.message.reply_text(
+
+            "⚠️ Horário inválido.\n\nExemplo: 14:00"
+
+        )
+
+        return
+
+    grupo = album_agendar_temp[usuario]
+
+    await update.message.reply_text(
+
+        f"✅ Horário recebido: {horario}\n\n"
+
+        f"Próximo passo: salvar o álbum."
+
+    )
+
+    del album_agendar_temp[usuario]
 # ==============================
 # BOT
 # ==============================
