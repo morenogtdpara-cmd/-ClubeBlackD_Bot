@@ -389,11 +389,13 @@ async def status(
 
     ultimo = (
 
-        STATUS_SISTEMA["ultimo_envio"]
+        ultimo = fonte_numero(
 
-        or "--:--"
+    STATUS_SISTEMA["ultimo_envio"]
 
-    )
+    or "--:--"
+
+)
 
     await update.callback_query.message.reply_text(
 
