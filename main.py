@@ -631,7 +631,21 @@ async def receber_album(
         albuns[grupo]["legenda"] = mensagem.caption
 
 
-    await asyncio.sleep(3)
+        await asyncio.sleep(3)
+
+
+    if context.user_data.get("aguardando_album"):
+
+        await enviar_album_automatico(
+
+            context,
+
+            grupo
+
+        )
+
+
+        context.user_data["aguardando_album"] = False
 
 
 # ==============================
