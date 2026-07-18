@@ -1087,67 +1087,105 @@ async def entrarnovip(
         reply_markup=botoes_vip()
 
     )
-
 # ==============================
-# ⚙️ ABRIR BLACK COMMAND
+# ⚙️ BLACK COMMAND - NAVEGAÇÃO
 # ==============================
 
-async def manager(
+async def black_command_menu(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    if update.effective_user.id != OWNER_ID:
-        return
+    query = update.callback_query
+
+    await query.answer()
 
 
-    teclado = InlineKeyboardMarkup(
+    if query.data == "command_divulgacao":
 
-        [
-
+        teclado = InlineKeyboardMarkup(
             [
-                InlineKeyboardButton(
-                    "📢 Divulgação Normal",
-                    callback_data="command_divulgacao"
-                )
-            ],
 
-            [
-                InlineKeyboardButton(
-                    "📚 Divulgação Álbum",
-                    callback_data="command_album"
-                )
-            ],
+                [
+                    InlineKeyboardButton(
+                        "📤 Enviar Agora",
+                        callback_data="divulgar_agora"
+                    )
+                ],
 
-            [
-                InlineKeyboardButton(
-                    "⏰ Agendamentos",
-                    callback_data="command_agendamentos"
-                )
+                [
+                    InlineKeyboardButton(
+                        "⏰ Agendar",
+                        callback_data="divulgar_agendar"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "🔙 Voltar",
+                        callback_data="command_voltar"
+                    )
+                ]
+
             ]
-
-        ]
-
-    )
+        )
 
 
-    await update.message.reply_text(
+        await query.edit_message_text(
 
-        "⚙️ BLACK COMMAND\n\n"
+            "📢 DIVULGAÇÃO NORMAL\n\n"
 
-        "👑 Controle de operações\n\n"
+            "Escolha uma opção:",
 
-        "Escolha uma opção:",
+            reply_markup=teclado
 
-        reply_markup=teclado
+        )
 
-    )
+
+    elif query.data == "command_album":
+
+        teclado = InlineKeyboardMarkup(
+            [
+
+                [
+                    InlineKeyboardButton(
+                        "📤 Enviar Agora",
+                        callback_data="album_agora"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "⏰ Agendar",
+                        callback_data="album_agendar"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "🔙 Voltar",
+                        callback_data="command_voltar"
+                    )
+                ]
+
+            ]
+        )
+
+
+        await query.edit_message_text(
+
+            "📚 DIVULGAÇÃO ÁLBUM\n\n"
+
+            "Escolha uma opção:",
+
+            reply_markup=teclado
+
+        )
 
 
     elif query.data == "command_agendamentos":
 
         teclado = InlineKeyboardMarkup(
-
             [
 
                 [
@@ -1172,7 +1210,6 @@ async def manager(
                 ]
 
             ]
-
         )
 
 
@@ -1185,6 +1222,7 @@ async def manager(
             reply_markup=teclado
 
         )
+
 # ==============================
 # BOT
 # ==============================
