@@ -203,6 +203,8 @@ albuns_processados = set()
 
 modo_album = set()
 modo_album_agendar = set()
+
+album_agendar_temp = {}
 # ==============================
 # FEEDBACK - ESTADO
 # ==============================
