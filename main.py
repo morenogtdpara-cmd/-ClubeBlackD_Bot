@@ -496,17 +496,13 @@ async def receber_album(
 
         return
 
-
     mensagem = update.message
-
 
     if not mensagem.media_group_id:
 
         return
 
-
     grupo = mensagem.media_group_id
-
 
     if grupo not in albuns:
 
@@ -518,52 +514,41 @@ async def receber_album(
 
         }
 
+        context.job_queue.run_once(
+            divulgar_album_completo,
+            5,
+            data=grupo
+        )
 
     albuns[grupo]["mensagens"].append(
         mensagem
     )
-
 
     if mensagem.caption:
 
         albuns[grupo]["legenda"] = mensagem.caption
 
 
-    # evita processar duas vezes
+# ==============================
+# DIVULGAR ÁLBUM COMPLETO
+# ==============================
 
-    if grupo in albuns_processados:
+async def divulgar_album_completo(
+    context: ContextTypes.DEFAULT_TYPE
+):
 
-        return
+    grupo = context.job.data
 
-
-    # espera o álbum completar
-
-    await asyncio.sleep(2)
-
-
-    if update.effective_user.id not in modo_album:
+    if grupo not in albuns:
 
         return
-
-
-    albuns_processados.add(
-        grupo
-    )
-
-
-    modo_album.remove(
-        update.effective_user.id
-    )
-
 
     midias = []
-
 
     legenda_usuario = albuns[grupo].get(
         "legenda",
         ""
     )
-
 
     if legenda_usuario:
 
@@ -581,10 +566,7 @@ async def receber_album(
 
         legenda_final = LEGENDA_FIXA.strip()
 
-
-
     for item in albuns[grupo]["mensagens"]:
-
 
         if item.photo:
 
@@ -602,7 +584,6 @@ async def receber_album(
 
             )
 
-
         elif item.video:
 
             midias.append(
@@ -619,8 +600,6 @@ async def receber_album(
 
             )
 
-
-
     if midias:
 
         await context.bot.send_media_group(
@@ -631,25 +610,11 @@ async def receber_album(
 
         )
 
-
         registrar_album(
             len(midias)
         )
 
-
     del albuns[grupo]
-
-
-    albuns_processados.remove(
-        grupo
-    )
-
-
-    await update.message.reply_text(
-
-        f"✅ Álbum divulgado! ({len(midias)} mídias)"
-
-    )
 
 # ==============================
 # DIVULGAR
