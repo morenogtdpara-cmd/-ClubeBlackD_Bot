@@ -21,7 +21,6 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
     ConversationHandler,
-    CallbackQueryHandler,
     filters
 )
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -1087,141 +1086,7 @@ async def entrarnovip(
         reply_markup=botoes_vip()
 
     )
-# ==============================
-# ⚙️ BLACK COMMAND - NAVEGAÇÃO
-# ==============================
 
-async def black_command_menu(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    query = update.callback_query
-
-    await query.answer()
-
-
-    if query.data == "command_divulgacao":
-
-        teclado = InlineKeyboardMarkup(
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📤 Enviar Agora",
-                        callback_data="divulgar_agora"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "⏰ Agendar",
-                        callback_data="divulgar_agendar"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 Voltar",
-                        callback_data="command_voltar"
-                    )
-                ]
-
-            ]
-        )
-
-
-        await query.edit_message_text(
-
-            "📢 DIVULGAÇÃO NORMAL\n\n"
-
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
-
-
-    elif query.data == "command_album":
-
-        teclado = InlineKeyboardMarkup(
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📤 Enviar Agora",
-                        callback_data="album_agora"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "⏰ Agendar",
-                        callback_data="album_agendar"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 Voltar",
-                        callback_data="command_voltar"
-                    )
-                ]
-
-            ]
-        )
-
-
-        await query.edit_message_text(
-
-            "📚 DIVULGAÇÃO ÁLBUM\n\n"
-
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
-
-
-    elif query.data == "command_agendamentos":
-
-        teclado = InlineKeyboardMarkup(
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📋 Ver Agendados",
-                        callback_data="ver_agendados"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "❌ Cancelar Agendado",
-                        callback_data="cancelar_agendado"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 Voltar",
-                        callback_data="command_voltar"
-                    )
-                ]
-
-            ]
-        )
-
-
-        await query.edit_message_text(
-
-            "⏰ AGENDAMENTOS\n\n"
-
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
 
 # ==============================
 # BOT
@@ -1238,19 +1103,6 @@ app = (
     .post_init(configurar_menu)
 
     .build()
-
-)
-
-
-app.add_handler(
-
-    CommandHandler(
-
-        "manager",
-
-        manager
-
-    )
 
 )
 
@@ -1360,17 +1212,6 @@ app.add_handler(
         filters.PHOTO | filters.VIDEO,
 
         receber_album
-
-    )
-
-)
-
-
-app.add_handler(
-
-    CallbackQueryHandler(
-
-        black_command_menu
 
     )
 
