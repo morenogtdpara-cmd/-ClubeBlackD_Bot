@@ -371,21 +371,21 @@ async def status(
 
     proximo = "--:--"
 
-if agendamentos:
+    if agendamentos:
 
-    horarios = sorted(
+        horarios = sorted(
 
-        [
+            [
 
-            item["horario"]
+                item["horario"]
 
-            for item in agendamentos
+                for item in agendamentos
 
-        ]
+            ]
 
-    )
+        )
 
-            proximo = fonte_numero(
+        proximo = fonte_numero(
             horarios[0]
         )
 
@@ -398,6 +398,7 @@ if agendamentos:
     )
 
     await update.callback_query.message.reply_text(
+
         "🖤 BLACK SYSTEM\n\n"
 
         "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
