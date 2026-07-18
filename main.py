@@ -555,28 +555,47 @@ async def divulgar(
 ):
 
     if update.effective_user.id != OWNER_ID:
+        return
+
+
+    # BOTÃO DO MANAGER
+    if update.callback_query:
+
+        query = update.callback_query
+
+        await query.answer()
+
+        await query.message.reply_text(
+            "📢 Responda a mensagem que deseja divulgar e clique novamente em DIVULGAR AGORA."
+        )
 
         return
 
-    if not update.message.reply_to_message:
 
-        return
+    # COMANDO /DIVULGAR
+    if update.message:
 
-    mensagem = update.message.reply_to_message
+        if not update.message.reply_to_message:
 
-    await context.bot.copy_message(
+            return
 
-        chat_id=GROUP_ID,
 
-        from_chat_id=mensagem.chat.id,
+        mensagem = update.message.reply_to_message
 
-        message_id=mensagem.message_id,
 
-        reply_markup=botoes_vip()
+        await context.bot.copy_message(
 
-    )
+            chat_id=GROUP_ID,
 
-    registrar_divulgacao()
+            from_chat_id=mensagem.chat.id,
+
+            message_id=mensagem.message_id,
+
+            reply_markup=botoes_vip()
+
+        )
+
+        registrar_divulgacao()
 
 
 # ==============================
