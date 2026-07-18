@@ -21,6 +21,7 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
     ConversationHandler,
+    CallbackQueryHandler,
     filters
 )
 BOT_TOKEN = os.getenv("BOT_TOKEN")
