@@ -1088,7 +1088,115 @@ async def entrarnovip(
 
     )
 
+# ==============================
+# ⚙️ BLACK MANAGER
+# ==============================
 
+async def manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+
+    teclado = InlineKeyboardMarkup(
+        [
+
+            [
+                InlineKeyboardButton(
+                    "📢 Divulgação",
+                    callback_data="manager_divulgar"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📚 Álbuns",
+                    callback_data="manager_album"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "⏰ Agendamentos",
+                    callback_data="manager_agendar"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📸 Feedbacks",
+                    callback_data="manager_feedback"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📊 Status",
+                    callback_data="manager_status"
+                )
+            ]
+
+        ]
+    )
+
+
+    await update.message.reply_text(
+
+        "⚙️ BLACK COMMAND\n\n"
+        "👑 Controle total do sistema",
+
+        reply_markup=teclado
+
+    )
+
+
+async def menu_manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+
+    if query.data == "manager_status":
+
+        await query.message.reply_text(
+            "Use o painel de status."
+        )
+
+
+    elif query.data == "manager_feedback":
+
+        await query.message.reply_text(
+            "📸 Envie /feedback para adicionar feedback."
+        )
+
+
+    elif query.data == "manager_album":
+
+        await query.message.reply_text(
+            "📚 Álbum selecionado.\n\n"
+            "Envie o álbum normalmente."
+        )
+
+
+    elif query.data == "manager_divulgar":
+
+        await query.message.reply_text(
+            "📢 Responda uma mídia e envie a divulgação."
+        )
+
+
+    elif query.data == "manager_agendar":
+
+        await query.message.reply_text(
+            "⏰ Responda uma publicação e use o agendamento."
+        )
 # ==============================
 # BOT
 # ==============================
