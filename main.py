@@ -524,7 +524,7 @@ async def receber_album(
 
         albuns[grupo]["legenda"] = mensagem.caption
 
-    await asyncio.sleep(5)
+    await asyncio.sleep(10)
 
     if grupo in albuns_processados:
 
