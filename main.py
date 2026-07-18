@@ -21,7 +21,6 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
     ConversationHandler,
-    CallbackQueryHandler,
     filters
 )
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -198,13 +197,7 @@ LEGENDA_FIXA = """
 
 
 albuns = {}
-aguardando_album = set()
-albuns_processados = set()
 
-modo_album = set()
-modo_album_agendar = set()
-
-album_agendar_temp = {}
 # ==============================
 # FEEDBACK - ESTADO
 # ==============================
@@ -487,138 +480,49 @@ async def receber_feedback(
 
     return ConversationHandler.END
 # ==============================
-# RECEBER HORÁRIO ÁLBUM
+# RECEBER ÁLBUM
 # ==============================
 
-async def receber_horario_album(
+async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    usuario = update.effective_user.id
-
-    if usuario not in album_agendar_temp:
+    if update.effective_user.id != OWNER_ID:
 
         return
 
-    horario = update.message.text.strip()
+    mensagem = update.message
 
-    try:
-
-        datetime.strptime(
-            horario,
-            "%H:%M"
-        )
-
-    except:
-
-        await update.message.reply_text(
-            "⚠️ Horário inválido.\n\nExemplo: 14:00"
-        )
+    if not mensagem.media_group_id:
 
         return
 
-
-    grupo = album_agendar_temp[usuario]
-
-
-    await update.message.reply_text(
-
-        f"✅ Horário recebido: {horario}\n\n"
-
-        "Próximo passo: salvar o álbum."
-
-    )
-
-
-    del album_agendar_temp[usuario]
-
-# ==============================
-# DIVULGAR ÁLBUM COMPLETO
-# ==============================
-
-async def divulgar_album_completo(
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    grupo = context.job.data
+    grupo = mensagem.media_group_id
 
     if grupo not in albuns:
 
-        return
+        albuns[grupo] = {
 
-    midias = []
+            "mensagens": [],
 
-    legenda_usuario = albuns[grupo].get(
-        "legenda",
-        ""
-    )
+            "legenda": mensagem.caption or ""
 
-    if legenda_usuario:
+        }
 
-        legenda_final = (
+    if len(albuns[grupo]["mensagens"]) < 10:
 
-            legenda_usuario.strip()
-
-            + "\n\n"
-
-            + LEGENDA_FIXA.strip()
-
+        albuns[grupo]["mensagens"].append(
+            mensagem
         )
 
-    else:
+    if mensagem.caption:
 
-        legenda_final = LEGENDA_FIXA.strip()
+        albuns[grupo]["legenda"] = mensagem.caption
 
-    for item in albuns[grupo]["mensagens"]:
 
-        if item.photo:
+    await asyncio.sleep(3)
 
-            midias.append(
-
-                InputMediaPhoto(
-
-                    media=item.photo[-1].file_id,
-
-                    caption=legenda_final
-                    if len(midias) == 0
-                    else None
-
-                )
-
-            )
-
-        elif item.video:
-
-            midias.append(
-
-                InputMediaVideo(
-
-                    media=item.video.file_id,
-
-                    caption=legenda_final
-                    if len(midias) == 0
-                    else None
-
-                )
-
-            )
-
-    if midias:
-
-        await context.bot.send_media_group(
-
-            chat_id=GROUP_ID,
-
-            media=midias
-
-        )
-
-        registrar_album(
-            len(midias)
-        )
-
-    del albuns[grupo]
 
 # ==============================
 # DIVULGAR
@@ -834,7 +738,7 @@ async def agendar_publicacao(
         return
 
 
-        mensagem = update.message.reply_to_message
+    mensagem = update.message.reply_to_message
 
 
     if mensagem.media_group_id:
@@ -1133,11 +1037,6 @@ async def configurar_menu(app):
     ),
 
     BotCommand(
-        "manager",
-        "⚙️ BLACK COMMAND"
-    ),
-
-    BotCommand(
         "divulgar",
         "DIVULGAR 🔥"
     ),
@@ -1157,7 +1056,7 @@ async def configurar_menu(app):
         "ADICIONAR FEEDBACK 📸"
     )
 
-]
+    ]
 
 
     await app.bot.set_my_commands(
@@ -1188,254 +1087,7 @@ async def entrarnovip(
 
     )
 
-# ==============================
-# ⚙️ BLACK COMMAND
-# ==============================
 
-async def manager(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-
-    teclado = InlineKeyboardMarkup(
-
-    [
-
-        [
-
-            InlineKeyboardButton(
-                "📢 Divulgação",
-                callback_data="command_divulgacao"
-            )
-
-        ],
-
-        [
-
-            InlineKeyboardButton(
-                "📚 Álbuns",
-                callback_data="command_album"
-            )
-
-        ],
-
-        [
-
-            InlineKeyboardButton(
-                "⏰ Agendamentos",
-                callback_data="command_agendamentos"
-            )
-
-        ],
-
-        [
-
-            InlineKeyboardButton(
-                "📸 Feedbacks",
-                callback_data="command_feedback"
-            )
-
-        ],
-
-        [
-
-            InlineKeyboardButton(
-                "📊 Status",
-                callback_data="command_status"
-            )
-
-        ],
-
-        [
-
-            InlineKeyboardButton(
-                "🔥 VIP",
-                callback_data="command_vip"
-            )
-
-        ]
-
-    ]
-
-)
-
-
-    await update.message.reply_text(
-
-        "⚙️ BLACK COMMAND\n\n"
-
-        "👑 Controle de operações\n\n"
-
-        "Escolha uma opção:",
-
-        reply_markup=teclado
-
-    )
-# ==============================
-# ⚙️ BLACK COMMAND - NAVEGAÇÃO
-# ==============================
-
-async def black_command_menu(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    query = update.callback_query
-
-    await query.answer()
-
-
-    if query.data == "command_album":
-
-        teclado = InlineKeyboardMarkup(
-
-            [
-
-                [
-
-                    InlineKeyboardButton(
-                        "📤 Enviar Agora",
-                        callback_data="album_enviar"
-                    )
-
-                ],
-
-                [
-
-                    InlineKeyboardButton(
-                        "⏰ Agendar",
-                        callback_data="album_agendar"
-                    )
-
-                ],
-
-                [
-
-                    InlineKeyboardButton(
-                        "🔙 Voltar",
-                        callback_data="command_voltar"
-                    )
-
-                ]
-
-            ]
-
-        )
-
-
-        await query.edit_message_text(
-
-            "📚 DIVULGAÇÃO ÁLBUM\n\n"
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
-
-
-    elif query.data == "album_enviar":
-
-        modo_album.add(
-
-            update.effective_user.id
-
-        )
-
-
-        await query.edit_message_text(
-
-            "📚 ÁLBUM\n\n"
-            "Envie ou encaminhe o álbum que deseja divulgar."
-
-        )
-
-
-    elif query.data == "album_agendar":
-
-        modo_album_agendar.add(
-
-            update.effective_user.id
-
-        )
-
-
-        await query.edit_message_text(
-
-            "⏰ AGENDAR ÁLBUM\n\n"
-            "Envie ou encaminhe o álbum.\n\n"
-            "Depois vou solicitar o horário."
-
-        )
-
-
-    elif query.data == "command_voltar":
-
-        teclado = InlineKeyboardMarkup(
-
-            [
-
-                [
-
-                    InlineKeyboardButton(
-                        "📢 Divulgação",
-                        callback_data="command_divulgacao"
-                    )
-
-                ],
-
-                [
-
-                    InlineKeyboardButton(
-                        "📚 Álbuns",
-                        callback_data="command_album"
-                    )
-
-                ],
-
-                [
-
-                    InlineKeyboardButton(
-                        "⏰ Agendamentos",
-                        callback_data="command_agendamentos"
-                    )
-
-                ],
-
-                [
-
-                    InlineKeyboardButton(
-                        "📸 Feedbacks",
-                        callback_data="command_feedback"
-                    )
-
-                ],
-
-                [
-
-                    InlineKeyboardButton(
-                        "📊 Status",
-                        callback_data="command_status"
-                    )
-
-                ]
-
-            ]
-
-        )
-
-
-        await query.edit_message_text(
-
-            "⚙️ BLACK COMMAND\n\n"
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
 # ==============================
 # BOT
 # ==============================
@@ -1454,60 +1106,15 @@ app = (
 
 )
 
-async def receber_album(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    mensagem = update.message
-
-    if not mensagem.media_group_id:
-        return
-
-    grupo = mensagem.media_group_id
-
-    if grupo not in albuns:
-        albuns[grupo] = {
-            "mensagens": [],
-            "midias": [],
-            "legenda": ""
-        }
-
-    albuns[grupo]["mensagens"].append(mensagem)
-
-    if mensagem.photo:
-        albuns[grupo]["midias"].append({
-            "tipo": "foto",
-            "file_id": mensagem.photo[-1].file_id
-        })
-
-    elif mensagem.video:
-        albuns[grupo]["midias"].append({
-            "tipo": "video",
-            "file_id": mensagem.video.file_id
-        })
-# ==============================
-# COMANDOS
-# ==============================
 
 app.add_handler(
 
     CommandHandler(
-        "manager",
-        manager
-    )
 
-)
-
-
-app.add_handler(
-
-    CommandHandler(
         "start",
+
         start
+
     )
 
 )
@@ -1516,8 +1123,11 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
         "divulgar",
+
         divulgar
+
     )
 
 )
@@ -1526,8 +1136,11 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
         "d_album",
+
         d_album
+
     )
 
 )
@@ -1536,8 +1149,11 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
         "entrarnovip",
+
         entrarnovip
+
     )
 
 )
@@ -1546,16 +1162,15 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
+
         "agendar",
+
         agendar_publicacao
+
     )
 
 )
 
-
-# ==============================
-# FEEDBACK
-# ==============================
 
 app.add_handler(
 
@@ -1590,10 +1205,6 @@ app.add_handler(
 )
 
 
-# ==============================
-# ÁLBUM
-# ==============================
-
 app.add_handler(
 
     MessageHandler(
@@ -1605,36 +1216,7 @@ app.add_handler(
     )
 
 )
-app.add_handler(
 
-    MessageHandler(
-
-        filters.TEXT & ~filters.COMMAND,
-
-        receber_horario_album
-
-    )
-
-)
-
-# ==============================
-# BOTÕES
-# ==============================
-
-app.add_handler(
-
-    CallbackQueryHandler(
-
-        black_command_menu
-
-    )
-
-)
-
-
-# ==============================
-# AGENDAMENTOS
-# ==============================
 
 app.job_queue.run_repeating(
 
