@@ -1195,6 +1195,45 @@ async def menu_manager(
 
 
     elif query.data == "manager_divulgacao":
+
+        teclado = InlineKeyboardMarkup(
+            [
+
+                [
+                    InlineKeyboardButton(
+                        "📤 DIVULGAR AGORA",
+                        callback_data="divulgar_agora"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "⏰ AGENDAR",
+                        callback_data="agendar_divulgacao"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "🔙 VOLTAR",
+                        callback_data="voltar_manager"
+                    )
+                ]
+
+            ]
+        )
+
+
+        await query.edit_message_text(
+
+            "📢 DIVULGAÇÃO\n\n"
+            "Escolha uma opção:",
+
+            reply_markup=teclado
+
+        )
+
+
     elif query.data == "manager_album":
 
         teclado = InlineKeyboardMarkup(
@@ -1228,42 +1267,6 @@ async def menu_manager(
         await query.edit_message_text(
 
             "📚 ÁLBUNS\n\n"
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
-        teclado = InlineKeyboardMarkup(
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📤 DIVULGAR AGORA",
-                        callback_data="divulgar_agora"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "⏰ AGENDAR",
-                        callback_data="agendar_divulgacao"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 VOLTAR",
-                        callback_data="voltar_manager"
-                    )
-                ]
-
-            ]
-        )
-
-
-        await query.edit_message_text(
-
-            "📢 DIVULGAÇÃO\n\n"
             "Escolha uma opção:",
 
             reply_markup=teclado
