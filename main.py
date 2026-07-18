@@ -1381,21 +1381,21 @@ async def black_command_menu(
 
     elif query.data == "album_agendar":
 
-    modo_album.add(
+        modo_album.add(
 
-        update.effective_user.id
+            update.effective_user.id
 
-    )
+        )
 
-    await query.edit_message_text(
+        await query.edit_message_text(
 
-        "⏰ AGENDAR ÁLBUM\n\n"
+            "⏰ AGENDAR ÁLBUM\n\n"
 
-        "Envie ou encaminhe o álbum.\n\n"
+            "Envie ou encaminhe o álbum.\n\n"
 
-        "Depois eu vou pedir o horário."
+            "Depois eu vou pedir o horário."
 
-    )
+        )
 
     elif query.data == "command_agendamentos":
 
