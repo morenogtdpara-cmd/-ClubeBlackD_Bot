@@ -596,12 +596,10 @@ async def receber_album(
 ):
 
     if update.effective_user.id != OWNER_ID:
-
         return
 
 
     if not context.user_data.get("aguardando_album"):
-
         return
 
 
@@ -609,7 +607,6 @@ async def receber_album(
 
 
     if not mensagem.media_group_id:
-
         return
 
 
@@ -646,22 +643,27 @@ async def receber_album(
     )
 
 
-    await asyncio.sleep(3)
+    context.user_data["ultimo_album"] = grupo
 
 
-    if context.user_data.get("aguardando_album"):
-
-        await enviar_album_automatico(
-
-            context,
-
-            grupo
-
-        )
+    await asyncio.sleep(5)
 
 
-        context.user_data["aguardando_album"] = False
+    if context.user_data.get("ultimo_album") != grupo:
+        return
 
+
+    if not context.user_data.get("aguardando_album"):
+        return
+
+
+    await enviar_album_automatico(
+        context,
+        grupo
+    )
+
+
+    context.user_data["aguardando_album"] = False
 
 # ==============================
 # DIVULGAR
