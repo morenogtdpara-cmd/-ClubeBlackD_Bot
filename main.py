@@ -490,58 +490,50 @@ async def receber_feedback(
 # RECEBER ÁLBUM
 # ==============================
 
-async def receber_album(
+async def receber_horario_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    if update.effective_user.id != OWNER_ID:
+    usuario = update.effective_user.id
+
+    if usuario not in album_agendar_temp:
 
         return
 
-    mensagem = update.message
+    horario = update.message.text.strip()
 
-    if not mensagem.media_group_id:
+    try:
+
+        datetime.strptime(
+
+            horario,
+
+            "%H:%M"
+
+        )
+
+    except:
+
+        await update.message.reply_text(
+
+            "⚠️ Horário inválido.\n\nExemplo: 14:00"
+
+        )
 
         return
 
-    grupo = mensagem.media_group_id
+    grupo = album_agendar_temp[usuario]
 
-        if grupo not in albuns:
+    await update.message.reply_text(
 
-        albuns[grupo] = {
+        f"✅ Horário recebido: {horario}\n\n"
 
-            "mensagens": [],
+        "Próximo passo: salvar o álbum."
 
-            "legenda": mensagem.caption or ""
-
-        }
-
-        if update.effective_user.id in modo_album:
-
-            context.job_queue.run_once(
-
-                divulgar_album_completo,
-
-                5,
-
-                data=grupo
-
-            )
-
-        elif update.effective_user.id in modo_album_agendar:
-
-            album_agendar_temp[
-                update.effective_user.id
-            ] = grupo
-
-    albuns[grupo]["mensagens"].append(
-        mensagem
     )
 
-    if mensagem.caption:
-
-        albuns[grupo]["legenda"] = mensagem.caption
+    del album_agendar_temp[usuario]
 
 # ==============================
 # DIVULGAR ÁLBUM COMPLETO
