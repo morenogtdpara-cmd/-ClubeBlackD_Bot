@@ -1298,7 +1298,6 @@ async def black_command_menu(
 
     await query.answer()
 
-
     if query.data == "command_divulgacao":
 
         teclado = InlineKeyboardMarkup(
@@ -1306,47 +1305,38 @@ async def black_command_menu(
             [
 
                 [
-
                     InlineKeyboardButton(
                         "📤 Enviar Agora",
                         callback_data="divulgar_agora"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "⏰ Agendar",
                         callback_data="divulgar_agendar"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "🔙 Voltar",
                         callback_data="command_voltar"
                     )
-
                 ]
 
             ]
 
         )
 
-
         await query.edit_message_text(
 
             "📢 DIVULGAÇÃO NORMAL\n\n"
-
             "Escolha uma opção:",
 
             reply_markup=teclado
 
         )
-
 
     elif query.data == "command_album":
 
@@ -1355,78 +1345,62 @@ async def black_command_menu(
             [
 
                 [
-
                     InlineKeyboardButton(
                         "📤 Enviar Agora",
                         callback_data="album_enviar"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "⏰ Agendar",
                         callback_data="album_agendar"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "🔙 Voltar",
                         callback_data="command_voltar"
                     )
-
                 ]
 
             ]
 
         )
 
-
         await query.edit_message_text(
 
             "📚 DIVULGAÇÃO ÁLBUM\n\n"
-
             "Escolha uma opção:",
 
             reply_markup=teclado
 
         )
 
-
     elif query.data == "album_enviar":
 
-        aguardando_album.add(
+        modo_album.add(
 
             update.effective_user.id
 
         )
 
-
         await query.edit_message_text(
 
             "📚 ÁLBUM\n\n"
-
-            "Envie o álbum agora.\n\n"
-
-            "Ele será divulgado automaticamente."
+            "Envie ou encaminhe o álbum que deseja divulgar."
 
         )
-
 
     elif query.data == "album_agendar":
 
         await query.edit_message_text(
 
             "⏰ AGENDAR ÁLBUM\n\n"
-
             "Função de agendamento de álbum."
 
         )
-
 
     elif query.data == "command_agendamentos":
 
@@ -1435,41 +1409,33 @@ async def black_command_menu(
             [
 
                 [
-
                     InlineKeyboardButton(
                         "📋 Ver Agendados",
                         callback_data="ver_agendados"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "❌ Cancelar Agendado",
                         callback_data="cancelar_agendado"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "🔙 Voltar",
                         callback_data="command_voltar"
                     )
-
                 ]
 
             ]
 
         )
 
-
         await query.edit_message_text(
 
             "⏰ AGENDAMENTOS\n\n"
-
             "Escolha uma opção:",
 
             reply_markup=teclado
