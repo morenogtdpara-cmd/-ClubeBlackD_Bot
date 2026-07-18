@@ -1148,7 +1148,54 @@ async def manager(
         reply_markup=teclado
 
     )
-    
+# ==============================
+# ⚙️ BLACK COMMAND - BOTÕES
+# ==============================
+
+async def black_command_menu(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+
+    if query.data == "command_divulgacao":
+
+        await query.edit_message_text(
+
+            "📢 Divulgação Normal\n\n"
+
+            "📤 Enviar Agora\n"
+            "⏰ Agendar"
+
+        )
+
+
+    elif query.data == "command_album":
+
+        await query.edit_message_text(
+
+            "📚 Divulgação Álbum\n\n"
+
+            "📤 Enviar Agora\n"
+            "⏰ Agendar"
+
+        )
+
+
+    elif query.data == "command_agendamentos":
+
+        await query.edit_message_text(
+
+            "⏰ Agendamentos\n\n"
+
+            "📋 Ver Agendados\n"
+            "❌ Cancelar Agendado"
+
+        )
 # ==============================
 # BOT
 # ==============================
