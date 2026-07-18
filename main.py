@@ -1628,7 +1628,17 @@ app.add_handler(
     )
 
 )
+app.add_handler(
 
+    MessageHandler(
+
+        filters.TEXT & ~filters.COMMAND,
+
+        receber_horario_album
+
+    )
+
+)
 
 # ==============================
 # BOTÕES
