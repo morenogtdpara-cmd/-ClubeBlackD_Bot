@@ -519,22 +519,21 @@ async def receber_album(
 
     if mensagem.caption:
 
-    albuns[grupo]["legenda"] = mensagem.caption
+        albuns[grupo]["legenda"] = mensagem.caption
 
 
-await asyncio.sleep(3)
+    await asyncio.sleep(3)
 
 
-if update.effective_user.id in aguardando_album:
+    if update.effective_user.id in aguardando_album:
 
-    aguardando_album.remove(
-        update.effective_user.id
-    )
+        aguardando_album.remove(
+            update.effective_user.id
+        )
 
-    await d_album(
-        update,
-        context
-    )
+        await update.message.reply_text(
+            "✅ Álbum recebido!"
+        )
 
 
 # ==============================
