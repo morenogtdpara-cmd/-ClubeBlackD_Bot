@@ -1360,30 +1360,24 @@ async def menu_manager(
             [
 
                 [
-
                     InlineKeyboardButton(
                         "📤 DIVULGAR AGORA",
                         callback_data="divulgar_agora"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "⏰ AGENDAR",
                         callback_data="agendar_divulgacao"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "🔙 VOLTAR",
                         callback_data="voltar_manager"
                     )
-
                 ]
 
             ]
@@ -1419,30 +1413,24 @@ async def menu_manager(
             [
 
                 [
-
                     InlineKeyboardButton(
                         "📤 ENVIAR ÁLBUM",
                         callback_data="enviar_album_novo"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "⏰ AGENDAR ÁLBUM",
                         callback_data="agendar_album_novo"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "🔙 VOLTAR",
                         callback_data="voltar_manager"
                     )
-
                 ]
 
             ]
@@ -1459,54 +1447,57 @@ async def menu_manager(
         )
 
 
+    elif query.data == "enviar_album_novo":
+
+        context.user_data["aguardando_album"] = True
+
+
+        await query.message.reply_text(
+
+            "📚 MODO ÁLBUM ATIVADO\n\n"
+            "Envie o álbum de fotos/vídeos."
+
+        )
+
+
     elif query.data == "voltar_manager":
 
         teclado = InlineKeyboardMarkup(
             [
 
                 [
-
                     InlineKeyboardButton(
                         "📢 DIVULGAÇÃO",
                         callback_data="manager_divulgacao"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "📚 ÁLBUNS",
                         callback_data="manager_album"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "⏰ AGENDAMENTOS",
                         callback_data="manager_agenda"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "📸 FEEDBACKS",
                         callback_data="manager_feedback"
                     )
-
                 ],
 
                 [
-
                     InlineKeyboardButton(
                         "📊 STATUS",
                         callback_data="manager_status"
                     )
-
                 ]
 
             ]
