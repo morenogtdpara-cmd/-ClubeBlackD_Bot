@@ -594,7 +594,7 @@ async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
+    print("RECEBER_ALBUM CHAMADA")
     if update.effective_user.id != OWNER_ID:
         return
 
