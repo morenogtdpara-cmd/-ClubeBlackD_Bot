@@ -202,6 +202,7 @@ aguardando_album = set()
 albuns_processados = set()
 
 modo_album = set()
+modo_album_agendar = set()
 # ==============================
 # FEEDBACK - ESTADO
 # ==============================
