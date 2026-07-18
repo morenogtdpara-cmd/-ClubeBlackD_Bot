@@ -1157,7 +1157,14 @@ async def manager(
 # ==============================
 
 app = (
+app.add_handler(
 
+    CommandHandler(
+        "manager",
+        manager
+    )
+
+)
     Application
 
     .builder()
