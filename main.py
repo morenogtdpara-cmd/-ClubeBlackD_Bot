@@ -1195,7 +1195,44 @@ async def menu_manager(
 
 
     elif query.data == "manager_divulgacao":
+    elif query.data == "manager_album":
 
+        teclado = InlineKeyboardMarkup(
+            [
+
+                [
+                    InlineKeyboardButton(
+                        "📤 DIVULGAR ÁLBUM AGORA",
+                        callback_data="album_agora"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "⏰ AGENDAR ÁLBUM",
+                        callback_data="album_agendar"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "🔙 VOLTAR",
+                        callback_data="voltar_manager"
+                    )
+                ]
+
+            ]
+        )
+
+
+        await query.edit_message_text(
+
+            "📚 ÁLBUNS\n\n"
+            "Escolha uma opção:",
+
+            reply_markup=teclado
+
+        )
         teclado = InlineKeyboardMarkup(
             [
 
