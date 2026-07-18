@@ -1112,10 +1112,10 @@ async def entrarnovip(
     )
 
 # ==============================
-# ⚙️ BLACK MANAGER
+# ⚙️ BLACK_MANAGER_NOVO
 # ==============================
 
-async def manager(
+async def manager_novo(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -1130,35 +1130,35 @@ async def manager(
             [
                 InlineKeyboardButton(
                     "📢 DIVULGAÇÃO",
-                    callback_data="manager_divulgacao"
+                    callback_data="novo_divulgacao"
                 )
             ],
 
             [
                 InlineKeyboardButton(
                     "📚 ÁLBUNS",
-                    callback_data="manager_album"
+                    callback_data="novo_album"
                 )
             ],
 
             [
                 InlineKeyboardButton(
                     "⏰ AGENDAMENTOS",
-                    callback_data="manager_agenda"
+                    callback_data="novo_agenda"
                 )
             ],
 
             [
                 InlineKeyboardButton(
                     "📸 FEEDBACKS",
-                    callback_data="manager_feedback"
+                    callback_data="novo_feedback"
                 )
             ],
 
             [
                 InlineKeyboardButton(
                     "📊 STATUS",
-                    callback_data="manager_status"
+                    callback_data="novo_status"
                 )
             ]
 
@@ -1168,7 +1168,7 @@ async def manager(
 
     await update.message.reply_text(
 
-        "⚙️ BLACK MANAGER\n\n"
+        "⚙️ BLACK MANAGER NOVO\n\n"
         "👑 CONTROLE DE OPERAÇÕES\n\n"
         "ESCOLHA UMA OPÇÃO:",
 
