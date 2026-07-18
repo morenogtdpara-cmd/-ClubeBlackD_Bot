@@ -1189,17 +1189,7 @@ async def manager(
 # BOT
 # ==============================
 
-app.add_handler(
-
-    CommandHandler(
-
-        "manager",
-
-        manager
-
-    )
-
-)
+app = (
 
     Application
 
@@ -1210,6 +1200,19 @@ app.add_handler(
     .post_init(configurar_menu)
 
     .build()
+
+)
+
+
+app.add_handler(
+
+    CommandHandler(
+
+        "manager",
+
+        manager
+
+    )
 
 )
 
@@ -1324,6 +1327,7 @@ app.add_handler(
 
 )
 
+
 app.add_handler(
 
     CallbackQueryHandler(
@@ -1333,6 +1337,7 @@ app.add_handler(
     )
 
 )
+
 
 app.job_queue.run_repeating(
 
