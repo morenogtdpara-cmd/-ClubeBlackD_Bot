@@ -531,8 +531,88 @@ async def receber_album(
             update.effective_user.id
         )
 
+        midias = []
+
+        legenda_usuario = albuns[grupo].get(
+            "legenda",
+            ""
+        )
+
+        if legenda_usuario:
+
+            legenda_final = (
+
+                legenda_usuario.strip()
+
+                + "\n\n"
+
+                + LEGENDA_FIXA.strip()
+
+            )
+
+        else:
+
+            legenda_final = LEGENDA_FIXA.strip()
+
+
+        for item in albuns[grupo]["mensagens"]:
+
+            if item.photo:
+
+                midias.append(
+
+                    InputMediaPhoto(
+
+                        media=item.photo[-1].file_id,
+
+                        caption=legenda_final
+
+                        if len(midias) == 0
+
+                        else None
+
+                    )
+
+                )
+
+            elif item.video:
+
+                midias.append(
+
+                    InputMediaVideo(
+
+                        media=item.video.file_id,
+
+                        caption=legenda_final
+
+                        if len(midias) == 0
+
+                        else None
+
+                    )
+
+                )
+
+        if midias:
+
+            await context.bot.send_media_group(
+
+                chat_id=GROUP_ID,
+
+                media=midias
+
+            )
+
+            registrar_album(
+                len(midias)
+            )
+
+        del albuns[grupo]
+
         await update.message.reply_text(
-            "✅ Álbum recebido!"
+
+            "✅ Álbum divulgado!"
+
         )
 
 
