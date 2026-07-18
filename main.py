@@ -198,7 +198,7 @@ LEGENDA_FIXA = """
 
 
 albuns = {}
-
+aguardando_album = set()
 # ==============================
 # FEEDBACK - ESTADO
 # ==============================
