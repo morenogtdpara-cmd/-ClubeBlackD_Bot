@@ -524,26 +524,23 @@ async def receber_album(
 
         albuns[grupo]["legenda"] = mensagem.caption
 
-
     await asyncio.sleep(5)
-
 
     if grupo in albuns_processados:
 
         return
 
-
     if update.effective_user.id in modo_album:
 
-    albuns_processados.add(
-        grupo
-    )
+        albuns_processados.add(
+            grupo
+        )
 
-    modo_album.remove(
-        update.effective_user.id
-    )
+        modo_album.remove(
+            update.effective_user.id
+        )
 
-    await asyncio.sleep(3)
+        await asyncio.sleep(3)
 
         midias = []
 
@@ -567,7 +564,6 @@ async def receber_album(
         else:
 
             legenda_final = LEGENDA_FIXA.strip()
-
 
         for item in albuns[grupo]["mensagens"]:
 
