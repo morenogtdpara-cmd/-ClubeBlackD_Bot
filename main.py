@@ -1171,7 +1171,7 @@ async def botoes_manager(
 
     if query.data == "manager_status":
 
-        await query.message.reply_text(
+    await status(update, context)
 
             "📊 STATUS DO SISTEMA\n\n"
             "⚡ Sistema ativo\n"
