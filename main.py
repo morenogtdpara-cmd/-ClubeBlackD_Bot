@@ -1181,7 +1181,7 @@ async def manager(
 
     )
 # ==============================
-# ⚙️ BLACK COMMAND - BOTÕES
+# ⚙️ BLACK COMMAND - NAVEGAÇÃO
 # ==============================
 
 async def black_command_menu(
@@ -1196,36 +1196,147 @@ async def black_command_menu(
 
     if query.data == "command_divulgacao":
 
+        teclado = InlineKeyboardMarkup(
+
+            [
+
+                [
+
+                    InlineKeyboardButton(
+                        "📤 Enviar Agora",
+                        callback_data="divulgar_agora"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "⏰ Agendar",
+                        callback_data="divulgar_agendar"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "🔙 Voltar",
+                        callback_data="command_voltar"
+                    )
+
+                ]
+
+            ]
+
+        )
+
+
         await query.edit_message_text(
 
-            "📢 Divulgação Normal\n\n"
+            "📢 DIVULGAÇÃO NORMAL\n\n"
 
-            "📤 Enviar Agora\n"
-            "⏰ Agendar"
+            "Escolha uma opção:",
+
+            reply_markup=teclado
 
         )
 
 
     elif query.data == "command_album":
 
+        teclado = InlineKeyboardMarkup(
+
+            [
+
+                [
+
+                    InlineKeyboardButton(
+                        "📤 Enviar Agora",
+                        callback_data="album_enviar"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "⏰ Agendar",
+                        callback_data="album_agendar"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "🔙 Voltar",
+                        callback_data="command_voltar"
+                    )
+
+                ]
+
+            ]
+
+        )
+
+
         await query.edit_message_text(
 
-            "📚 Divulgação Álbum\n\n"
+            "📚 DIVULGAÇÃO ÁLBUM\n\n"
 
-            "📤 Enviar Agora\n"
-            "⏰ Agendar"
+            "Escolha uma opção:",
+
+            reply_markup=teclado
 
         )
 
 
     elif query.data == "command_agendamentos":
 
+        teclado = InlineKeyboardMarkup(
+
+            [
+
+                [
+
+                    InlineKeyboardButton(
+                        "📋 Ver Agendados",
+                        callback_data="ver_agendados"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "❌ Cancelar Agendado",
+                        callback_data="cancelar_agendado"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "🔙 Voltar",
+                        callback_data="command_voltar"
+                    )
+
+                ]
+
+            ]
+
+        )
+
+
         await query.edit_message_text(
 
-            "⏰ Agendamentos\n\n"
+            "⏰ AGENDAMENTOS\n\n"
 
-            "📋 Ver Agendados\n"
-            "❌ Cancelar Agendado"
+            "Escolha uma opção:",
+
+            reply_markup=teclado
 
         )
 # ==============================
