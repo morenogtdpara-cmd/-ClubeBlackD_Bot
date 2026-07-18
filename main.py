@@ -1159,7 +1159,7 @@ async def manager(
 # BOTÕES BLACK MANAGER
 # ==============================
 
-async def botoes_manager(
+async def menu_manager(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -1169,9 +1169,9 @@ async def botoes_manager(
     await query.answer()
 
 
-if query.data == "manager_status":
+    if query.data == "manager_status":
 
-    await status(update, context)
+        await status(update, context)
 
 # ==============================
 # BOT
