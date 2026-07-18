@@ -1089,103 +1089,59 @@ async def entrarnovip(
     )
 
 # ==============================
-# ⚙️ BLACK COMMAND - NAVEGAÇÃO
+# ⚙️ ABRIR BLACK COMMAND
 # ==============================
 
-async def black_command_menu(
+async def manager(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    query = update.callback_query
-
-    await query.answer()
-
-
-    if query.data == "command_divulgacao":
-
-        teclado = InlineKeyboardMarkup(
-
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📤 Enviar Agora",
-                        callback_data="divulgar_agora"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "⏰ Agendar",
-                        callback_data="divulgar_agendar"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 Voltar",
-                        callback_data="command_voltar"
-                    )
-                ]
-
-            ]
-
-        )
+    if update.effective_user.id != OWNER_ID:
+        return
 
 
-        await query.edit_message_text(
+    teclado = InlineKeyboardMarkup(
 
-            "📢 DIVULGAÇÃO NORMAL\n\n"
-
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
-
-
-    elif query.data == "command_album":
-
-        teclado = InlineKeyboardMarkup(
+        [
 
             [
+                InlineKeyboardButton(
+                    "📢 Divulgação Normal",
+                    callback_data="command_divulgacao"
+                )
+            ],
 
-                [
-                    InlineKeyboardButton(
-                        "📤 Enviar Agora",
-                        callback_data="album_agora"
-                    )
-                ],
+            [
+                InlineKeyboardButton(
+                    "📚 Divulgação Álbum",
+                    callback_data="command_album"
+                )
+            ],
 
-                [
-                    InlineKeyboardButton(
-                        "⏰ Agendar",
-                        callback_data="album_agendar"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 Voltar",
-                        callback_data="command_voltar"
-                    )
-                ]
-
+            [
+                InlineKeyboardButton(
+                    "⏰ Agendamentos",
+                    callback_data="command_agendamentos"
+                )
             ]
 
-        )
+        ]
+
+    )
 
 
-        await query.edit_message_text(
+    await update.message.reply_text(
 
-            "📚 DIVULGAÇÃO ÁLBUM\n\n"
+        "⚙️ BLACK COMMAND\n\n"
 
-            "Escolha uma opção:",
+        "👑 Controle de operações\n\n"
 
-            reply_markup=teclado
+        "Escolha uma opção:",
 
-        )
+        reply_markup=teclado
+
+    )
 
 
     elif query.data == "command_agendamentos":
