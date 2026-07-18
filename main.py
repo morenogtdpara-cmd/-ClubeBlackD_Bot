@@ -844,7 +844,7 @@ async def agendar_publicacao(
         grupo = mensagem.media_group_id
 
 
-        if grupo not in albuns:
+    if grupo not in albuns:
 
             await update.message.reply_text(
 
