@@ -1275,7 +1275,7 @@ async def menu_manager(
 
         await status(update, context)
 
-    eli query.data == "divulgar_agora":
+    elif query.data == "divulgar_agora":
 
     await divulgar(update, context)
     elif query.data == "manager_divulgacao":
