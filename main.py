@@ -1281,13 +1281,19 @@ async def black_command_menu(
         )
 
 
+            elif query.data == "album_enviar":
+
+        aguardando_album.add(
+            update.effective_user.id
+        )
+
         await query.edit_message_text(
 
-            "📚 DIVULGAÇÃO ÁLBUM\n\n"
+            "📚 ÁLBUM\n\n"
 
-            "Escolha uma opção:",
+            "Envie o álbum agora.\n\n"
 
-            reply_markup=teclado
+            "Ele será divulgado automaticamente."
 
         )
 
