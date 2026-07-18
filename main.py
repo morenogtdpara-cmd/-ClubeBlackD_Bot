@@ -1157,12 +1157,23 @@ async def manager(
 # ==============================
 
 app = (
+
     Application
+
     .builder()
+
     .token(BOT_TOKEN)
+
     .post_init(configurar_menu)
+
     .build()
+
 )
+
+
+# ==============================
+# COMANDOS
+# ==============================
 
 app.add_handler(
 
@@ -1172,27 +1183,13 @@ app.add_handler(
     )
 
 )
-    Application
-
-    .builder()
-
-    .token(BOT_TOKEN)
-
-    .post_init(configurar_menu)
-
-    .build()
-
-)
 
 
 app.add_handler(
 
     CommandHandler(
-
         "start",
-
         start
-
     )
 
 )
@@ -1201,11 +1198,8 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
-
         "divulgar",
-
         divulgar
-
     )
 
 )
@@ -1214,11 +1208,8 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
-
         "d_album",
-
         d_album
-
     )
 
 )
@@ -1227,11 +1218,8 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
-
         "entrarnovip",
-
         entrarnovip
-
     )
 
 )
@@ -1240,15 +1228,16 @@ app.add_handler(
 app.add_handler(
 
     CommandHandler(
-
         "agendar",
-
         agendar_publicacao
-
     )
 
 )
 
+
+# ==============================
+# FEEDBACK
+# ==============================
 
 app.add_handler(
 
@@ -1283,6 +1272,10 @@ app.add_handler(
 )
 
 
+# ==============================
+# ÁLBUM
+# ==============================
+
 app.add_handler(
 
     MessageHandler(
@@ -1295,6 +1288,25 @@ app.add_handler(
 
 )
 
+
+# ==============================
+# BOTÕES
+# ==============================
+
+app.add_handler(
+
+    CallbackQueryHandler(
+
+        black_command_menu
+
+    )
+
+)
+
+
+# ==============================
+# AGENDAMENTOS
+# ==============================
 
 app.job_queue.run_repeating(
 
