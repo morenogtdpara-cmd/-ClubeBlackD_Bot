@@ -1592,15 +1592,16 @@ async def menu_manager(
 
     elif query.data == "enviar_album_novo":
 
-        context.user_data["aguardando_album"] = True
+    context.user_data["aguardando_album"] = True
 
+    print("ALBUM ATIVADO ✅")
 
-        await query.message.reply_text(
+    await query.message.reply_text(
 
-            "📚 MODO ÁLBUM ATIVADO\n\n"
-            "Envie o álbum de fotos/vídeos."
+        "📚 MODO ÁLBUM ATIVADO\n\n"
+        "Envie o álbum de fotos/vídeos."
 
-        )
+    )
 
 
     elif query.data == "voltar_manager":
