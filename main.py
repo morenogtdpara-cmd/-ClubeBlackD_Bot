@@ -100,6 +100,10 @@ def salvar_sistema(dados):
 
 STATUS_SISTEMA = carregar_sistema()
 
+INICIO_BOT = datetime.now(
+    ZoneInfo("America/Sao_Paulo")
+)
+
 
 
 def atualizar_dia():
