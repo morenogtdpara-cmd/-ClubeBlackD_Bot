@@ -460,6 +460,82 @@ async def feedback(
 
     return AGUARDANDO_FEEDBACK
 # ==============================
+# RECEBER DIVULGAÇÃO NOVA (MANAGER)
+# ==============================
+
+async def receber_divulgacao_nova(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+
+    if not context.user_data.get(
+        "aguardando_divulgacao"
+    ):
+        return
+
+
+    mensagem = update.message
+
+
+    # TEXTO
+    if mensagem.text:
+
+        await context.bot.send_message(
+
+            chat_id=GROUP_ID,
+
+            text=mensagem.text,
+
+            reply_markup=botoes_vip()
+
+        )
+
+
+    # FOTO COM LEGENDA
+    elif mensagem.photo and mensagem.caption:
+
+        await context.bot.send_photo(
+
+            chat_id=GROUP_ID,
+
+            photo=mensagem.photo[-1].file_id,
+
+            caption=mensagem.caption,
+
+            reply_markup=botoes_vip()
+
+        )
+
+
+    else:
+
+        await update.message.reply_text(
+
+            "⚠️ Divulgação precisa ser texto ou foto com legenda."
+
+        )
+
+        return
+
+
+    registrar_divulgacao()
+
+
+    context.user_data[
+        "aguardando_divulgacao"
+    ] = False
+
+
+    await update.message.reply_text(
+
+        "✅ Divulgação publicada com sucesso!"
+
+    )
+# ==============================
 # RECEBER FEEDBACK
 # ==============================
 
