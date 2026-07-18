@@ -1228,7 +1228,14 @@ app.add_handler(
 
 )
 
+app.add_handler(
 
+    CommandHandler(
+        "manager",
+        manager
+    )
+
+)
 app.add_handler(
 
     CommandHandler(
