@@ -522,7 +522,7 @@ async def receber_album(
         albuns[grupo]["legenda"] = mensagem.caption
 
 
-    await asyncio.sleep(8)
+    await asyncio.sleep(20)
 
 
     if update.effective_user.id in aguardando_album:
