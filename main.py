@@ -1157,6 +1157,12 @@ async def manager(
 # ==============================
 
 app = (
+    Application
+    .builder()
+    .token(BOT_TOKEN)
+    .post_init(configurar_menu)
+    .build()
+)
 
 app.add_handler(
 
