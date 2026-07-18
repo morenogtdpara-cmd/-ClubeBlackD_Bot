@@ -1169,7 +1169,7 @@ async def botoes_manager(
     await query.answer()
 
 
-    if query.data == "manager_status":
+if query.data == "manager_status":
 
     await status(update, context)
 
