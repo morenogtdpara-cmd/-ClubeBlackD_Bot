@@ -487,7 +487,7 @@ async def receber_feedback(
 
     return ConversationHandler.END
 # ==============================
-# RECEBER ÁLBUM
+# RECEBER HORÁRIO ÁLBUM
 # ==============================
 
 async def receber_horario_album(
