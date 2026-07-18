@@ -1450,6 +1450,11 @@ async def black_command_menu(
             reply_markup=teclado
 
         )
+async def receber_horario_album(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+    pass
 # ==============================
 # BOT
 # ==============================
