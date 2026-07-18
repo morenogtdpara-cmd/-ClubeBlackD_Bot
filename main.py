@@ -1157,6 +1157,7 @@ async def manager(
 # ==============================
 
 app = (
+
 app.add_handler(
 
     CommandHandler(
