@@ -506,24 +506,21 @@ async def receber_horario_album(
     try:
 
         datetime.strptime(
-
             horario,
-
             "%H:%M"
-
         )
 
     except:
 
         await update.message.reply_text(
-
             "⚠️ Horário inválido.\n\nExemplo: 14:00"
-
         )
 
         return
 
+
     grupo = album_agendar_temp[usuario]
+
 
     await update.message.reply_text(
 
@@ -532,6 +529,7 @@ async def receber_horario_album(
         "Próximo passo: salvar o álbum."
 
     )
+
 
     del album_agendar_temp[usuario]
 
