@@ -1454,7 +1454,41 @@ app = (
 
 )
 
+async def receber_album(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    mensagem = update.message
+
+    if not mensagem.media_group_id:
+        return
+
+    grupo = mensagem.media_group_id
+
+    if grupo not in albuns:
+        albuns[grupo] = {
+            "mensagens": [],
+            "midias": [],
+            "legenda": ""
+        }
+
+    albuns[grupo]["mensagens"].append(mensagem)
+
+    if mensagem.photo:
+        albuns[grupo]["midias"].append({
+            "tipo": "foto",
+            "file_id": mensagem.photo[-1].file_id
+        })
+
+    elif mensagem.video:
+        albuns[grupo]["midias"].append({
+            "tipo": "video",
+            "file_id": mensagem.video.file_id
+        })
 # ==============================
 # COMANDOS
 # ==============================
