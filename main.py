@@ -371,27 +371,25 @@ async def status(
 
     proximo = "--:--"
 
-    if agendamentos:
+if agendamentos:
 
-        horarios = sorted(
+    horarios = sorted(
 
-            [
+        [
 
-                item["horario"]
+            item["horario"]
 
-                for item in agendamentos
+            for item in agendamentos
 
-            ]
+        ]
 
-        )
+    )
 
-        proximo = fonte_numero(
-    horarios[0]
-)
+    proximo = fonte_numero(
+        horarios[0]
+    )
 
-    ultimo = (
-
-        ultimo = fonte_numero(
+ultimo = fonte_numero(
 
     STATUS_SISTEMA["ultimo_envio"]
 
