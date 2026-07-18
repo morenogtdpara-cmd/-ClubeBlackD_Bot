@@ -1195,7 +1195,33 @@ app = (
     .build()
 
 )
+app.add_handler(
 
+    CommandHandler(
+        "manager",
+        manager
+    )
+
+)
+
+
+app.add_handler(
+
+    CallbackQueryHandler(
+        botoes_manager
+    )
+
+)
+
+
+app.add_handler(
+
+    CommandHandler(
+        "start",
+        start
+    )
+
+)
 
 app.add_handler(
 
