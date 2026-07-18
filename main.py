@@ -334,6 +334,16 @@ async def start(
 # STATUS REAL
 # ==============================
 
+def fonte_numero(texto):
+
+    normal = "0123456789"
+    bonito = "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
+
+    return str(texto).translate(
+        str.maketrans(normal, bonito)
+    )
+
+
 async def status(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -351,9 +361,13 @@ async def status(
 
     tempo = agora - INICIO_BOT
 
-    horas = tempo.seconds // 3600
+    horas = fonte_numero(
+        tempo.seconds // 3600
+    )
 
-    minutos = (tempo.seconds % 3600) // 60
+    minutos = fonte_numero(
+        (tempo.seconds % 3600) // 60
+    )
 
     proximo = "--:--"
 
@@ -393,11 +407,11 @@ async def status(
 
         "📋 HOJE\n\n"
 
-        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/30\n"
+        f"👑 Envios: {fonte_numero(STATUS_SISTEMA['envios_hoje'])}/𝟑𝟎\n"
 
-        f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
+        f"📱 Mídias: {fonte_numero(STATUS_SISTEMA['midias_hoje'])}\n"
 
-        f"⏰ Agendados: {len(agendamentos)}\n\n"
+        f"⏰ Agendados: {fonte_numero(len(agendamentos))}\n\n"
 
         "━━━━━━━━━━━\n\n"
 
