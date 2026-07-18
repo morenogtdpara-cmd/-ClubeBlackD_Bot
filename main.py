@@ -646,7 +646,7 @@ async def receber_album(
     context.user_data["ultimo_album"] = grupo
 
 
-    await asyncio.sleep(5)
+    await asyncio.sleep(20)
 
 
     if context.user_data.get("ultimo_album") != grupo:
