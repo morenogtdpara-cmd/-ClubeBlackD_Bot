@@ -1087,7 +1087,71 @@ async def entrarnovip(
 
     )
 
+# ==============================
+# ⚙️ BLACK COMMAND
+# ==============================
 
+async def manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+
+    teclado = InlineKeyboardMarkup(
+
+        [
+
+            [
+
+                InlineKeyboardButton(
+                    "📢 Divulgação Normal",
+                    callback_data="command_divulgacao"
+                )
+
+            ],
+
+            [
+
+                InlineKeyboardButton(
+                    "📚 Divulgação Álbum",
+                    callback_data="command_album"
+                )
+
+            ],
+
+            [
+
+                [
+
+                    InlineKeyboardButton(
+                        "⏰ Agendamentos",
+                        callback_data="command_agendamentos"
+                    )
+
+                ]
+
+            ]
+
+        ]
+
+    )
+
+
+    await update.message.reply_text(
+
+        "⚙️ BLACK COMMAND\n\n"
+
+        "👑 Controle de operações\n\n"
+
+        "Escolha uma opção:",
+
+        reply_markup=teclado
+
+    )
+    
 # ==============================
 # BOT
 # ==============================
