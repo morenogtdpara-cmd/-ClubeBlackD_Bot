@@ -1113,7 +1113,7 @@ async def manager(
         [
 
             InlineKeyboardButton(
-                "📢 Divulgação Normal",
+                "📢 Divulgação",
                 callback_data="command_divulgacao"
             )
 
@@ -1122,7 +1122,7 @@ async def manager(
         [
 
             InlineKeyboardButton(
-                "📚 Divulgação Álbum",
+                "📚 Álbuns",
                 callback_data="command_album"
             )
 
@@ -1133,6 +1133,33 @@ async def manager(
             InlineKeyboardButton(
                 "⏰ Agendamentos",
                 callback_data="command_agendamentos"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "📸 Feedbacks",
+                callback_data="command_feedback"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "📊 Status",
+                callback_data="command_status"
+            )
+
+        ],
+
+        [
+
+            InlineKeyboardButton(
+                "🔥 VIP",
+                callback_data="command_vip"
             )
 
         ]
