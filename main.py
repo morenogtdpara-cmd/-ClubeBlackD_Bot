@@ -1281,11 +1281,25 @@ async def black_command_menu(
         )
 
 
-            elif query.data == "album_enviar":
+        await query.edit_message_text(
+
+            "📚 DIVULGAÇÃO ÁLBUM\n\n"
+
+            "Escolha uma opção:",
+
+            reply_markup=teclado
+
+        )
+
+
+    elif query.data == "album_enviar":
 
         aguardando_album.add(
+
             update.effective_user.id
+
         )
+
 
         await query.edit_message_text(
 
@@ -1298,30 +1312,13 @@ async def black_command_menu(
         )
 
 
-    elif query.data == "album_enviar":
-
-    aguardando_album.add(
-        update.effective_user.id
-    )
-
-    await query.edit_message_text(
-
-        "📚 ÁLBUM\n\n"
-
-        "Envie o álbum agora.\n\n"
-
-        "Ele será divulgado automaticamente."
-
-    )
-
-
     elif query.data == "album_agendar":
 
         await query.edit_message_text(
 
             "⏰ AGENDAR ÁLBUM\n\n"
 
-            "Envie o horário desejado."
+            "Função de agendamento de álbum."
 
         )
 
