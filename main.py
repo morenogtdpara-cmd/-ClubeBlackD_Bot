@@ -1036,7 +1036,10 @@ async def configurar_menu(app):
         "start",
         "BLACK SYSTEM 👑"
     ),
-
+    BotCommand(
+        "manager",
+        "⚙️ BLACK MANAGER"
+    ),
     BotCommand(
         "divulgar",
         "DIVULGAR 🔥"
