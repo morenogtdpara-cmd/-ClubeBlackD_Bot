@@ -533,7 +533,7 @@ async def receber_album(
         return
 
 
-    if update.effective_user.id in aguardando_album:
+    if update.effective_user.id in modo_album:
 
         albuns_processados.add(
             grupo
