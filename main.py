@@ -591,13 +591,22 @@ async def receber_album(
 
         return
 
+
+    if not context.user_data.get("aguardando_album"):
+
+        return
+
+
     mensagem = update.message
+
 
     if not mensagem.media_group_id:
 
         return
 
+
     grupo = mensagem.media_group_id
+
 
     if grupo not in albuns:
 
@@ -609,11 +618,13 @@ async def receber_album(
 
         }
 
+
     if len(albuns[grupo]["mensagens"]) < 10:
 
         albuns[grupo]["mensagens"].append(
             mensagem
         )
+
 
     if mensagem.caption:
 
