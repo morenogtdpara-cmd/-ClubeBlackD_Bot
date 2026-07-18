@@ -472,6 +472,14 @@ async def receber_divulgacao_nova(
         return
 
 
+    # SE ESTIVER EM MODO ÁLBUM
+    # NÃO FAZ NADA
+    if context.user_data.get(
+        "aguardando_album"
+    ):
+        return
+
+
     if not context.user_data.get(
         "aguardando_divulgacao"
     ):
