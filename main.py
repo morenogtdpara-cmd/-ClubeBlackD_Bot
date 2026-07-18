@@ -1806,20 +1806,21 @@ app.add_handler(
 
     MessageHandler(
 
-        filters.TEXT | filters.PHOTO,
+        filters.PHOTO | filters.VIDEO,
 
-        receber_divulgacao_nova
+        receber_album
 
     )
 
 )
+
 app.add_handler(
 
     MessageHandler(
 
-        filters.PHOTO | filters.VIDEO,
+        filters.TEXT | filters.PHOTO,
 
-        receber_album
+        receber_divulgacao_nova
 
     )
 
