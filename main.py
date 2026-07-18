@@ -1358,6 +1358,15 @@ app.add_handler(
 
 )
 
+app.add_handler(
+
+    CallbackQueryHandler(
+
+        black_command_menu
+
+    )
+
+)
 
 app.job_queue.run_repeating(
 
