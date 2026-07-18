@@ -377,7 +377,7 @@ async def status(
 
     )
 
-    await update.message.reply_text(
+    await update.callback_query.message.reply_text(
 
         "🖤 BLACK SYSTEM\n\n"
 
