@@ -1382,7 +1382,7 @@ async def black_command_menu(
 
     elif query.data == "album_agendar":
 
-        modo_album.add(
+        modo_album_agendar.add(
 
             update.effective_user.id
 
@@ -1394,7 +1394,7 @@ async def black_command_menu(
 
             "Envie ou encaminhe o álbum.\n\n"
 
-            "Depois eu vou pedir o horário."
+            "Depois vou solicitar o horário."
 
         )
 
