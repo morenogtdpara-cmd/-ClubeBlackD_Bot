@@ -631,7 +631,14 @@ async def receber_album(
         albuns[grupo]["legenda"] = mensagem.caption
 
 
-        await asyncio.sleep(3)
+    print(
+        "DEBUG ALBUM:",
+        grupo,
+        len(albuns[grupo]["mensagens"])
+    )
+
+
+    await asyncio.sleep(3)
 
 
     if context.user_data.get("aguardando_album"):
