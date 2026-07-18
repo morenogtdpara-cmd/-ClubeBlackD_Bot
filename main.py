@@ -535,15 +535,15 @@ async def receber_album(
 
     if update.effective_user.id in modo_album:
 
-        albuns_processados.add(
-            grupo
-        )
+    albuns_processados.add(
+        grupo
+    )
 
-        aguardando_album.remove(
-            update.effective_user.id
-        )
+    modo_album.remove(
+        update.effective_user.id
+    )
 
-        await asyncio.sleep(3)
+    await asyncio.sleep(3)
 
         midias = []
 
