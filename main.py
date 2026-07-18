@@ -385,7 +385,9 @@ async def status(
 
         )
 
-        proximo = horarios[0]
+        proximo = fonte_numero(
+    horarios[0]
+)
 
     ultimo = (
 
