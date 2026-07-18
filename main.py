@@ -1624,7 +1624,17 @@ app.add_handler(
 
 )
 
+app.add_handler(
 
+    MessageHandler(
+
+        filters.TEXT | filters.PHOTO,
+
+        receber_divulgacao_nova
+
+    )
+
+)
 app.add_handler(
 
     MessageHandler(
