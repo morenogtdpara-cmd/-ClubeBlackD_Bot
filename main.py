@@ -1292,6 +1292,30 @@ async def black_command_menu(
         )
 
 
+    elif query.data == "album_enviar":
+
+        await query.edit_message_text(
+
+            "📚 ÁLBUM\n\n"
+
+            "Envie ou responda ao álbum que deseja divulgar.\n\n"
+
+            "Depois use /d_album"
+
+        )
+
+
+    elif query.data == "album_agendar":
+
+        await query.edit_message_text(
+
+            "⏰ AGENDAR ÁLBUM\n\n"
+
+            "Envie o horário desejado."
+
+        )
+
+
     elif query.data == "command_agendamentos":
 
         teclado = InlineKeyboardMarkup(
