@@ -1275,10 +1275,7 @@ async def menu_manager(
 
     if query.data == "manager_status":
 
-        await status(
-            update,
-            context
-        )
+        await status(update, context)
 
 
     elif query.data == "manager_divulgacao":
@@ -1314,7 +1311,6 @@ async def menu_manager(
                 ]
 
             ]
-
         )
 
 
@@ -1328,11 +1324,10 @@ async def menu_manager(
         )
 
 
-        elif query.data == "divulgar_agora":
-
-        await query.answer()
+    elif query.data == "divulgar_agora":
 
         context.user_data["aguardando_divulgacao"] = True
+
 
         await query.message.reply_text(
 
@@ -1393,7 +1388,6 @@ async def menu_manager(
                 ]
 
             ]
-
         )
 
 
