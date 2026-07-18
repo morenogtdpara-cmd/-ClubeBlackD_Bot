@@ -1038,6 +1038,11 @@ async def configurar_menu(app):
     ),
 
     BotCommand(
+        "manager",
+        "⚙️ BLACK COMMAND"
+    ),
+
+    BotCommand(
         "divulgar",
         "DIVULGAR 🔥"
     ),
@@ -1057,7 +1062,7 @@ async def configurar_menu(app):
         "ADICIONAR FEEDBACK 📸"
     )
 
-    ]
+]
 
 
     await app.bot.set_my_commands(
