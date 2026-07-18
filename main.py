@@ -523,14 +523,25 @@ async def receber_album(
         albuns[grupo]["legenda"] = mensagem.caption
 
 
-    await asyncio.sleep(20)
+    await asyncio.sleep(5)
+
+
+    if grupo in albuns_processados:
+
+        return
 
 
     if update.effective_user.id in aguardando_album:
 
+        albuns_processados.add(
+            grupo
+        )
+
         aguardando_album.remove(
             update.effective_user.id
         )
+
+        await asyncio.sleep(3)
 
         midias = []
 
@@ -567,9 +578,7 @@ async def receber_album(
                         media=item.photo[-1].file_id,
 
                         caption=legenda_final
-
                         if len(midias) == 0
-
                         else None
 
                     )
@@ -585,9 +594,7 @@ async def receber_album(
                         media=item.video.file_id,
 
                         caption=legenda_final
-
                         if len(midias) == 0
-
                         else None
 
                     )
@@ -610,9 +617,13 @@ async def receber_album(
 
         del albuns[grupo]
 
+        albuns_processados.remove(
+            grupo
+        )
+
         await update.message.reply_text(
 
-            "✅ Álbum divulgado!"
+            f"✅ Álbum divulgado! ({len(midias)} mídias)"
 
         )
 
