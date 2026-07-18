@@ -1173,11 +1173,6 @@ if query.data == "manager_status":
 
     await status(update, context)
 
-            "📊 STATUS DO SISTEMA\n\n"
-            "⚡ Sistema ativo\n"
-            "✅ Operações funcionando"
-
-        )
 # ==============================
 # BOT
 # ==============================
