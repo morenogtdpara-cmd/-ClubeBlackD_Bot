@@ -1203,11 +1203,10 @@ app.add_handler(
 app.add_handler(
 
     CallbackQueryHandler(
-        botoes_manager
+        menu_manager
     )
 
 )
-
 
 app.add_handler(
 
