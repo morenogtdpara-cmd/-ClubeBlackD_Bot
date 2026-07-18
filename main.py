@@ -1328,15 +1328,16 @@ async def menu_manager(
         )
 
 
-    elif query.data == "divulgar_agora":
+        elif query.data == "divulgar_agora":
 
-        await query.answer(
-            "BOTÃO FUNCIONOU ✅"
-        )
+        await query.answer()
+
+        context.user_data["aguardando_divulgacao"] = True
 
         await query.message.reply_text(
 
-            "📢 Responda a mensagem que deseja divulgar."
+            "📢 MODO DIVULGAÇÃO ATIVADO\n\n"
+            "Envie a mensagem que deseja publicar."
 
         )
 
