@@ -1156,6 +1156,29 @@ async def manager(
 
     )
 # ==============================
+# BOTÕES BLACK MANAGER
+# ==============================
+
+async def botoes_manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+
+    if query.data == "manager_status":
+
+        await query.message.reply_text(
+
+            "📊 STATUS DO SISTEMA\n\n"
+            "⚡ Sistema ativo\n"
+            "✅ Operações funcionando"
+
+        )
+# ==============================
 # BOT
 # ==============================
 
