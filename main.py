@@ -1103,42 +1103,38 @@ async def manager(
 
     teclado = InlineKeyboardMarkup(
 
+    [
+
         [
 
-            [
+            InlineKeyboardButton(
+                "📢 Divulgação Normal",
+                callback_data="command_divulgacao"
+            )
 
-                InlineKeyboardButton(
-                    "📢 Divulgação Normal",
-                    callback_data="command_divulgacao"
-                )
+        ],
 
-            ],
+        [
 
-            [
+            InlineKeyboardButton(
+                "📚 Divulgação Álbum",
+                callback_data="command_album"
+            )
 
-                InlineKeyboardButton(
-                    "📚 Divulgação Álbum",
-                    callback_data="command_album"
-                )
+        ],
 
-            ],
+        [
 
-            [
-
-                [
-
-                    InlineKeyboardButton(
-                        "⏰ Agendamentos",
-                        callback_data="command_agendamentos"
-                    )
-
-                ]
-
-            ]
+            InlineKeyboardButton(
+                "⏰ Agendamentos",
+                callback_data="command_agendamentos"
+            )
 
         ]
 
-    )
+    ]
+
+)
 
 
     await update.message.reply_text(
