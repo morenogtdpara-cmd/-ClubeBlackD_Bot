@@ -496,11 +496,14 @@ async def receber_album(
 
         return
 
+
     mensagem = update.message
+
 
     if not mensagem.media_group_id:
 
         return
+
 
     grupo = mensagem.media_group_id
 
@@ -516,11 +519,9 @@ async def receber_album(
         }
 
 
-    if len(albuns[grupo]["mensagens"]) < 10:
-
-        albuns[grupo]["mensagens"].append(
-            mensagem
-        )
+    albuns[grupo]["mensagens"].append(
+        mensagem
+    )
 
 
     if mensagem.caption:
@@ -528,19 +529,17 @@ async def receber_album(
         albuns[grupo]["legenda"] = mensagem.caption
 
 
-    # espera o restante do álbum chegar
-
-    await asyncio.sleep(3)
-
-
-    # evita duplicar envio
+    # evita processar duas vezes
 
     if grupo in albuns_processados:
 
         return
 
 
-    # só continua se veio pelo botão
+    # espera o álbum completar
+
+    await asyncio.sleep(2)
+
 
     if update.effective_user.id not in modo_album:
 
@@ -638,7 +637,6 @@ async def receber_album(
         )
 
 
-
     del albuns[grupo]
 
 
@@ -652,7 +650,6 @@ async def receber_album(
         f"✅ Álbum divulgado! ({len(midias)} mídias)"
 
     )
-
 
 # ==============================
 # DIVULGAR
