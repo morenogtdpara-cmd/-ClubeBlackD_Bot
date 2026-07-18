@@ -1161,7 +1161,49 @@ async def menu_manager(
     query = update.callback_query
 
     await query.answer()
+if query.data == "command_divulgacao":
 
+    await query.edit_message_text(
+
+        "📢 DIVULGAÇÃO\n\n"
+        "Responda uma mídia e escolha a operação:",
+
+        reply_markup=InlineKeyboardMarkup(
+
+            [
+
+                [
+
+                    InlineKeyboardButton(
+                        "📤 ENVIAR AGORA",
+                        callback_data="divulgar_agora"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "⏰ AGENDAR",
+                        callback_data="divulgar_agendar"
+                    )
+
+                ],
+
+                [
+
+                    InlineKeyboardButton(
+                        "🔙 VOLTAR",
+                        callback_data="command_voltar"
+                    )
+
+                ]
+
+            ]
+
+        )
+
+    )
 
     if query.data == "manager_status":
 
