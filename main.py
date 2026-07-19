@@ -53,7 +53,17 @@ def main():
         )
     )
 
-
+app.add_handler(
+    MessageHandler(
+        (
+            filters.PHOTO
+            | filters.VIDEO
+            | filters.AUDIO
+            | filters.TEXT
+        ),
+        receber_divulgacao
+    )
+)
     iniciar_scheduler(app)
 
 
