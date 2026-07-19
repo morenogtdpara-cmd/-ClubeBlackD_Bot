@@ -157,7 +157,8 @@ async def callbacks(
             "⚡ Sistema pronto."
         )
 
-        elif query.data == "album":
+
+    elif query.data == "album":
 
         await query.message.reply_text(
             "🖼️ CENTRAL DE ÁLBUM\n\nEscolha uma opção:",
