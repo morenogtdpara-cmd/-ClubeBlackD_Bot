@@ -1688,32 +1688,20 @@ app.add_handler(
 
 app.add_handler(
 
-    ConversationHandler(
+    MessageHandler(
 
-        entry_points=[],
+        filters.PHOTO,
 
-        states={
-
-            AGUARDANDO_FEEDBACK: [
-
-                MessageHandler(
-
-                    filters.PHOTO,
-
-                    receber_feedback
-
-                )
-
-            ]
-
-        },
-
-        fallbacks=[],
+        receber_feedback
 
     )
 
 )
 
+
+# ==============================
+# DIVULGAÇÃO
+# ==============================
 
 app.add_handler(
 
@@ -1727,6 +1715,10 @@ app.add_handler(
 
 )
 
+
+# ==============================
+# ÁLBUM
+# ==============================
 
 app.add_handler(
 
