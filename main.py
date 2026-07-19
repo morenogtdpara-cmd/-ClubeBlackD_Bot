@@ -227,7 +227,46 @@ async def callbacks(
     await query.message.reply_text(
         texto
     )
+async def receber_album(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if update.effective_user.id not in AGUARDANDO_ALBUM:
+        return
+
+    if update.message.photo:
+
+        AGUARDANDO_ALBUM[
+            update.effective_user.id
+        ].append(
+            {
+                "tipo": "foto",
+                "file_id": update.message.photo[-1].file_id,
+                "legenda": update.message.caption
+            }
+        )
+
+    elif update.message.video:
+
+        AGUARDANDO_ALBUM[
+            update.effective_user.id
+        ].append(
+            {
+                "tipo": "video",
+                "file_id": update.message.video.file_id,
+                "legenda": update.message.caption
+            }
+        )
+
+    if len(AGUARDANDO_ALBUM[update.effective_user.id]) >= 10:
+
+        await update.message.reply_text(
+            "✅ Álbum recebido (10 mídias)."
+        )
 async def receber_divulgacao(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
