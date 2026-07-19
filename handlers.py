@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
-from keyboards import painel_keyboard, vip_keyboard
+from keyboards import painel_keyboard, vip_keyboard, album_keyboard
 
 
 AGUARDANDO_DIVULGACAO = set()
@@ -49,6 +49,7 @@ async def callbacks(
 
     await query.answer()
 
+
     if query.data == "divulgar":
 
         AGUARDANDO_DIVULGACAO.add(
@@ -56,14 +57,41 @@ async def callbacks(
         )
 
         await query.message.reply_text(
-            "📢 CENTRAL DE DIVULGAÇÃO\n\n"
-            "📤 Envie agora sua publicação.\n\n"
+            "📢 MODO DIVULGAÇÃO ATIVADO\n\n"
+            "📤 Envie sua publicação.\n\n"
             "Aceito:\n"
             "✅ Texto\n"
             "✅ Foto\n"
             "✅ Vídeo\n"
             "✅ Áudio"
         )
+
+        return
+
+
+    elif query.data == "album":
+
+        await query.message.reply_text(
+            "🖼️ CENTRAL DE ÁLBUM\n\n"
+            "Escolha uma opção:",
+            reply_markup=album_keyboard()
+        )
+
+        return
+
+
+    elif query.data == "album_agora":
+
+        AGUARDANDO_ALBUM[query.from_user.id] = []
+
+        await query.message.reply_text(
+            "🖼️ MODO ÁLBUM ATIVADO\n\n"
+            "📤 Envie as fotos ou vídeos.\n\n"
+            "📌 Limite máximo: 10 mídias."
+        )
+
+        return
+
 
     else:
 
