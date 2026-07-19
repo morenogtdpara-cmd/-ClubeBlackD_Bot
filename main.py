@@ -1556,6 +1556,8 @@ app = (
     .build()
 
 )
+
+
 app.add_handler(
 
     CommandHandler(
@@ -1564,6 +1566,7 @@ app.add_handler(
     )
 
 )
+
 
 app.add_handler(
 
@@ -1573,6 +1576,7 @@ app.add_handler(
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
@@ -1582,105 +1586,79 @@ app.add_handler(
 
 )
 
-app.add_handler(
-
-    CommandHandler(
-
-        "start",
-
-        start
-
-    )
-
-)
 
 app.add_handler(
 
     CommandHandler(
-        "manager",
-        manager
-    )
-
-)
-app.add_handler(
-
-    CommandHandler(
-
         "divulgar",
-
         divulgar
-
     )
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
-
         "d_album",
-
         d_album
-
     )
 
 )
 
+
 app.add_handler(
 
     CommandHandler(
-
         "entrarnovip",
-
         entrarnovip
-
     )
 
 )
+
 
 app.add_handler(
 
     CommandHandler(
-
         "agendar",
-
         agendar_publicacao
-
     )
 
 )
+
+
+# ==============================
+# FEEDBACK PELO BOTÃO
+# ==============================
 
 app.add_handler(
 
     ConversationHandler(
 
-        entry_points=[
-
-            CommandHandler(
-                "feedback",
-                feedback
-            )
-
-        ],
+        entry_points=[],
 
         states={
 
             AGUARDANDO_FEEDBACK: [
 
                 MessageHandler(
+
                     filters.PHOTO,
+
                     receber_feedback
+
                 )
 
             ]
 
         },
 
-        fallbacks=[]
+        fallbacks=[],
 
     )
 
 )
+
 
 app.add_handler(
 
@@ -1693,6 +1671,8 @@ app.add_handler(
     )
 
 )
+
+
 app.add_handler(
 
     MessageHandler(
@@ -1705,6 +1685,7 @@ app.add_handler(
 
 )
 
+
 app.job_queue.run_repeating(
 
     verificar_agendamentos,
@@ -1715,6 +1696,8 @@ app.job_queue.run_repeating(
 
 )
 
+
 print("Bot iniciado ✅")
+
 
 app.run_polling()
