@@ -26,10 +26,7 @@ def main():
 
     init_db()
 
-    app = Application.builder().token(
-        BOT_TOKEN
-    ).build()
-
+    app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(
         CommandHandler(
@@ -38,40 +35,26 @@ def main():
         )
     )
 
-
-    app.add_handler(
-        CommandHandler(
-            "manager",
-            manager
-        )
-    )
-
-
     app.add_handler(
         CallbackQueryHandler(
             callbacks
         )
     )
 
-app.add_handler(
-    MessageHandler(
-        (
-            filters.PHOTO
-            | filters.VIDEO
-            | filters.AUDIO
-            | filters.TEXT
-        ),
-        receber_divulgacao
+    app.add_handler(
+        MessageHandler(
+            (
+                filters.PHOTO
+                | filters.VIDEO
+                | filters.AUDIO
+                | filters.TEXT
+            ),
+            receber_divulgacao
+        )
     )
-)
-    iniciar_scheduler(app)
 
+    iniciar_scheduler(app)
 
     print("BOT ONLINE")
 
-
     app.run_polling()
-
-
-if __name__ == "__main__":
-    main()
