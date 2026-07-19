@@ -333,7 +333,25 @@ async def receber_divulgacao(
 
     if update.effective_user.id != ADMIN_ID:
         return
+async def receber_divulgacao(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if update.effective_user.id in AGUARDANDO_ALBUM:
+
+        await receber_album(
+            update,
+            context
+        )
+
+        return
+
+    if update.effective_user.id not in AGUARDANDO_DIVULGACAO:
+        return
     if update.effective_user.id not in AGUARDANDO_DIVULGACAO:
         return
 
