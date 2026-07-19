@@ -38,12 +38,6 @@ def manager_keyboard():
                 "📊 RELATÓRIO",
                 callback_data="relatorio"
             )
-        ],
-        [
-            InlineKeyboardButton(
-                "🔙 VOLTAR",
-                callback_data="voltar_start"
-            )
         ]
     ])
 
@@ -72,10 +66,15 @@ def divulgar_keyboard():
     ])
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     if update.effective_user.id != ADMIN_ID:
-        await update.message.reply_text("Bot privado.")
+        await update.message.reply_text(
+            "Bot privado."
+        )
         return
 
     await update.message.reply_text(
@@ -83,7 +82,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     if update.effective_user.id != ADMIN_ID:
         return
@@ -94,10 +96,14 @@ async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def callbacks(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     query = update.callback_query
     await query.answer()
+
 
     if query.data == "divulgar":
 
@@ -107,6 +113,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         return
+
 
     elif query.data == "divulgar_agora":
 
@@ -120,6 +127,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
 
+
     elif query.data == "agendar_divulgacao":
 
         await query.message.reply_text(
@@ -128,12 +136,14 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
 
+
     elif query.data == "album":
 
         texto = (
             "🖼️ Álbum\n\n"
             "🚧 Em construção."
         )
+
 
     elif query.data == "feedbacks":
 
@@ -142,6 +152,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🚧 Em construção."
         )
 
+
     elif query.data == "relatorio":
 
         texto = (
@@ -149,28 +160,25 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "✅ Bot online."
         )
 
+
     elif query.data == "voltar_painel":
 
         await query.message.reply_text(
-            "⚡️ PAINEL DE COMANDOS",
+            "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
             reply_markup=manager_keyboard()
         )
 
         return
 
-    elif query.data == "voltar_start":
-
-        await query.message.reply_text(
-            "✅ Bot iniciado."
-        )
-
-        return
 
     else:
 
         texto = "Opção inválida."
 
-    await query.message.reply_text(texto)
+
+    await query.message.reply_text(
+        texto
+    )
 
 
 async def receber_divulgacao(
@@ -181,8 +189,10 @@ async def receber_divulgacao(
     if update.effective_user.id != ADMIN_ID:
         return
 
+
     if update.effective_user.id not in AGUARDANDO_DIVULGACAO:
         return
+
 
     if update.message.photo:
 
@@ -191,12 +201,14 @@ async def receber_divulgacao(
             photo=update.message.photo[-1].file_id
         )
 
+
     elif update.message.video:
 
         await context.bot.send_video(
             chat_id=GROUP_ID,
             video=update.message.video.file_id
         )
+
 
     else:
 
@@ -206,9 +218,11 @@ async def receber_divulgacao(
 
         return
 
+
     AGUARDANDO_DIVULGACAO.remove(
         update.effective_user.id
     )
+
 
     await update.message.reply_text(
         "✅ Divulgação enviada com sucesso."
@@ -219,19 +233,32 @@ def main():
 
     init_db()
 
+
     app = Application.builder().token(BOT_TOKEN).build()
 
-    app.add_handler(
-        CommandHandler("start", start)
-    )
 
     app.add_handler(
-        CommandHandler("manager", manager)
+        CommandHandler(
+            "start",
+            start
+        )
     )
 
+
     app.add_handler(
-        CallbackQueryHandler(callbacks)
+        CommandHandler(
+            "manager",
+            manager
+        )
     )
+
+
+    app.add_handler(
+        CallbackQueryHandler(
+            callbacks
+        )
+    )
+
 
     app.add_handler(
         MessageHandler(
@@ -240,9 +267,12 @@ def main():
         )
     )
 
+
     print("BOT ONLINE")
 
+
     app.run_polling()
+
 
 
 if __name__ == "__main__":
