@@ -82,7 +82,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    if query.data == "DIVULGAR":
+    if query.data == "divulgar":
         texto = "📢 Divulgação\n\n🚧 Em construção."
 
     elif query.data == "album":
