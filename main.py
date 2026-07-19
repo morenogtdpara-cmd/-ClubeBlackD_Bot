@@ -43,34 +43,15 @@ def manager_keyboard():
 
     return InlineKeyboardMarkup([
         [
-            InlineKeyboardButton(
-                "📢 DIVULGAR",
-                callback_data="divulgacao"
-            )
+            InlineKeyboardButton("📢 DIVULGAR", callback_data="divulgar"),
+            InlineKeyboardButton("🖼️ ÁLBUM", callback_data="album")
         ],
         [
-            InlineKeyboardButton(
-                "🖼️ ÁLBUM",
-                callback_data="album"
-            )
+            InlineKeyboardButton("⭐ FEEDBACKS", callback_data="feedbacks"),
+            InlineKeyboardButton("📅 AGENDAMENTOS", callback_data="agendamentos")
         ],
         [
-            InlineKeyboardButton(
-                "⭐ FEEDBACKS",
-                callback_data="feedbacks"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "📅 AGENDAMENTOS",
-                callback_data="agendamentos"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "📊 RELATÓRIO",
-                callback_data="status"
-            )
+            InlineKeyboardButton("📊 RELATÓRIO", callback_data="relatorio")
         ]
     ])
 
