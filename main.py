@@ -296,6 +296,40 @@ async def receber_album(
         await update.message.reply_text(
             "✅ Álbum recebido (10 mídias)."
         )
+async def enviar_album(
+    context,
+    medias,
+    legenda=None
+):
+
+    from telegram import InputMediaPhoto, InputMediaVideo
+
+    grupo = []
+
+    for i, media in enumerate(medias):
+
+        if media["tipo"] == "foto":
+
+            grupo.append(
+                InputMediaPhoto(
+                    media=media["file_id"],
+                    caption=legenda if i == 0 else None
+                )
+            )
+
+        elif media["tipo"] == "video":
+
+            grupo.append(
+                InputMediaVideo(
+                    media=media["file_id"],
+                    caption=legenda if i == 0 else None
+                )
+            )
+
+    await context.bot.send_media_group(
+        chat_id=GROUP_ID,
+        media=grupo
+    )
 async def receber_divulgacao(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
