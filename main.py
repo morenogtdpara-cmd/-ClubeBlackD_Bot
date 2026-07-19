@@ -167,7 +167,16 @@ async def callbacks(
         )
 
         return
+    elif query.data == "album_agora":
 
+        AGUARDANDO_ALBUM[query.from_user.id] = []
+
+        await query.message.reply_text(
+            "🖼️ Envie o álbum.\n\n"
+            "📌 Máximo: 10 mídias."
+        )
+
+        return
     elif query.data == "fila":
 
         texto = (
