@@ -74,7 +74,6 @@ def manager_keyboard():
         ]
     ])
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if update.effective_user.id != ADMIN_ID:
