@@ -38,6 +38,12 @@ def manager_keyboard():
                 "📊 RELATÓRIO",
                 callback_data="relatorio"
             )
+        ],
+        [
+            InlineKeyboardButton(
+                "⏰ FILA",
+                callback_data="fila"
+            )
         ]
     ])
 
@@ -135,6 +141,17 @@ async def callbacks(
         )
 
         return
+
+
+    elif query.data == "fila":
+
+        texto = (
+            "⏰ FILA DE PUBLICAÇÕES\n\n"
+            "📢 Divulgações aguardando: 0\n\n"
+            "🖼️ Álbuns aguardando: 0\n\n"
+            "📌 Total na fila: 0\n\n"
+            "⚡ Sistema pronto."
+        )
 
 
     elif query.data == "album":
