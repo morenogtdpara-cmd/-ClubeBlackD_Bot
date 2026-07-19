@@ -17,6 +17,7 @@ VIP_LINK = "https://t.me/ClubeBlackBot"
 
 AGUARDANDO_DIVULGACAO = set()
 AGUARDANDO_ALBUM = {}
+ALBUNS_TEMP = {}
 def botoes_vip():
 
     return InlineKeyboardMarkup([
