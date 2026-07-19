@@ -1,11 +1,14 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from config import ADMIN_ID
-from keyboards import painel_keyboard
+from config import ADMIN_ID, GROUP_ID, VIP_LINK
+from keyboards import vip_keyboard
 
 
-async def start(
+AGUARDANDO_DIVULGACAO = set()
+
+
+async def iniciar_divulgacao(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -13,67 +16,75 @@ async def start(
     user_id = update.effective_user.id
 
     if user_id != ADMIN_ID:
+        return
+
+    AGUARDANDO_DIVULGACAO.add(user_id)
+
+    await update.message.reply_text(
+        "📤 Envie a publicação.\n\n"
+        "Aceito:\n"
+        "✅ Texto\n"
+        "✅ Foto\n"
+        "✅ Vídeo\n"
+        "✅ Áudio"
+    )
+
+
+async def receber_divulgacao(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    user_id = update.effective_user.id
+
+    if user_id not in AGUARDANDO_DIVULGACAO:
+        return
+
+    if update.message.photo:
+
+        await context.bot.send_photo(
+            chat_id=GROUP_ID,
+            photo=update.message.photo[-1].file_id,
+            caption=update.message.caption,
+            reply_markup=vip_keyboard(VIP_LINK)
+        )
+
+    elif update.message.video:
+
+        await context.bot.send_video(
+            chat_id=GROUP_ID,
+            video=update.message.video.file_id,
+            caption=update.message.caption,
+            reply_markup=vip_keyboard(VIP_LINK)
+        )
+
+    elif update.message.audio:
+
+        await context.bot.send_audio(
+            chat_id=GROUP_ID,
+            audio=update.message.audio.file_id,
+            caption=update.message.caption,
+            reply_markup=vip_keyboard(VIP_LINK)
+        )
+
+    elif update.message.text:
+
+        await context.bot.send_message(
+            chat_id=GROUP_ID,
+            text=update.message.text,
+            reply_markup=vip_keyboard(VIP_LINK)
+        )
+
+    else:
+
         await update.message.reply_text(
-            "Bot privado."
+            "⚠️ Tipo de mensagem não permitido."
         )
         return
 
-    await update.message.reply_text(
-        "✅ Bot iniciado."
-    )
 
-
-async def manager(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    user_id = update.effective_user.id
-
-    if user_id != ADMIN_ID:
-        return
+    AGUARDANDO_DIVULGACAO.remove(user_id)
 
     await update.message.reply_text(
-        "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
-        reply_markup=painel_keyboard()
+        "✅ Divulgação enviada com sucesso."
     )
-
-
-async def callbacks(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    query = update.callback_query
-
-    await query.answer()
-
-    if query.data == "divulgar":
-
-        await query.message.reply_text(
-            "📢 Central de divulgação."
-        )
-
-    elif query.data == "album":
-
-        await query.message.reply_text(
-            "🖼️ Central de álbum."
-        )
-
-    elif query.data == "feedbacks":
-
-        await query.message.reply_text(
-            "⭐ Feedbacks em construção."
-        )
-
-    elif query.data == "relatorio":
-
-        await query.message.reply_text(
-            "📊 Relatório em construção."
-        )
-
-    elif query.data == "fila":
-
-        await query.message.reply_text(
-            "⏰ Fila vazia."
-        )
