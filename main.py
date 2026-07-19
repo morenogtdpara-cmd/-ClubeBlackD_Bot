@@ -1,26 +1,23 @@
 from telegram.ext import (
     Application,
     CommandHandler,
-    CallbackQueryHandler
+    CallbackQueryHandler,
+    MessageHandler,
+    filters
 )
 
+from handlers import (
+    start,
+    manager,
+    callbacks,
+    receber_divulgacao
+)
 from config import BOT_TOKEN
 from database import init_db
 from handlers import (
     start,
     manager,
     callbacks
-)
-from handlers import (
-
-    start,
-
-    manager,
-
-    callbacks,
-
-    receber_divulgacao
-
 )
 from scheduler import iniciar_scheduler
 
