@@ -269,29 +269,7 @@ async def receber_album(
             }
         )
 
-    await asyncio.sleep(3)
-
-    medias = ALBUNS_TEMP.get(grupo_id)
-
-    if not medias:
-        return
-
-    await enviar_album(
-        context,
-        medias,
-        medias[0].get("legenda")
-    )
-
-    del ALBUNS_TEMP[grupo_id]
-
-    AGUARDANDO_ALBUM.pop(
-        update.effective_user.id,
-        None
-    )
-
-    await update.message.reply_text(
-        "✅ Álbum enviado com sucesso."
-    )
+    
 async def enviar_album(
     context,
     medias,
