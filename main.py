@@ -238,7 +238,35 @@ async def receber_album(
 
     if update.effective_user.id not in AGUARDANDO_ALBUM:
         return
+    if update.effective_user.id in AGUARDANDO_ALBUM:
 
+        if update.message.media_group_id:
+
+            if update.message.photo:
+
+                ALBUNS_TEMP.setdefault(
+                    update.message.media_group_id,
+                    []
+                ).append(
+                    {
+                        "tipo": "foto",
+                        "file_id": update.message.photo[-1].file_id
+                    }
+                )
+
+            elif update.message.video:
+
+                ALBUNS_TEMP.setdefault(
+                    update.message.media_group_id,
+                    []
+                ).append(
+                    {
+                        "tipo": "video",
+                        "file_id": update.message.video.file_id
+                    }
+                )
+
+            return
     if update.message.photo:
 
         AGUARDANDO_ALBUM[
