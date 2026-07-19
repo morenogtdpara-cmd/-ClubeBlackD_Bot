@@ -10,7 +10,8 @@ from handlers import (
     start,
     manager,
     callbacks,
-    receber_divulgacao
+    receber_divulgacao,
+    receber_album
 )
 
 from config import BOT_TOKEN
