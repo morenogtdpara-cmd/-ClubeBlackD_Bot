@@ -89,20 +89,10 @@ async def callbacks(
 
         AGUARDANDO_ALBUM[query.from_user.id] = []
 
-        teclado_finalizar = InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton(
-                    "✅ FINALIZAR ÁLBUM",
-                    callback_data="finalizar_album"
-                )
-            ]
-        ])
-
         await query.message.reply_text(
             "🖼️ MODO ÁLBUM ATIVADO\n\n"
             "📤 Envie as fotos ou vídeos.\n\n"
-            "📌 Limite máximo: 10 mídias.",
-            reply_markup=teclado_finalizar
+            "📌 Limite máximo: 10 mídias."
         )
 
         return
