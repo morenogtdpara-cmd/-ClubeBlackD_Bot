@@ -33,6 +33,24 @@ def painel_keyboard():
     ])
 
 
+def album_keyboard():
+
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "📤 ENVIAR ÁLBUM",
+                callback_data="album_agora"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🔙 VOLTAR",
+                callback_data="voltar"
+            )
+        ]
+    ])
+
+
 def vip_keyboard(link):
 
     return InlineKeyboardMarkup([
