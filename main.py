@@ -35,14 +35,38 @@ def manager_keyboard():
                 callback_data="feedbacks"
             ),
             InlineKeyboardButton(
-                "📅 AGENDAMENTOS",
-                callback_data="agendamentos"
+                "📊 RELATÓRIO",
+                callback_data="relatorio"
             )
         ],
         [
             InlineKeyboardButton(
-                "📊 RELATÓRIO",
-                callback_data="relatorio"
+                "🔙 VOLTAR",
+                callback_data="voltar_start"
+            )
+        ]
+    ])
+
+
+def divulgar_keyboard():
+
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "📤 ENVIAR AGORA",
+                callback_data="divulgar_agora"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "📅 AGENDAR DIVULGAÇÃO",
+                callback_data="agendar_divulgacao"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🔙 VOLTAR",
+                callback_data="voltar_painel"
             )
         ]
     ])
@@ -77,12 +101,29 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "divulgar":
 
+        await query.message.reply_text(
+            "📢 CENTRAL DE DIVULGAÇÃO",
+            reply_markup=divulgar_keyboard()
+        )
+
+        return
+
+    elif query.data == "divulgar_agora":
+
         AGUARDANDO_DIVULGACAO.add(
             query.from_user.id
         )
 
         await query.message.reply_text(
             "📤 Envie uma foto ou vídeo para divulgação."
+        )
+
+        return
+
+    elif query.data == "agendar_divulgacao":
+
+        await query.message.reply_text(
+            "📅 Sistema de agendamento em construção."
         )
 
         return
@@ -101,19 +142,29 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🚧 Em construção."
         )
 
-    elif query.data == "agendamentos":
-
-        texto = (
-            "📅 Agendamentos\n\n"
-            "🚧 Em construção."
-        )
-
     elif query.data == "relatorio":
 
         texto = (
             "📊 Relatório\n\n"
             "✅ Bot online."
         )
+
+    elif query.data == "voltar_painel":
+
+        await query.message.reply_text(
+            "⚡️ PAINEL DE COMANDOS",
+            reply_markup=manager_keyboard()
+        )
+
+        return
+
+    elif query.data == "voltar_start":
+
+        await query.message.reply_text(
+            "✅ Bot iniciado."
+        )
+
+        return
 
     else:
 
