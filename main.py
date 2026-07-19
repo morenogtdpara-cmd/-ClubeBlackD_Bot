@@ -11,7 +11,17 @@ from handlers import (
     manager,
     callbacks
 )
+from handlers import (
 
+    start,
+
+    manager,
+
+    callbacks,
+
+    receber_divulgacao
+
+)
 from scheduler import iniciar_scheduler
 
 
