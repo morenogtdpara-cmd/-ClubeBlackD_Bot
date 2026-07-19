@@ -44,31 +44,31 @@ def manager_keyboard():
     return InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
-                "📢 Divulgação",
+                "📢 DIVULGAR",
                 callback_data="divulgacao"
             )
         ],
         [
             InlineKeyboardButton(
-                "🖼️ Álbum",
+                "🖼️ ÁLBUM",
                 callback_data="album"
             )
         ],
         [
             InlineKeyboardButton(
-                "⭐ Feedbacks",
+                "⭐ FEEDBACKS",
                 callback_data="feedbacks"
             )
         ],
         [
             InlineKeyboardButton(
-                "📅 Agendamentos",
+                "📅 AGENDAMENTOS",
                 callback_data="agendamentos"
             )
         ],
         [
             InlineKeyboardButton(
-                "📊 Status do bot",
+                "📊 RELATÓRIO",
                 callback_data="status"
             )
         ]
@@ -91,8 +91,8 @@ async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "⚫ BLACK MANAGER\n\nEscolha uma opção:",
-        reply_markup=manager_keyboard()
+    "⚡️ oluPAINEL DE COMANDOS\n\nEscolha uma opção:"
+        .reply_markup=manager_keyboard()
     )
 
 
