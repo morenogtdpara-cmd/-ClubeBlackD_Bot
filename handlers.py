@@ -91,13 +91,16 @@ async def callbacks(
         )
 
         return
+
+
     elif query.data == "finalizar_album":
 
-    await query.message.reply_text(
-        "✅ Álbum finalizado. Preparando envio..."
-    )
+        await query.message.reply_text(
+            "✅ Álbum finalizado. Preparando envio..."
+        )
 
-    return
+        return
+
 
     else:
 
