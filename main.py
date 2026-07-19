@@ -238,7 +238,10 @@ async def receber_album(
 
     if update.effective_user.id not in AGUARDANDO_ALBUM:
         return
-    if update.effective_user.id in AGUARDANDO_ALBUM:
+   await update.message.reply_text(
+    f"✅ Mídia recebida: {len(ALBUNS_TEMP[update.message.media_group_id])}/10"
+)
+     if update.effective_user.id in AGUARDANDO_ALBUM:
 
         if update.message.media_group_id:
 
