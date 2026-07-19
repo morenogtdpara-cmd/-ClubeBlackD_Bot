@@ -48,7 +48,28 @@ def main():
         )
     )
 
+app.add_handler(
+    MessageHandler(
+        (
+            filters.PHOTO
+            | filters.VIDEO
+        ),
+        receber_album
+    )
+)
 
+
+app.add_handler(
+    MessageHandler(
+        (
+            filters.PHOTO
+            | filters.VIDEO
+            | filters.AUDIO
+            | filters.TEXT
+        ),
+        receber_divulgacao
+    )
+)
     app.add_handler(
         MessageHandler(
             (
