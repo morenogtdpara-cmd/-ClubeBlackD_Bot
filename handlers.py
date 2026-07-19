@@ -88,3 +88,21 @@ async def receber_divulgacao(
     await update.message.reply_text(
         "✅ Divulgação enviada com sucesso."
     )
+    async def callbacks(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "divulgar":
+
+        await query.message.reply_text(
+            "📢 CENTRAL DE DIVULGAÇÃO\n\n"
+            "Clique para enviar sua publicação."
+        )
+
+        await iniciar_divulgacao(
+            query.message,
+            context
+        )
