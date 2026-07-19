@@ -123,15 +123,15 @@ async def callbacks(
 
     elif query.data == "divulgar_agora":
 
-        AGUARDANDO_DIVULGACAO.add(
-            query.from_user.id
-        )
+    AGUARDANDO_DIVULGACAO.add(
+        query.from_user.id
+    )
 
-        await query.message.reply_text(
-            "📤 Envie uma foto ou vídeo para divulgação."
-        )
+    await query.message.reply_text(
+        "📤 Envie uma foto ou vídeo para divulgação."
+    )
 
-        return
+    return
 
 
     elif query.data == "agendar_divulgacao":
