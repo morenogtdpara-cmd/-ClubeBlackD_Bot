@@ -15,7 +15,6 @@ GROUP_ID = -1004231485932
 
 AGUARDANDO_DIVULGACAO = set()
 
-
 def manager_keyboard():
 
     return InlineKeyboardMarkup([
@@ -47,7 +46,6 @@ def manager_keyboard():
         ]
     ])
 
-
 def divulgar_keyboard():
 
     return InlineKeyboardMarkup([
@@ -71,7 +69,6 @@ def divulgar_keyboard():
         ]
     ])
 
-
 async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -87,7 +84,6 @@ async def start(
         "✅ Bot iniciado."
     )
 
-
 async def manager(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -101,7 +97,6 @@ async def manager(
         reply_markup=manager_keyboard()
     )
 
-
 async def callbacks(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -109,7 +104,6 @@ async def callbacks(
 
     query = update.callback_query
     await query.answer()
-
 
     if query.data == "divulgar":
 
@@ -120,19 +114,17 @@ async def callbacks(
 
         return
 
-
     elif query.data == "divulgar_agora":
 
-    AGUARDANDO_DIVULGACAO.add(
-        query.from_user.id
-    )
+        AGUARDANDO_DIVULGACAO.add(
+            query.from_user.id
+        )
 
-    await query.message.reply_text(
-        "📤 Envie uma foto ou vídeo para divulgação."
-    )
+        await query.message.reply_text(
+            "📤 Envie uma foto ou vídeo para divulgação."
+        )
 
-    return
-
+        return
 
     elif query.data == "agendar_divulgacao":
 
@@ -141,7 +133,6 @@ async def callbacks(
         )
 
         return
-
 
     elif query.data == "fila":
 
@@ -153,14 +144,12 @@ async def callbacks(
             "⚡ Sistema pronto."
         )
 
-
     elif query.data == "album":
 
         texto = (
             "🖼️ Álbum\n\n"
             "🚧 Em construção."
         )
-
 
     elif query.data == "feedbacks":
 
@@ -169,14 +158,12 @@ async def callbacks(
             "🚧 Em construção."
         )
 
-
     elif query.data == "relatorio":
 
         texto = (
             "📊 Relatório\n\n"
             "✅ Bot online."
         )
-
 
     elif query.data == "voltar_painel":
 
@@ -187,16 +174,13 @@ async def callbacks(
 
         return
 
-
     else:
 
         texto = "Opção inválida."
 
-
     await query.message.reply_text(
         texto
     )
-
 
 async def receber_divulgacao(
     update: Update,
@@ -206,10 +190,8 @@ async def receber_divulgacao(
     if update.effective_user.id != ADMIN_ID:
         return
 
-
     if update.effective_user.id not in AGUARDANDO_DIVULGACAO:
         return
-
 
     if update.message.photo:
 
@@ -218,14 +200,12 @@ async def receber_divulgacao(
             photo=update.message.photo[-1].file_id
         )
 
-
     elif update.message.video:
 
         await context.bot.send_video(
             chat_id=GROUP_ID,
             video=update.message.video.file_id
         )
-
 
     else:
 
@@ -235,24 +215,19 @@ async def receber_divulgacao(
 
         return
 
-
     AGUARDANDO_DIVULGACAO.remove(
         update.effective_user.id
     )
-
 
     await update.message.reply_text(
         "✅ Divulgação enviada com sucesso."
     )
 
-
 def main():
 
     init_db()
 
-
     app = Application.builder().token(BOT_TOKEN).build()
-
 
     app.add_handler(
         CommandHandler(
@@ -261,7 +236,6 @@ def main():
         )
     )
 
-
     app.add_handler(
         CommandHandler(
             "manager",
@@ -269,13 +243,11 @@ def main():
         )
     )
 
-
     app.add_handler(
         CallbackQueryHandler(
             callbacks
         )
     )
-
 
     app.add_handler(
         MessageHandler(
@@ -284,13 +256,9 @@ def main():
         )
     )
 
-
     print("BOT ONLINE")
 
-
     app.run_polling()
-
-
 
 if __name__ == "__main__":
     main()
