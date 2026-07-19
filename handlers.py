@@ -1,7 +1,9 @@
 from telegram import (
     Update,
     InlineKeyboardButton,
-    InlineKeyboardMarkup
+    InlineKeyboardMarkup,
+    InputMediaPhoto,
+    InputMediaVideo
 )
 
 from telegram.ext import ContextTypes
@@ -114,6 +116,68 @@ async def callbacks(
         )
 
 
+async def receber_album(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    user_id = update.effective_user.id
+
+    if user_id not in AGUARDANDO_ALBUM:
+        return
+
+
+    if update.message.photo:
+
+        AGUARDANDO_ALBUM[user_id].append(
+            {
+                "tipo": "foto",
+                "id": update.message.photo[-1].file_id
+            }
+        )
+
+
+    elif update.message.video:
+
+        AGUARDANDO_ALBUM[user_id].append(
+            {
+                "tipo": "video",
+                "id": update.message.video.file_id
+            }
+        )
+
+
+    else:
+        return
+
+
+    if len(AGUARDANDO_ALBUM[user_id]) > 10:
+
+        AGUARDANDO_ALBUM[user_id].pop()
+
+        await update.message.reply_text(
+            "⚠️ Limite máximo de 10 mídias atingido."
+        )
+
+        return
+
+
+    finalizar = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "✅ FINALIZAR ÁLBUM",
+                callback_data="finalizar_album"
+            )
+        ]
+    ])
+
+
+    await update.message.reply_text(
+        "PARA O ENVIO APERTE EM FINALIZAR",
+        reply_markup=finalizar
+    )
+
+
 async def receber_divulgacao(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -165,10 +229,6 @@ async def receber_divulgacao(
 
 
     else:
-
-        await update.message.reply_text(
-            "⚠️ Tipo de mensagem não permitido."
-        )
 
         return
 
