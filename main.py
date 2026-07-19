@@ -157,14 +157,14 @@ async def callbacks(
             "⚡ Sistema pronto."
         )
 
-    elif query.data == "album":
+        elif query.data == "album":
 
-    await query.message.reply_text(
-        "🖼️ CENTRAL DE ÁLBUM\n\nEscolha uma opção:",
-        reply_markup=album_keyboard()
-    )
+        await query.message.reply_text(
+            "🖼️ CENTRAL DE ÁLBUM\n\nEscolha uma opção:",
+            reply_markup=album_keyboard()
+        )
 
-    return
+        return
 
     elif query.data == "feedbacks":
 
