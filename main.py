@@ -345,16 +345,6 @@ def main():
             callbacks
         )
     )
-    app.add_handler(
-        MessageHandler(
-            (
-                filters.PHOTO
-                | filters.VIDEO
-            ),
-            receber_album
-        ),
-        group=0
-    )
 
     app.add_handler(
         MessageHandler(
