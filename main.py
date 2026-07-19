@@ -49,7 +49,14 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             show_alert=True
         )
 
+async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    await update.message.reply_text(
+        "⚙️ BLACK MANAGER\n\n🚧 Sistema em construção."
+    )
 def main():
 
     init_db()
