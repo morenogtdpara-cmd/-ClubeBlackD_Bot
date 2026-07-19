@@ -10,8 +10,7 @@ from handlers import (
     start,
     manager,
     callbacks,
-    receber_divulgacao,
-    receber_album
+    receber_divulgacao
 )
 
 from config import BOT_TOKEN
@@ -45,17 +44,6 @@ def main():
     app.add_handler(
         CallbackQueryHandler(
             callbacks
-        )
-    )
-
-
-    app.add_handler(
-        MessageHandler(
-            (
-                filters.PHOTO
-                | filters.VIDEO
-            ),
-            receber_album
         )
     )
 
