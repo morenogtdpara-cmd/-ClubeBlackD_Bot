@@ -5,7 +5,36 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes
 )
+def manager_keyboard():
 
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "🖼️ ÁLBUM",
+                callback_data="album"
+            ),
+            InlineKeyboardButton(
+                "📢 DIVULGAR",
+                callback_data="divulgar"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "⭐ FEEDBACKS",
+                callback_data="feedbacks"
+            ),
+            InlineKeyboardButton(
+                "📅 AGENDAMENTOS",
+                callback_data="agendamentos"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "📊 ESTATÍSTICA",
+                callback_data="estatistica"
+            )
+        ]
+    ])
 from config import BOT_TOKEN, ADMIN_ID
 from database import init_db
 
