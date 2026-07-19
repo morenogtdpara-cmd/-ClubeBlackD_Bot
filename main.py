@@ -1683,23 +1683,6 @@ app.add_handler(
 
 
 # ==============================
-# FEEDBACK PELO BOTÃO
-# ==============================
-
-app.add_handler(
-
-    MessageHandler(
-
-        filters.PHOTO,
-
-        receber_feedback
-
-    )
-
-)
-
-
-# ==============================
 # DIVULGAÇÃO
 # ==============================
 
@@ -1710,6 +1693,23 @@ app.add_handler(
         filters.TEXT | filters.PHOTO,
 
         receber_divulgacao_nova
+
+    )
+
+)
+
+
+# ==============================
+# FEEDBACK PELO BOTÃO
+# ==============================
+
+app.add_handler(
+
+    MessageHandler(
+
+        filters.PHOTO,
+
+        receber_feedback
 
     )
 
