@@ -16,7 +16,7 @@ GROUP_ID = -1004231485932
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
 AGUARDANDO_DIVULGACAO = set()
-
+AGUARDANDO_ALBUM = {}
 def botoes_vip():
 
     return InlineKeyboardMarkup([
@@ -159,10 +159,12 @@ async def callbacks(
 
     elif query.data == "album":
 
-        texto = (
-            "🖼️ Álbum\n\n"
-            "🚧 Em construção."
-        )
+    await query.message.reply_text(
+        "🖼️ CENTRAL DE ÁLBUM\n\nEscolha uma opção:",
+        reply_markup=album_keyboard()
+    )
+
+    return
 
     elif query.data == "feedbacks":
 
