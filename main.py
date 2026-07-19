@@ -3,6 +3,7 @@ from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     MessageHandler,
+    ConversationHandler,
     filters
 )
 
@@ -10,12 +11,17 @@ from handlers import (
     start,
     manager,
     callbacks,
-    receber_divulgacao
+    receber_divulgacao,
+    receber_album,
+    finalizar_album
 )
 
 from config import BOT_TOKEN
 from database import init_db
 from scheduler import iniciar_scheduler
+
+
+ALBUM = 1
 
 
 def main():
@@ -43,8 +49,38 @@ def main():
 
     app.add_handler(
         CallbackQueryHandler(
-            callbacks
+            callbacks,
+            pattern="^(?!album_agora$|finalizar_album$).*"
         )
+    )
+
+
+    album_handler = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                callbacks,
+                pattern="^album_agora$"
+            )
+        ],
+        states={
+            ALBUM: [
+                MessageHandler(
+                    filters.PHOTO | filters.VIDEO,
+                    receber_album
+                )
+            ]
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                finalizar_album,
+                pattern="^finalizar_album$"
+            )
+        ]
+    )
+
+
+    app.add_handler(
+        album_handler
     )
 
 
