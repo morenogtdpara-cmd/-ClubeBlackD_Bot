@@ -81,7 +81,28 @@ def divulgar_keyboard():
             )
         ]
     ])
+def album_keyboard():
 
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "📤 ENVIAR AGORA",
+                callback_data="album_agora"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "📅 AGENDAR ÁLBUM",
+                callback_data="album_agendar"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🔙 VOLTAR",
+                callback_data="voltar_painel"
+            )
+        ]
+    ])
 async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
