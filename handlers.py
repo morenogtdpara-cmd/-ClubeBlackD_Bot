@@ -115,21 +115,18 @@ async def receber_album(
         )
 
     finalizar = InlineKeyboardMarkup([
-    [
-        InlineKeyboardButton(
-            "✅ FINALIZAR ÁLBUM",
-            callback_data="finalizar_album"
-        )
-    ]
-])
+        [
+            InlineKeyboardButton(
+                "✅ FINALIZAR ÁLBUM",
+                callback_data="finalizar_album"
+            )
+        ]
+    ])
 
-
-await update.message.reply_text(
-    f"✅ Mídia adicionada ({len(ALBUM_MIDIAS[user_id])})",
-    reply_markup=finalizar
-)
-
-return ALBUM
+    await update.message.reply_text(
+        f"✅ Mídia adicionada ({len(ALBUM_MIDIAS[user_id])})",
+        reply_markup=finalizar
+    )
 
     return ALBUM
 
