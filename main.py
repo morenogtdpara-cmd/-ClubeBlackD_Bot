@@ -1,1785 +1,643 @@
-import os
+import sqlite3
+from config import DB_PATH
+
+def conectar():
+    return sqlite3.connect(DB_PATH, check_same_thread=False)
+
+def init_db():
+    c = conectar()
+    c.executescript("""
+        CREATE TABLE IF NOT EXISTS broadcasts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo TEXT NOT NULL,
+            conteudo TEXT,
+            file_id TEXT,
+            agendado_para TEXT,
+            status TEXT DEFAULT 'pendente',
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS feedbacks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            username TEXT,
+            nome TEXT,
+            mensagem TEXT NOT NULL,
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS stats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            evento TEXT NOT NULL,
+            user_id INTEGER,
+            detalhes TEXT,
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS configuracoes (
+            chave TEXT PRIMARY KEY,
+            valor TEXT
+        );
+    """)
+    c.commit()
+    c.close()
+
+# --- Broadcasts ---
+def salvar_broadcast(tipo, conteudo=None, file_id=None, agendado_para=None):
+    c = conectar()
+    c.execute("INSERT INTO broadcasts (tipo, conteudo, file_id, agendado_para) VALUES (?, ?, ?, ?)",
+              (tipo, conteudo, file_id, agendado_para))
+    c.commit()
+    bid = c.lastrowid
+    c.close()
+    return bid
+
+def listar_broadcasts_pendentes():
+    c = conectar()
+    rows = c.execute("SELECT * FROM broadcasts WHERE status='pendente' ORDER BY criado_em DESC").fetchall()
+    c.close()
+    return rows
+
+def listar_broadcasts_agendados():
+    c = conectar()
+    rows = c.execute("SELECT * FROM broadcasts WHERE status='agendado' ORDER BY agendado_para ASC").fetchall()
+    c.close()
+    return rows
+
+def listar_todos_broadcasts(limite=20):
+    c = conectar()
+    rows = c.execute("SELECT * FROM broadcasts ORDER BY criado_em DESC LIMIT ?", (limite,)).fetchall()
+    c.close()
+    return rows
+
+def marcar_broadcast_enviado(bid):
+    c = conectar()
+    c.execute("UPDATE broadcasts SET status='enviado' WHERE id=?", (bid,))
+    c.commit()
+    c.close()
+
+def cancelar_broadcast(bid):
+    c = conectar()
+    c.execute("UPDATE broadcasts SET status='cancelado' WHERE id=?", (bid,))
+    c.commit()
+    c.close()
+
+# --- Feedbacks ---
+def salvar_feedback(user_id, username, nome, mensagem):
+    c = conectar()
+    c.execute("INSERT INTO feedbacks (user_id, username, nome, mensagem) VALUES (?, ?, ?, ?)",
+              (user_id, username, nome, mensagem))
+    c.commit()
+    c.close()
+
+def listar_feedbacks(limite=30):
+    c = conectar()
+    rows = c.execute("SELECT * FROM feedbacks ORDER BY criado_em DESC LIMIT ?", (limite,)).fetchall()
+    c.close()
+    return rows
+
+def contar_feedbacks():
+    c = conectar()
+    r = c.execute("SELECT COUNT(*) FROM feedbacks").fetchone()[0]
+    c.close()
+    return r
+
+# --- Stats ---
+def registrar_evento(evento, user_id=None, detalhes=None):
+    c = conectar()
+    c.execute("INSERT INTO stats (evento, user_id, detalhes) VALUES (?, ?, ?)",
+              (evento, user_id, detalhes))
+    c.commit()
+    c.close()
+
+def contar_eventos(evento):
+    c = conectar()
+    r = c.execute("SELECT COUNT(*) FROM stats WHERE evento=?", (evento,)).fetchone()[0]
+    c.close()
+    return r
+
+def contar_usuarios_unicos():
+    c = conectar()
+    r = c.execute("SELECT COUNT(DISTINCT user_id) FROM stats WHERE user_id IS NOT NULL").fetchone()[0]
+    c.close()
+    return r
+
+# --- Configurações ---
+def get_config(chave, padrao=None):
+    c = conectar()
+    r = c.execute("SELECT valor FROM configuracoes WHERE chave=?", (chave,)).fetchone()
+    c.close()
+    return r[0] if r else padrao
+
+def set_config(chave, valor):
+    c = conectar()
+    c.execute("INSERT OR REPLACE INTO configuracoes (chave, valor) VALUES (?, ?)", (chave, valor))
+    c.commit()
+    c.close()
+    
+    Show! Entendi a ansiedade haha. Vou jogar o código completão aqui pra tu. É um projeto mais parrudo, então preparei ele bem organizado. Bora lá que o código é grande mas tá tudo no jeito! 🚀
+
+
+
+
+
+ 
+
+ 
+
+ 📁  requirements.txt 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+ 📁  config.py 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+ 📁  database.py 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ Agora o arquivo principal:
+
+
+
+
+
+ 📁  main.py 
+
+ 
+
+
+
+```python
 import asyncio
-import json
+from datetime import datetime, timedelta
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+from telegram.constants import ParseMode
 
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from pathlib import Path
 
-from telegram import (
-    Update,
-    BotCommand,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    InputMediaPhoto,
-    InputMediaVideo
-)
 
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    ConversationHandler,
-    CallbackQueryHandler,
-    filters
-)
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+from config import BOTTOKEN, GRUPO ID, ADMIN_ID
+from database import *
 
-GROUP_ID = -1004231485932
 
-OWNER_ID = 8880948641
 
-VIP_LINK = "https://t.me/ClubeBlackBot"
 
-# ==============================
-# 🖤 BLACK SYSTEM - DADOS REAIS
-# ==============================
 
-ARQUIVO_SISTEMA = "black_system.json"
+ ==================== ESTADOS ====================
 
-def carregar_sistema():
+ 
 
-    if not Path(ARQUIVO_SISTEMA).exists():
 
-        dados = {
+ Dicionário para gerenciar estados dos usuários
 
-            "data": "",
+ 
+estados = {}           # user_id -> estado
+dadosestado = {}      # user id -> dict com dados temporários
+bufferalbum = {}      # media group_id -> lista de mensagens
+albumtimers = {}      # media group_id -> task
 
-            "envios_hoje": 0,
 
-            "midias_hoje": 0,
 
-            "ultimo_envio": None,
 
-            "ultimo_tipo": None,
 
-            "ultimo_status": None,
+ ==================== TECLADOS ====================
 
-            "feedbacks": 0,
+ 
 
-            "albuns": 0,
 
-            "divulgacoes": 0
 
-        }
+def teclado_painel():
+    return InlineKeyboardMarkup([
+        InlineKeyboardButton("📢 Nova Divulgação", callback_data="broadcast_novo"),
+        InlineKeyboardButton("📋 Ver Agendamentos", callback_data="agendamentos_listar"),
+        [InlineKeyboardButton("💬 Ver Feedbacks", callbackdata="feedbacks ver"),
+         InlineKeyboardButton("📊 Estatísticas", callbackdata="stats ver")],
+        InlineKeyboardButton("⚙️ Configurações", callback_data="config_abrir"),
+        InlineKeyboardButton("❌ Fechar Painel", callback_data="painel_fechar"),
+    ])
 
-        salvar_sistema(dados)
 
-        return dados
 
-    with open(
-        ARQUIVO_SISTEMA,
-        "r",
-        encoding="utf-8"
-    ) as arquivo:
+def teclado_voltar():
+    return InlineKeyboardMarkup([
+        InlineKeyboardButton("🔙 Voltar ao Painel", callback_data="painel_abrir")
+    ])
 
-        return json.load(arquivo)
 
-def salvar_sistema(dados):
 
-    with open(
-        ARQUIVO_SISTEMA,
-        "w",
-        encoding="utf-8"
-    ) as arquivo:
+def tecladoconfirmar broadcast(bid):
+    return InlineKeyboardMarkup([
+        InlineKeyboardButton("✅ Enviar Agora", callback_data=f"broadcast_enviar_{bid}"),
+        InlineKeyboardButton("⏰ Agendar", callback_data=f"broadcast_agendar_{bid}"),
+        InlineKeyboardButton("❌ Cancelar", callback_data=f"broadcast_cancelar_{bid}"),
+    ])
 
-        json.dump(
-            dados,
-            arquivo,
-            indent=4,
-            ensure_ascii=False
+
+
+def teclado_config():
+    return InlineKeyboardMarkup([
+        InlineKeyboardButton("📝 Mensagem de Boas-vindas", callback_data="config_boasvindas"),
+        InlineKeyboardButton("📢 Mensagem de Divulgação Padrão", callback_data="config_padrao"),
+        InlineKeyboardButton("🔙 Voltar ao Painel", callback_data="painel_abrir"),
+    ])
+
+
+
+
+
+ ==================== VERIFICAÇÕES ====================
+
+ 
+
+
+
+def ehadmin(user id: int) -> bool:
+    return userid == ADMIN ID
+
+
+
+async def verificar_admin(update: Update) -> bool:
+    user = update.effective_user
+    if not user or user.id != ADMIN_ID:
+        if update.callback_query:
+            await update.callbackquery.answer("🚫 Acesso restrito ao administrador.", show alert=True)
+        else:
+            await update.message.reply_text("🚫 Este comando é restrito ao administrador.")
+        return False
+    return True
+
+
+
+
+
+ ==================== COMANDOS GERAIS ====================
+
+ 
+
+
+
+async def cmdstart(update: Update, context: ContextTypes.DEFAULT TYPE):
+    user = update.effective_user
+    nome = user.first_name or "usuário"
+    registrar_evento("start", user.id, nome)
+
+
+
+    if user.id == ADMIN_ID:
+        await update.message.reply_text(
+            f"👑 Olá, <b>{nome}</b>! Bem-vindo ao painel do <b>Bot de Divulgação</b>.\n\n"
+            f"Use /painel para acessar o painel de controle.",
+            parse_mode=ParseMode.HTML,
+            reply_markup=InlineKeyboardMarkup([
+                InlineKeyboardButton("🎛️ Abrir Painel", callback_data="painel_abrir")
+            ])
         )
-
-STATUS_SISTEMA = carregar_sistema()
-
-INICIO_BOT = datetime.now(
-    ZoneInfo("America/Sao_Paulo")
-)
-
-def atualizar_dia():
-
-    agora = datetime.now(
-        ZoneInfo("America/Sao_Paulo")
-    )
-
-    data_atual = agora.strftime(
-        "%d/%m/%Y"
-    )
-
-    if STATUS_SISTEMA["data"] != data_atual:
-
-        STATUS_SISTEMA["data"] = data_atual
-
-        STATUS_SISTEMA["envios_hoje"] = 0
-
-        STATUS_SISTEMA["midias_hoje"] = 0
-
-        salvar_sistema(
-            STATUS_SISTEMA
-        )
-
-# ==============================
-# REGISTROS DO SISTEMA
-# ==============================
-
-def atualizar_ultimo_envio(tipo, quantidade=1):
-
-    STATUS_SISTEMA["envios_hoje"] += 1
-
-    STATUS_SISTEMA["midias_hoje"] += quantidade
-
-    STATUS_SISTEMA["ultimo_envio"] = datetime.now(
-        ZoneInfo("America/Sao_Paulo")
-    ).strftime("%H:%M")
-
-    STATUS_SISTEMA["ultimo_tipo"] = tipo
-
-    STATUS_SISTEMA["ultimo_status"] = "Sucesso"
-
-    salvar_sistema(
-        STATUS_SISTEMA
-    )
-
-def registrar_divulgacao():
-
-    atualizar_dia()
-
-    STATUS_SISTEMA["divulgacoes"] += 1
-
-    atualizar_ultimo_envio(
-        "Publicação",
-        1
-    )
-
-def registrar_album(quantidade):
-
-    atualizar_dia()
-
-    STATUS_SISTEMA["albuns"] += 1
-
-    atualizar_ultimo_envio(
-        "Álbum",
-        quantidade
-    )
-
-def registrar_feedback():
-
-    atualizar_dia()
-
-    STATUS_SISTEMA["feedbacks"] += 1
-
-    atualizar_ultimo_envio(
-        "Feedback",
-        1
-    )
-
-# ==============================
-# LEGENDA FIXA
-# ==============================
-
-LEGENDA_FIXA = """
-🔥 CONTEÚDO EXCLUSIVO LIBERADO 🔥
-
-🚀 Acesse nosso canal oficial:
-@ClubeBlackBot
-"""
-
-albuns = {}
-
-# ==============================
-# ESTADOS DO SISTEMA
-# ==============================
-
-AGUARDANDO_FEEDBACK = 1
-
-AGUARDANDO_DIVULGACAO_NOVA = 2
-
-# ==============================
-# AGENDAMENTOS
-# ==============================
-
-ARQUIVO_AGENDAMENTOS = "agendamentos.json"
-
-def carregar_agendamentos():
-
-    if not Path(
-        ARQUIVO_AGENDAMENTOS
-    ).exists():
-
-        return []
-
-    with open(
-        ARQUIVO_AGENDAMENTOS,
-        "r",
-        encoding="utf-8"
-    ) as arquivo:
-
-        return json.load(arquivo)
-
-def salvar_agendamentos(lista):
-
-    with open(
-        ARQUIVO_AGENDAMENTOS,
-        "w",
-        encoding="utf-8"
-    ) as arquivo:
-
-        json.dump(
-            lista,
-            arquivo,
-            indent=4,
-            ensure_ascii=False
-        )
-
-agendamentos = carregar_agendamentos()
-
-# ==============================
-# BOTÃO VIP
-# ==============================
-
-def botoes_vip():
-
-    return InlineKeyboardMarkup(
-
-        [
-
-            [
-
-                InlineKeyboardButton(
-
-                    "🔥 ENTRAR NO VIP 🔥",
-
-                    url=VIP_LINK
-
-                )
-
-            ]
-
-        ]
-
-    )
-
-# ==============================
-# START
-# ==============================
-
-async def start(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    await update.message.reply_text(
-
-        "🖤 BLACK SYSTEM\n\n"
-
-        "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
-
-        "⚡ Sistema Ativo ⚡\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "📋 HOJE\n\n"
-
-        f"👑 Envios: {STATUS_SISTEMA['envios_hoje']}/𝟐𝟎\n"
-
-        f"📱 Mídias: {STATUS_SISTEMA['midias_hoje']}\n"
-
-        f"⏰ Agendados: {len(agendamentos)}\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "📊 ESTATÍSTICAS TOTAIS\n\n"
-
-        f"📤 Divulgações: {STATUS_SISTEMA['divulgacoes']}\n"
-
-        f"📚 Álbuns: {STATUS_SISTEMA['albuns']}\n"
-
-        f"📨 Feedbacks: {STATUS_SISTEMA['feedbacks']}\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "🥷🏾 Controle total\n"
-
-        "⚡ Sistema protegido ⚡"
-
-    )
-
-# ==============================
-# STATUS REAL
-# ==============================
-
-def fonte_numero(texto):
-
-    normal = "0123456789"
-    bonito = "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
-
-    return str(texto).translate(
-        str.maketrans(normal, bonito)
-    )
-
-async def status(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    atualizar_dia()
-
-    agora = datetime.now(
-        ZoneInfo("America/Sao_Paulo")
-    )
-
-    tempo = agora - INICIO_BOT
-
-    horas = fonte_numero(
-        tempo.seconds // 3600
-    )
-
-    minutos = fonte_numero(
-        (tempo.seconds % 3600) // 60
-    )
-
-    proximo = "--:--"
-
-    if agendamentos:
-
-        horarios = sorted(
-
-            [
-
-                item["horario"]
-
-                for item in agendamentos
-
-            ]
-
-        )
-
-        proximo = fonte_numero(
-            horarios[0]
-        )
-
-    ultimo = fonte_numero(
-
-        STATUS_SISTEMA["ultimo_envio"]
-
-        or "--:--"
-
-    )
-
-    await update.callback_query.message.reply_text(
-
-        "🖤 BLACK SYSTEM\n\n"
-
-        "👑 Bem-vindo de volta, Chefe! 🥷🏾\n\n"
-
-        f"⚡ Sistema Ativo há: {horas}h {minutos}m\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "📋 HOJE\n\n"
-
-        f"👑 Envios: {fonte_numero(STATUS_SISTEMA['envios_hoje'])}/𝟑𝟎\n"
-
-        f"📱 Mídias: {fonte_numero(STATUS_SISTEMA['midias_hoje'])}\n"
-
-        f"⏰ Agendados: {fonte_numero(len(agendamentos))}\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "⚡ PRÓXIMA DIVULGAÇÃO\n\n"
-
-        f"🕙 {proximo}\n"
-
-        "📢 Publicação\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "📌 ÚLTIMO ENVIO\n\n"
-
-        f"🕘 {ultimo}\n"
-
-        f"✅ {STATUS_SISTEMA['ultimo_status'] or '--'}\n\n"
-
-        "━━━━━━━━━━━\n\n"
-
-        "🥷🏾 Controle total\n"
-
-        "⚡ Sistema protegido ⚡"
-
-    )
-
-# ==============================
-# INICIAR FEEDBACK
-# ==============================
-
-async def feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    await update.message.reply_text(
-        "📸 Envie a foto do feedback."
-    )
-
-    return AGUARDANDO_FEEDBACK
-# ==============================
-# RECEBER DIVULGAÇÃO NOVA (MANAGER)
-# ==============================
-
-async def receber_divulgacao_nova(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    # SE ESTIVER EM MODO ÁLBUM
-    # NÃO FAZ NADA
-    if context.user_data.get(
-        "aguardando_album"
-    ):
-        return
-
-    if not context.user_data.get(
-        "aguardando_divulgacao"
-    ):
-        return
-
-    mensagem = update.message
-
-
-    # TEXTO
-    if mensagem.text:
-
-        await context.bot.send_message(
-
-            chat_id=GROUP_ID,
-
-            text=mensagem.text,
-
-            reply_markup=botoes_vip()
-
-        )
-
-
-    # FOTO COM LEGENDA
-    elif mensagem.photo and mensagem.caption:
-
-        await context.bot.send_photo(
-
-            chat_id=GROUP_ID,
-
-            photo=mensagem.photo[-1].file_id,
-
-            caption=mensagem.caption,
-
-            reply_markup=botoes_vip()
-
-        )
-
-
-    # VÍDEO COM LEGENDA
-    elif mensagem.video and mensagem.caption:
-
-        await context.bot.send_video(
-
-            chat_id=GROUP_ID,
-
-            video=mensagem.video.file_id,
-
-            caption=mensagem.caption,
-
-            reply_markup=botoes_vip()
-
-        )
-
-
-    # VÍDEO SEM LEGENDA
-    elif mensagem.video:
-
-        await context.bot.send_video(
-
-            chat_id=GROUP_ID,
-
-            video=mensagem.video.file_id,
-
-            reply_markup=botoes_vip()
-
-        )
-
-
     else:
-
         await update.message.reply_text(
-
-            "⚠️ Divulgação precisa ser texto, foto ou vídeo."
-
+            f"👋 Olá, <b>{nome}</b>!\n\n"
+            f"Envie /feedback para deixar sua opinião ou sugestão.\n"
+            f"Use /help para ver todos os comandos.",
+            parse_mode=ParseMode.HTML
         )
 
-        return
 
 
-    registrar_divulgacao()
-
-    context.user_data[
-        "aguardando_divulgacao"
-    ] = False
-
-
-    await update.message.reply_text(
-
-        "✅ Divulgação publicada com sucesso!"
-
+async def cmdhelp(update: Update, context: ContextTypes.DEFAULT TYPE):
+    txt = (
+        "📋 <b>Comandos Disponíveis</b>\n\n"
+        "/start - Iniciar o bot\n"
+        "/feedback - Enviar um feedback\n"
+        "/help - Esta mensagem\n"
     )
-# ==============================
-# RECEBER FEEDBACK
-# ==============================
+    if update.effectiveuser.id == ADMIN ID:
+        txt += "\n🔐 <b>Comandos Admin:</b>\n/painel - Painel de controle"
+    await update.message.replytext(txt, parse mode=ParseMode.HTML)
 
-async def receber_feedback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
 
-    if update.effective_user.id != OWNER_ID:
 
+
+
+ ==================== PAINEL ADMIN ====================
+
+ 
+
+
+
+async def painelabrir(update: Update, context: ContextTypes.DEFAULT TYPE):
+    if not await verificar_admin(update):
         return
 
 
-    if not context.user_data.get(
-        "aguardando_feedback"
-    ):
-
-        return
-
-
-    if not update.message.photo:
-
-        await update.message.reply_text(
-
-            "⚠️ Envie uma foto para o feedback."
-
-        )
-
-        return
-
-
-    foto = update.message.photo[-1].file_id
-
-
-    LEGENDA_FEEDBACK = """
-⭐ FEEDBACK REAL ⭐
-
-🔥 Mais um cliente satisfeito com o Clube Black VIP.
-
-💎 Conteúdo exclusivo.
-⚡ Acesso rápido.
-🖤 Experiência premium.
-
-🚀 Entre para o VIP agora!
-"""
-
-
-    await context.bot.send_photo(
-
-        chat_id=GROUP_ID,
-
-        photo=foto,
-
-        caption=LEGENDA_FEEDBACK,
-
-        reply_markup=botoes_vip()
-
-    )
-
-
-    registrar_feedback()
-
-
-    context.user_data[
-        "aguardando_feedback"
-    ] = False
-
-
-    await update.message.reply_text(
-
-        "✅ Feedback enviado com sucesso!"
-
-    )
-# ==============================
-# RECEBER ÁLBUM
-# ==============================
-
-async def receber_album(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    if not context.user_data.get("aguardando_album"):
-
-        return
-
-    mensagem = update.message
-
-    if not mensagem.media_group_id:
-
-        return
-
-    grupo = mensagem.media_group_id
-
-    if grupo not in albuns:
-
-        albuns[grupo] = {
-
-            "mensagens": [],
-
-            "legenda": mensagem.caption or ""
-
-        }
-
-    if len(albuns[grupo]["mensagens"]) < 10:
-
-        albuns[grupo]["mensagens"].append(
-            mensagem
-        )
-
-    if mensagem.caption:
-
-        albuns[grupo]["legenda"] = mensagem.caption
-
-    print(
-        "DEBUG ALBUM:",
-        grupo,
-        len(albuns[grupo]["mensagens"])
-    )
-
-    await asyncio.sleep(3)
-
-    if context.user_data.get("aguardando_album"):
-
-        await enviar_album_automatico(
-
-            context,
-
-            grupo
-
-        )
-
-        context.user_data["aguardando_album"] = False
-
-# ==============================
-# DIVULGAR
-# ==============================
-
-async def divulgar(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    # BOTÃO DO MANAGER
-    if update.callback_query:
-
-        query = update.callback_query
-
-        await query.answer()
-
-        await query.message.reply_text(
-            "📢 Responda a mensagem que deseja divulgar e clique novamente em DIVULGAR AGORA."
-        )
-
-        return
-
-    # COMANDO /DIVULGAR
-    if update.message:
-
-        if not update.message.reply_to_message:
-
-            return
-
-        mensagem = update.message.reply_to_message
-
-        await context.bot.copy_message(
-
-            chat_id=GROUP_ID,
-
-            from_chat_id=mensagem.chat.id,
-
-            message_id=mensagem.message_id,
-
-            reply_markup=botoes_vip()
-
-        )
-
-        registrar_divulgacao()
-
-# ==============================
-# ENVIAR ÁLBUM AUTOMÁTICO
-# ==============================
-
-async def enviar_album_automatico(
-    context,
-    grupo
-):
-
-    if grupo not in albuns:
-
-        return
-
-    midias = []
-
-    legenda_usuario = albuns[grupo].get(
-
-        "legenda",
-
-        ""
-
-    )
-
-    if legenda_usuario:
-
-        legenda_final = (
-
-            legenda_usuario.strip()
-
-            + "\n\n"
-
-            + LEGENDA_FIXA.strip()
-
-        )
-
-    else:
-
-        legenda_final = LEGENDA_FIXA.strip()
-
-    for item in albuns[grupo]["mensagens"]:
-
-        if item.photo:
-
-            midias.append(
-
-                InputMediaPhoto(
-
-                    media=item.photo[-1].file_id,
-
-                    caption=legenda_final
-
-                    if len(midias) == 0
-
-                    else None
-
-                )
-
-            )
-
-        elif item.video:
-
-            midias.append(
-
-                InputMediaVideo(
-
-                    media=item.video.file_id,
-
-                    caption=legenda_final
-
-                    if len(midias) == 0
-
-                    else None
-
-                )
-
-            )
-
-    if midias:
-
-        await context.bot.send_media_group(
-
-            chat_id=GROUP_ID,
-
-            media=midias
-
-        )
-
-    registrar_album(
-
-        len(midias)
-
-    )
-
-    del albuns[grupo]
-# ==============================
-# DIVULGAR ÁLBUM MANUAL
-# ==============================
-
-async def d_album(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    if not update.message.reply_to_message:
-
-        return
-
-    grupo = update.message.reply_to_message.media_group_id
-
-    if not grupo or grupo not in albuns:
-
-        await update.message.reply_text(
-
-            "⚠️ Álbum não encontrado."
-
-        )
-
-        return
-
-    midias = []
-
-    legenda_usuario = albuns[grupo].get(
-
-        "legenda",
-
-        ""
-
-    )
-
-    if legenda_usuario:
-
-        legenda_final = (
-
-            legenda_usuario.strip()
-
-            + "\n\n"
-
-            + LEGENDA_FIXA.strip()
-
-        )
-
-    else:
-
-        legenda_final = LEGENDA_FIXA.strip()
-
-    for item in albuns[grupo]["mensagens"]:
-
-        if item.photo:
-
-            midias.append(
-
-                InputMediaPhoto(
-
-                    media=item.photo[-1].file_id,
-
-                    caption=legenda_final
-
-                    if len(midias) == 0
-
-                    else None
-
-                )
-
-            )
-
-        elif item.video:
-
-            midias.append(
-
-                InputMediaVideo(
-
-                    media=item.video.file_id,
-
-                    caption=legenda_final
-
-                    if len(midias) == 0
-
-                    else None
-
-                )
-
-            )
-
-    if midias:
-
-        await context.bot.send_media_group(
-
-            chat_id=GROUP_ID,
-
-            media=midias
-
-        )
-
-    registrar_album(
-    len(midias)
-)
-
-    del albuns[grupo]
-
-    await update.message.reply_text(
-
-        "✅ Álbum divulgado!"
-
-    )
-
-# ==============================
-# AGENDAR PUBLICAÇÃO
-# ==============================
-
-async def agendar_publicacao(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    if not update.message.reply_to_message:
-
-        await update.message.reply_text(
-
-            "⚠️ Responda a publicação e use /agendar HH:MM"
-
-        )
-
-        return
-
-    if not context.args:
-
-        await update.message.reply_text(
-
-            "⚠️ Exemplo: /agendar 08:00"
-
-        )
-
-        return
-
-    horario = context.args[0]
-
-    try:
-
-        datetime.strptime(
-
-            horario,
-
-            "%H:%M"
-
-        )
-
-    except:
-
-        await update.message.reply_text(
-
-            "⚠️ Horário inválido."
-
-        )
-
-        return
-
-    mensagem = update.message.reply_to_message
-
-    if mensagem.media_group_id:
-
-        grupo = mensagem.media_group_id
-
-        if grupo not in albuns:
-
-            await update.message.reply_text(
-
-                "⚠️ Álbum não encontrado."
-
-            )
-
-            return
-
-        midias_album = []
-
-        for item in albuns[grupo]["mensagens"]:
-
-            if item.photo:
-
-                midias_album.append({
-
-                    "tipo": "foto",
-
-                    "file_id": item.photo[-1].file_id
-
-                })
-
-            elif item.video:
-
-                midias_album.append({
-
-                    "tipo": "video",
-
-                    "file_id": item.video.file_id
-
-                })
-
-        agendamentos.append({
-
-            "horario": horario,
-
-            "tipo": "album",
-
-            "chat_id": GROUP_ID,
-
-            "midias": midias_album,
-
-            "legenda": albuns[grupo].get(
-
-                "legenda",
-
-                ""
-
-            )
-
-        })
-
-        salvar_agendamentos(
-
-            agendamentos
-
-        )
-
-        await update.message.reply_text(
-
-            f"✅ Álbum agendado com sucesso!\n\n"
-
-            f"📅 Horário: {horario}\n"
-
-            f"🖼️ Tipo: Álbum"
-
-        )
-
-        return
-
-    agendamentos.append({
-
-        "horario": horario,
-
-        "tipo": "publicacao",
-
-        "chat_id": mensagem.chat.id,
-
-        "message_id": mensagem.message_id
-
-    })
-
-    salvar_agendamentos(
-
-        agendamentos
-
-    )
-
-    await update.message.reply_text(
-
-        f"✅ Agendado com sucesso!\n\n"
-
-        f"📅 Horário: {horario}\n"
-
-        f"📢 Tipo: Publicação"
-
-    )
-
-# ==============================
-# VERIFICAR AGENDAMENTOS
-# ==============================
-
-async def verificar_agendamentos(
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    print("VERIFICANDO AGENDAMENTOS")
-
-    agora = datetime.now(
-        ZoneInfo("America/Sao_Paulo")
-    ).strftime("%H:%M")
-
-    for item in agendamentos.copy():
-
-        if item["horario"] != agora:
-
-            continue
-
-        try:
-
-            if item.get("tipo") == "album":
-
-                midias = []
-
-                legenda_usuario = item.get(
-                    "legenda",
-                    ""
-                )
-
-                if legenda_usuario:
-
-                    legenda_final = (
-
-                        legenda_usuario.strip()
-
-                        + "\n\n"
-
-                        + LEGENDA_FIXA.strip()
-
-                    )
-
-                else:
-
-                    legenda_final = LEGENDA_FIXA.strip()
-
-                for item_midia in item["midias"]:
-
-                    if item_midia["tipo"] == "foto":
-
-                        midias.append(
-
-                            InputMediaPhoto(
-
-                                media=item_midia["file_id"],
-
-                                caption=legenda_final
-
-                                if len(midias) == 0
-
-                                else None
-
-                            )
-
-                        )
-
-                    elif item_midia["tipo"] == "video":
-
-                        midias.append(
-
-                            InputMediaVideo(
-
-                                media=item_midia["file_id"],
-
-                                caption=legenda_final
-
-                                if len(midias) == 0
-
-                                else None
-
-                            )
-
-                        )
-
-                if midias:
-
-                    await context.bot.send_media_group(
-
-                        chat_id=GROUP_ID,
-
-                        media=midias
-
-                    )
-
-                registrar_album(
-                    len(midias)
-                )
-
-                print("ÁLBUM ENVIADO ✅")
-
-            else:
-
-                await context.bot.copy_message(
-
-                    chat_id=GROUP_ID,
-
-                    from_chat_id=item["chat_id"],
-
-                    message_id=item["message_id"],
-
-                    reply_markup=botoes_vip()
-
-                )
-
-                registrar_divulgacao()
-
-                print("PUBLICAÇÃO ENVIADA ✅")
-
-            await context.bot.send_message(
-
-                chat_id=OWNER_ID,
-
-                text=(
-
-                    "✅ Publicação enviada com sucesso!\n\n"
-
-                    f"📅 Horário: {agora}\n"
-
-                    f"📢 Tipo: {item.get('tipo', 'publicacao')}"
-
-                )
-
-            )
-
-            agendamentos.remove(item)
-
-            salvar_agendamentos(
-                agendamentos
-            )
-
-        except Exception as e:
-
-            print(
-                "ERRO AO ENVIAR AGENDAMENTO:",
-                e
-            )
-
-# ==============================
-# MENU
-# ==============================
-
-async def configurar_menu(app):
-
-    comandos = [
-
-    BotCommand(
-        "start",
-        "BLACK SYSTEM 👑"
-    ),
-    BotCommand(
-        "manager",
-        "⚙️ BLACK MANAGER"
-    ),
-    BotCommand(
-        "divulgar",
-        "DIVULGAR 🔥"
-    ),
-
-    BotCommand(
-        "d_album",
-        "DIVULGAR ÁLBUM 🖼️"
-    ),
-
-    BotCommand(
-        "agendar",
-        "AGENDAR DIVULGAÇÃO ⏰"
-    ),
-
-    BotCommand(
-        "feedback",
-        "ADICIONAR FEEDBACK 📸"
-    )
-
-    ]
-
-    await app.bot.set_my_commands(
-        comandos
-    )
-
-# ==============================
-# VIP
-# ==============================
-
-async def entrarnovip(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-
-        return
-
-    await context.bot.send_message(
-
-        chat_id=GROUP_ID,
-
-        text="",
-
-        reply_markup=botoes_vip()
-
-    )
-# ==============================
-# ⚙️ BLACK MANAGER
-# ==============================
-
-async def manager(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    teclado = InlineKeyboardMarkup(
-        [
-
-            [
-                InlineKeyboardButton(
-                    "📢 DIVULGAÇÃO",
-                    callback_data="manager_divulgacao"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "📚 ÁLBUNS",
-                    callback_data="manager_album"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "⏰ AGENDAMENTOS",
-                    callback_data="manager_agenda"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "📸 FEEDBACKS",
-                    callback_data="manager_feedback"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "📊 STATUS",
-                    callback_data="manager_status"
-                )
-            ]
-
-        ]
-    )
-
-    await update.message.reply_text(
-
-        "⚙️ BLACK MANAGER\n\n"
-        "👑 CONTROLE DE OPERAÇÕES\n\n"
-        "ESCOLHA UMA OPÇÃO:",
-
-        reply_markup=teclado
-
-    )
-# ==============================
-# ⚙️ BLACK_MANAGER_NOVO
-# ==============================
-
-async def manager_novo(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != OWNER_ID:
-        return
-
-    teclado = InlineKeyboardMarkup(
-        [
-
-            [
-                InlineKeyboardButton(
-                    "📢 DIVULGAÇÃO",
-                    callback_data="novo_divulgacao"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "📚 ÁLBUNS",
-                    callback_data="novo_album"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "⏰ AGENDAMENTOS",
-                    callback_data="novo_agenda"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "📸 FEEDBACKS",
-                    callback_data="novo_feedback"
-                )
-            ],
-
-            [
-                InlineKeyboardButton(
-                    "📊 STATUS",
-                    callback_data="novo_status"
-                )
-            ]
-
-        ]
-    )
-
-    await update.message.reply_text(
-
-        "⚙️ BLACK MANAGER NOVO\n\n"
-        "👑 CONTROLE DE OPERAÇÕES\n\n"
-        "ESCOLHA UMA OPÇÃO:",
-
-        reply_markup=teclado
-
-    )
-# ==============================
-# BOTÕES BLACK MANAGER
-# ==============================
-
-async def menu_manager(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
 
     query = update.callback_query
+    if query:
+        await query.answer()
+        await query.editmessage text(
+            "🎛️ <b>Painel de Controle</b>\n\nSelecione uma opção:",
+            parse_mode=ParseMode.HTML,
+            replymarkup=teclado painel()
+        )
+    else:
+        await update.message.reply_text(
+            "🎛️ <b>Painel de Controle</b>\n\nSelecione uma opção:",
+            parse_mode=ParseMode.HTML,
+            replymarkup=teclado painel()
+        )
 
+
+
+async def cmdpainel(update: Update, context: ContextTypes.DEFAULT TYPE):
+    if not await verificar_admin(update):
+        return
+    await update.message.reply_text(
+        "🎛️ <b>Painel de Controle</b>\n\nSelecione uma opção:",
+        parse_mode=ParseMode.HTML,
+        replymarkup=teclado painel()
+    )
+
+
+
+async def painelfechar(update: Update, context: ContextTypes.DEFAULT TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.editmessage text("✅ Painel fechado. Use /painel para abrir novamente.")
+
+
+
+
+
+ ==================== BROADCAST / DIVULGAÇÃO ====================
+
+ 
+
+
+
+async def broadcastiniciar(update: Update, context: ContextTypes.DEFAULT TYPE):
+    if not await verificar_admin(update):
+        return
+
+
+
+    query = update.callback_query
     await query.answer()
 
 
-    if query.data == "manager_status":
 
-        await status(update, context)
-
-
-    elif query.data == "manager_divulgacao":
-
-        teclado = InlineKeyboardMarkup(
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📤 DIVULGAR AGORA",
-                        callback_data="divulgar_agora"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "⏰ AGENDAR",
-                        callback_data="agendar_divulgacao"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 VOLTAR",
-                        callback_data="voltar_manager"
-                    )
-                ]
-
-            ]
-        )
-
-
-        await query.edit_message_text(
-
-            "📢 DIVULGAÇÃO\n\n"
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
-
-
-    elif query.data == "divulgar_agora":
-
-        context.user_data["aguardando_divulgacao"] = True
-
-
-        await query.message.reply_text(
-
-            "📢 MODO DIVULGAÇÃO ATIVADO\n\n"
-            "Envie a mensagem que deseja publicar."
-
-        )
-
-
-    elif query.data == "manager_album":
-
-        teclado = InlineKeyboardMarkup(
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📤 ENVIAR ÁLBUM",
-                        callback_data="enviar_album_novo"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "⏰ AGENDAR ÁLBUM",
-                        callback_data="agendar_album_novo"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "🔙 VOLTAR",
-                        callback_data="voltar_manager"
-                    )
-                ]
-
-            ]
-        )
-
-
-        await query.edit_message_text(
-
-            "📚 ÁLBUNS\n\n"
-            "Escolha uma opção:",
-
-            reply_markup=teclado
-
-        )
-
-
-    elif query.data == "enviar_album_novo":
-
-        context.user_data["aguardando_album"] = True
-
-
-        await query.message.reply_text(
-
-            "📚 MODO ÁLBUM ATIVADO\n\n"
-            "Envie o álbum de fotos/vídeos."
-
-        )
-
-
-    elif query.data == "manager_feedback":
-
-        context.user_data["aguardando_feedback"] = True
-
-
-        await query.message.reply_text(
-
-            "📸 MODO FEEDBACK ATIVADO\n\n"
-            "Envie a foto do feedback."
-
-        )
-
-
-    elif query.data == "voltar_manager":
-
-        teclado = InlineKeyboardMarkup(
-            [
-
-                [
-                    InlineKeyboardButton(
-                        "📢 DIVULGAÇÃO",
-                        callback_data="manager_divulgacao"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "📚 ÁLBUNS",
-                        callback_data="manager_album"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "⏰ AGENDAMENTOS",
-                        callback_data="manager_agenda"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "📸 FEEDBACKS",
-                        callback_data="manager_feedback"
-                    )
-                ],
-
-                [
-                    InlineKeyboardButton(
-                        "📊 STATUS",
-                        callback_data="manager_status"
-                    )
-                ]
-
-            ]
-        )
-
-
-        await query.edit_message_text(
-
-            "⚙️ BLACK MANAGER\n\n"
-            "👑 CONTROLE DE OPERAÇÕES\n\n"
-            "ESCOLHA UMA OPÇÃO:",
-
-            reply_markup=teclado
-
-        )
-# ==============================
-# BOT
-# ==============================
-
-app = (
-
-    Application
-
-    .builder()
-
-    .token(BOT_TOKEN)
-
-    .post_init(configurar_menu)
-
-    .build()
-
-)
-
-
-app.add_handler(
-
-    CommandHandler(
-        "manager",
-        manager
+    userid = update.effective user.id
+    estadosuser_id = "aguardandoconteudo broadcast"
+    dadosestado[user id] = {}
+
+
+
+    await query.editmessage text(
+        "📢 <b>Nova Divulgação</b>\n\n"
+        "Envie o conteúdo que deseja divulgar no grupo.\n\n"
+        "Pode ser:\n"
+        "• Um texto\n"
+        "• Uma foto (com legenda opcional)\n"
+        "• Um vídeo (com legenda opcional)\n"
+        "• Várias fotos/vídeos (álbum)\n\n"
+        "<i>Envie o conteúdo agora...</i>",
+        parse_mode=ParseMode.HTML,
+        reply_markup=InlineKeyboardMarkup([
+            InlineKeyboardButton("🔙 Cancelar", callback_data="painel_abrir")
+        ])
     )
 
-)
 
 
-app.add_handler(
+async def receberconteudo broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    userid = update.effective user.id
+    if estados.get(userid) != "aguardando conteudo_broadcast":
+        return
 
-    CallbackQueryHandler(
-        menu_manager
+
+
+    msg = update.message
+    mediagroup id = msg.mediagroup id
+
+
+
+    # Se faz parte de um álbum, aguardar todas as mídias
+    if mediagroup id:
+        if mediagroup id not in buffer_album:
+            bufferalbum[media group_id] = []
+        bufferalbum[media group_id].append(msg)
+
+
+
+        # Cancela timer anterior se existir
+        if mediagroup id in album_timers:
+            albumtimers[media group_id].cancel()
+
+
+
+        # Cria novo timer para processar o álbum
+        async def processar_album(mgid):
+            await asyncio.sleep(1.2)  # Aguarda outras mídias chegarem
+            msgs = buffer_album.pop(mgid, [])
+            album_timers.pop(mgid, None)
+            if msgs:
+                await finalizarcaptura broadcast(user_id, msgs, update, context)
+
+
+
+        albumtimers[media groupid] = asyncio.create task(processaralbum(media group_id))
+        return  # Não processa ainda, aguarda o timer
+
+
+
+    # Conteúdo único (texto, foto ou vídeo)
+    await finalizarcaptura broadcast(user_id, msg, update, context)
+
+
+
+async def finalizarcaptura broadcast(user_id, mensagens, update, context):
+    """Processa as mensagens capturadas e pergunta confirmação."""
+    estadosuser_id = None
+    dados = {"mensagens": [], "tipo": None}
+
+
+
+    for msg in mensagens:
+        if msg.photo:
+            dados"mensagens".append({"tipo": "photo", "fileid": msg.photo[-1].file id, "caption": msg.caption})
+        elif msg.video:
+            dados"mensagens".append({"tipo": "video", "fileid": msg.video.file id, "caption": msg.caption})
+        elif msg.text:
+            dados"mensagens".append({"tipo": "text", "texto": msg.text})
+
+
+
+    if not dados"mensagens":
+        await update.message.reply_text("⚠️ Nenhum conteúdo válido detectado. Tente novamente.")
+        return
+
+
+
+    # Define tipo geral
+    if len(dados"mensagens") > 1:
+        dados"tipo" = "album"
+    else:
+        dados"tipo" = dados"mensagens""tipo"
+
+
+
+    dadosestado[user id] = dados
+
+
+
+    # Salva no banco
+    import json
+    bid = salvar_broadcast(
+        tipo=dados"tipo",
+        conteudo=json.dumps(dados"mensagens", ensure_ascii=False)
+    )
+    dados"bid" = bid
+
+
+
+    # Preview
+    tipo_nome = {"text": "📝 Texto", "photo": "🖼️ Foto", "video": "🎬 Vídeo", "album": "🖼️🎬 Álbum"}
+    preview = f"📢 <b>Pré-visualização da Divulgação</b>\n\nTipo: {tipo_nome.get(dados'tipo', dados'tipo')}\nMídias: {len(dados'mensagens')}\n\nDeseja enviar agora ou agendar?"
+    await update.message.replytext(preview, parse mode=ParseMode.HTML, replymarkup=teclado confirmar_broadcast(bid))
+
+
+
+async def broadcastenviar(update: Update, context: ContextTypes.DEFAULT TYPE):
+    if not await verificar_admin(update):
+        return
+    query = update.callback_query
+    await query.answer()
+
+
+
+    bid = int(query.data.split("_")-1)
+    await enviarpara grupo(bid, context)
+    marcarbroadcast enviado(bid)
+    registrarevento("broadcast enviado", update.effective_user.id, f"bid={bid}")
+
+
+
+    await query.editmessage text("✅ Divulgação enviada com sucesso ao grupo!", replymarkup=teclado voltar())
+
+
+
+async def enviarpara grupo(bid, context):
+    import json
+    c = conectar()
+    row = c.execute("SELECT tipo, conteudo FROM broadcasts WHERE id=?", (bid,)).fetchone()
+    c.close()
+    if not row:
+        return
+
+
+
+    tipo, conteudo_str = row
+    mensagens = json.loads(conteudo_str)
+
+
+
+    if tipo == "text":
+        await context.bot.sendmessage(chat id=GRUPO_ID, text=mensagens0)
+    elif tipo == "photo":
+        m = mensagens0
+        await context.bot.sendphoto(chat id=GRUPOID, photo=m["file id"], caption=m.get("caption") or "")
+    elif tipo == "video":
+        m = mensagens0
+        await context.bot.sendvideo(chat id=GRUPOID, video=m["file id"], caption=m.get("caption") or "")
+    elif tipo == "album":
+        media_group = []
+        for m in mensagens:
+            if m"tipo" == "photo":
+                mediagroup.append({"type": "photo", "media": m["file id"], "caption": m.get("caption") or ""})
+            elif m"tipo" == "video":
+                mediagroup.append({"type": "video", "media": m["file id"], "caption": m.get("caption") or ""})
+        if media_group:
+            await context.bot.sendmedia group(chatid=GRUPO ID, media=media_group)
+
+
+
+async def broadcastagendar tela(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await verificar_admin(update):
+        return
+    query = update.callback_query
+    await query.answer()
+
+
+
+    bid = int(query.data.split("_")-1)
+    userid = update.effective user.id
+    estadosuser_id = "aguardandodata agendamento"
+    dadosestado[user id] = {"bid": bid}
+
+
+
+    await query.editmessage text(
+        "⏰ <b>Agendar Divulgação</b>\n\n"
+        "Envie a data e hora no formato:\n"
+        "<code>DD/MM/AAAA HH:MM</code>\n\n"
+        "Exemplo: <code>25/12/2026 18:00</code>",
+        parse_mode=ParseMode.HTML,
+        reply_markup=InlineKeyboardMarkup([
+            InlineKeyboardButton("🔙 Voltar", callback_data=f"broadcast_voltar_{bid}")
+        ])
     )
 
-)
 
 
-app.add_handler(
-
-    CommandHandler(
-        "start",
-        start
-    )
-
-)
+async def receberdata agendamento(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    userid = update.effective user.id
+    if estados.get(userid) != "aguardando data_agendamento":
+        return
 
 
-app.add_handler(
 
-    CommandHandler(
-        "divulgar",
-        divulgar
-    )
-
-)
-
-
-app.add_handler(
-
-    CommandHandler(
-        "d_album",
-        d_album
-    )
-
-)
-
-
-app.add_handler(
-
-    CommandHandler(
-        "entrarnovip",
-        entrarnovip
-    )
-
-)
-
-
-app.add_handler(
-
-    CommandHandler(
-        "agendar",
-        agendar_publicacao
-    )
-
-)
-
-
-# ==============================
-# DIVULGAÇÃO
-# ==============================
-
-app.add_handler(
-
-    MessageHandler(
-
-        filters.TEXT | filters.PHOTO,
-
-        receber_divulgacao_nova
-
-    )
-
-)
-
-
-# ==============================
-# FEEDBACK PELO BOTÃO
-# ==============================
-
-app.add_handler(
-
-    MessageHandler(
-
-        filters.PHOTO,
-
-        receber_feedback
-
-    )
-
-)
-
-
-# ==============================
-# ÁLBUM
-# ==============================
-
-app.add_handler(
-
-    MessageHandler(
-
-        filters.PHOTO | filters.VIDEO,
-
-        receber_album
-
-    )
-
-)
-
-
-app.job_queue.run_repeating(
-
-    verificar_agendamentos,
-
-    interval=30,
-
-    first=10
-
-)
-
-
-print("Bot iniciado ✅")
-
-
-app.run_polling()
+    texto = update.message.text.strip()
+    try:
+        data_hora = datetime.strptime(texto, "%d/%m/%Y %H:%M
