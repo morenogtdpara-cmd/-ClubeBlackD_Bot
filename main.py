@@ -520,9 +520,30 @@ async def receber_feedback(
 ):
 
     if update.effective_user.id != OWNER_ID:
+
         return
 
+
+    if not context.user_data.get(
+        "aguardando_feedback"
+    ):
+
+        return
+
+
+    if not update.message.photo:
+
+        await update.message.reply_text(
+
+            "⚠️ Envie uma foto para o feedback."
+
+        )
+
+        return
+
+
     foto = update.message.photo[-1].file_id
+
 
     LEGENDA_FEEDBACK = """
 ⭐ FEEDBACK REAL ⭐
@@ -536,6 +557,7 @@ async def receber_feedback(
 🚀 Entre para o VIP agora!
 """
 
+
     await context.bot.send_photo(
 
         chat_id=GROUP_ID,
@@ -547,12 +569,21 @@ async def receber_feedback(
         reply_markup=botoes_vip()
 
     )
-    registrar_feedback()
-    await update.message.reply_text(
-        "✅ Feedback enviado com sucesso!"
-    )
 
-    return ConversationHandler.END
+
+    registrar_feedback()
+
+
+    context.user_data[
+        "aguardando_feedback"
+    ] = False
+
+
+    await update.message.reply_text(
+
+        "✅ Feedback enviado com sucesso!"
+
+    )
 # ==============================
 # RECEBER ÁLBUM
 # ==============================
