@@ -246,12 +246,12 @@ async def receber_album(
 
     grupo_id = update.message.media_group_id
 
+    if grupo_id not in ALBUNS_TEMP:
+        ALBUNS_TEMP[grupo_id] = []
+
     if update.message.photo:
 
-        ALBUNS_TEMP.setdefault(
-            grupo_id,
-            []
-        ).append(
+        ALBUNS_TEMP[grupo_id].append(
             {
                 "tipo": "foto",
                 "file_id": update.message.photo[-1].file_id,
@@ -261,10 +261,7 @@ async def receber_album(
 
     elif update.message.video:
 
-        ALBUNS_TEMP.setdefault(
-            grupo_id,
-            []
-        ).append(
+        ALBUNS_TEMP[grupo_id].append(
             {
                 "tipo": "video",
                 "file_id": update.message.video.file_id,
@@ -272,32 +269,29 @@ async def receber_album(
             }
         )
 
-    # espera o Telegram terminar de enviar o álbum
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
 
-    medias = ALBUNS_TEMP.get(
-        grupo_id,
-        []
+    medias = ALBUNS_TEMP.get(grupo_id)
+
+    if not medias:
+        return
+
+    await enviar_album(
+        context,
+        medias,
+        medias[0].get("legenda")
     )
 
-    if medias:
+    del ALBUNS_TEMP[grupo_id]
 
-        await enviar_album(
-            context,
-            medias,
-            medias[0].get("legenda")
-        )
+    AGUARDANDO_ALBUM.pop(
+        update.effective_user.id,
+        None
+    )
 
-        del ALBUNS_TEMP[grupo_id]
-
-        AGUARDANDO_ALBUM.pop(
-            update.effective_user.id,
-            None
-        )
-
-        await update.message.reply_text(
-            "✅ Álbum enviado com sucesso."
-        )
+    await update.message.reply_text(
+        "✅ Álbum enviado com sucesso."
+    )
 async def enviar_album(
     context,
     medias,
