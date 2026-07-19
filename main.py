@@ -1,12 +1,49 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
+    CallbackQueryHandler,
     ContextTypes
 )
 
 from config import BOT_TOKEN, ADMIN_ID
 from database import init_db
+
+
+def manager_keyboard():
+
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "📢 Divulgação",
+                callback_data="divulgacao"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🖼️ Álbum",
+                callback_data="album"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "⭐ Feedbacks",
+                callback_data="feedbacks"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "📅 Agendamentos",
+                callback_data="agendamentos"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "📊 Status do bot",
+                callback_data="status"
+            )
+        ]
+    ])
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -26,8 +63,36 @@ async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "⚙️ BLACK MANAGER\n\n🚧 Sistema em construção."
+        "⚫ BLACK MANAGER\n\nEscolha uma opção:",
+        reply_markup=manager_keyboard()
     )
+
+
+async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "divulgacao":
+        texto = "📢 Divulgação\n\n🚧 Em construção."
+
+    elif query.data == "album":
+        texto = "🖼️ Álbum\n\n🚧 Em construção."
+
+    elif query.data == "feedbacks":
+        texto = "⭐ Feedbacks\n\n🚧 Em construção."
+
+    elif query.data == "agendamentos":
+        texto = "📅 Agendamentos\n\n🚧 Em construção."
+
+    elif query.data == "status":
+        texto = "📊 Status do bot\n\n✅ Online."
+
+    else:
+        texto = "Opção inválida."
+
+
+    await query.message.reply_text(texto)
 
 
 def main():
@@ -38,6 +103,10 @@ def main():
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("manager", manager))
+
+    app.add_handler(
+        CallbackQueryHandler(callbacks)
+    )
 
     print("BOT ONLINE")
 
