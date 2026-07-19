@@ -461,6 +461,7 @@ async def receber_divulgacao_nova(
 
     mensagem = update.message
 
+
     # TEXTO
     if mensagem.text:
 
@@ -473,6 +474,7 @@ async def receber_divulgacao_nova(
             reply_markup=botoes_vip()
 
         )
+
 
     # FOTO COM LEGENDA
     elif mensagem.photo and mensagem.caption:
@@ -489,21 +491,54 @@ async def receber_divulgacao_nova(
 
         )
 
+
+    # VÍDEO COM LEGENDA
+    elif mensagem.video and mensagem.caption:
+
+        await context.bot.send_video(
+
+            chat_id=GROUP_ID,
+
+            video=mensagem.video.file_id,
+
+            caption=mensagem.caption,
+
+            reply_markup=botoes_vip()
+
+        )
+
+
+    # VÍDEO SEM LEGENDA
+    elif mensagem.video:
+
+        await context.bot.send_video(
+
+            chat_id=GROUP_ID,
+
+            video=mensagem.video.file_id,
+
+            reply_markup=botoes_vip()
+
+        )
+
+
     else:
 
         await update.message.reply_text(
 
-            "⚠️ Divulgação precisa ser texto ou foto com legenda."
+            "⚠️ Divulgação precisa ser texto, foto ou vídeo."
 
         )
 
         return
+
 
     registrar_divulgacao()
 
     context.user_data[
         "aguardando_divulgacao"
     ] = False
+
 
     await update.message.reply_text(
 
