@@ -3,19 +3,30 @@ from telegram.ext import (
     Application,
     CommandHandler,
     CallbackQueryHandler,
-    ContextTypes
+    MessageHandler,
+    ContextTypes,
+    filters
 )
+
+from config import BOT_TOKEN, ADMIN_ID
+from database import init_db
+
+GROUP_ID = -1004231485932
+
+AGUARDANDO_DIVULGACAO = set()
+
+
 def manager_keyboard():
 
     return InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
-                "🖼️ ÁLBUM",
-                callback_data="album"
-            ),
-            InlineKeyboardButton(
                 "📢 DIVULGAR",
                 callback_data="divulgar"
+            ),
+            InlineKeyboardButton(
+                "🖼️ ÁLBUM",
+                callback_data="album"
             )
         ],
         [
@@ -30,30 +41,12 @@ def manager_keyboard():
         ],
         [
             InlineKeyboardButton(
-                "📊 ESTATÍSTICA",
-                callback_data="estatistica"
+                "📊 RELATÓRIO",
+                callback_data="relatorio"
             )
         ]
     ])
-from config import BOT_TOKEN, ADMIN_ID
-from database import init_db
 
-
-def manager_keyboard():
-
-    return InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton("📢 DIVULGAR", callback_data="divulgar"),
-            InlineKeyboardButton("🖼️ ÁLBUM", callback_data="album")
-        ],
-        [
-            InlineKeyboardButton("⭐ FEEDBACKS", callback_data="feedbacks"),
-            InlineKeyboardButton("📅 AGENDAMENTOS", callback_data="agendamentos")
-        ],
-        [
-            InlineKeyboardButton("📊 RELATÓRIO", callback_data="relatorio")
-        ]
-    ])
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -72,9 +65,9 @@ async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-    "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
-    reply_markup=manager_keyboard()
-)
+        "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
+        reply_markup=manager_keyboard()
+    )
 
 
 async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -82,35 +75,93 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-   if query.data == "divulgar":
+    if query.data == "divulgar":
 
-    AGUARDANDO_DIVULGACAO.add(
-        query.from_user.id
-    )
+        AGUARDANDO_DIVULGACAO.add(
+            query.from_user.id
+        )
 
-    await query.message.reply_text(
-        "📤 Envie uma foto ou vídeo para divulgação."
-    )
+        await query.message.reply_text(
+            "📤 Envie uma foto ou vídeo para divulgação."
+        )
 
-    return
+        return
 
     elif query.data == "album":
-        texto = "🖼️ Álbum\n\n🚧 Em construção."
+
+        texto = (
+            "🖼️ Álbum\n\n"
+            "🚧 Em construção."
+        )
 
     elif query.data == "feedbacks":
-        texto = "⭐ Feedbacks\n\n🚧 Em construção."
+
+        texto = (
+            "⭐ Feedbacks\n\n"
+            "🚧 Em construção."
+        )
 
     elif query.data == "agendamentos":
-        texto = "📅 Agendamentos\n\n🚧 Em construção."
 
-    elif query.data == "status":
-        texto = "📊 Status do bot\n\n✅ Online."
+        texto = (
+            "📅 Agendamentos\n\n"
+            "🚧 Em construção."
+        )
+
+    elif query.data == "relatorio":
+
+        texto = (
+            "📊 Relatório\n\n"
+            "✅ Bot online."
+        )
 
     else:
+
         texto = "Opção inválida."
 
-
     await query.message.reply_text(texto)
+
+
+async def receber_divulgacao(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if update.effective_user.id not in AGUARDANDO_DIVULGACAO:
+        return
+
+    if update.message.photo:
+
+        await context.bot.send_photo(
+            chat_id=GROUP_ID,
+            photo=update.message.photo[-1].file_id
+        )
+
+    elif update.message.video:
+
+        await context.bot.send_video(
+            chat_id=GROUP_ID,
+            video=update.message.video.file_id
+        )
+
+    else:
+
+        await update.message.reply_text(
+            "⚠️ Envie uma foto ou vídeo."
+        )
+
+        return
+
+    AGUARDANDO_DIVULGACAO.remove(
+        update.effective_user.id
+    )
+
+    await update.message.reply_text(
+        "✅ Divulgação enviada com sucesso."
+    )
 
 
 def main():
@@ -119,11 +170,23 @@ def main():
 
     app = Application.builder().token(BOT_TOKEN).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("manager", manager))
+    app.add_handler(
+        CommandHandler("start", start)
+    )
+
+    app.add_handler(
+        CommandHandler("manager", manager)
+    )
 
     app.add_handler(
         CallbackQueryHandler(callbacks)
+    )
+
+    app.add_handler(
+        MessageHandler(
+            filters.PHOTO | filters.VIDEO,
+            receber_divulgacao
+        )
     )
 
     print("BOT ONLINE")
