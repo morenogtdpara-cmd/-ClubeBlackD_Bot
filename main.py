@@ -91,9 +91,9 @@ async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-    "⚡️ oluPAINEL DE COMANDOS\n\nEscolha uma opção:"
-        .reply_markup=manager_keyboard()
-    )
+    "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
+    reply_markup=manager_keyboard()
+)
 
 
 async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
