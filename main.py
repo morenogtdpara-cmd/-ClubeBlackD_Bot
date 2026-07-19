@@ -32,13 +32,11 @@ OWNER_ID = 8880948641
 
 VIP_LINK = "https://t.me/ClubeBlackBot"
 
-
 # ==============================
 # 🖤 BLACK SYSTEM - DADOS REAIS
 # ==============================
 
 ARQUIVO_SISTEMA = "black_system.json"
-
 
 def carregar_sistema():
 
@@ -70,7 +68,6 @@ def carregar_sistema():
 
         return dados
 
-
     with open(
         ARQUIVO_SISTEMA,
         "r",
@@ -78,8 +75,6 @@ def carregar_sistema():
     ) as arquivo:
 
         return json.load(arquivo)
-
-
 
 def salvar_sistema(dados):
 
@@ -96,15 +91,11 @@ def salvar_sistema(dados):
             ensure_ascii=False
         )
 
-
-
 STATUS_SISTEMA = carregar_sistema()
 
 INICIO_BOT = datetime.now(
     ZoneInfo("America/Sao_Paulo")
 )
-
-
 
 def atualizar_dia():
 
@@ -115,7 +106,6 @@ def atualizar_dia():
     data_atual = agora.strftime(
         "%d/%m/%Y"
     )
-
 
     if STATUS_SISTEMA["data"] != data_atual:
 
@@ -128,8 +118,6 @@ def atualizar_dia():
         salvar_sistema(
             STATUS_SISTEMA
         )
-
-
 
 # ==============================
 # REGISTROS DO SISTEMA
@@ -153,7 +141,6 @@ def atualizar_ultimo_envio(tipo, quantidade=1):
         STATUS_SISTEMA
     )
 
-
 def registrar_divulgacao():
 
     atualizar_dia()
@@ -165,7 +152,6 @@ def registrar_divulgacao():
         1
     )
 
-
 def registrar_album(quantidade):
 
     atualizar_dia()
@@ -176,7 +162,6 @@ def registrar_album(quantidade):
         "Álbum",
         quantidade
     )
-
 
 def registrar_feedback():
 
@@ -200,21 +185,21 @@ LEGENDA_FIXA = """
 @ClubeBlackBot
 """
 
-
 albuns = {}
 
 # ==============================
-# FEEDBACK - ESTADO
+# ESTADOS DO SISTEMA
 # ==============================
 
 AGUARDANDO_FEEDBACK = 1
+
+AGUARDANDO_DIVULGACAO_NOVA = 2
 
 # ==============================
 # AGENDAMENTOS
 # ==============================
 
 ARQUIVO_AGENDAMENTOS = "agendamentos.json"
-
 
 def carregar_agendamentos():
 
@@ -232,7 +217,6 @@ def carregar_agendamentos():
 
         return json.load(arquivo)
 
-
 def salvar_agendamentos(lista):
 
     with open(
@@ -248,9 +232,7 @@ def salvar_agendamentos(lista):
             ensure_ascii=False
         )
 
-
 agendamentos = carregar_agendamentos()
-
 
 # ==============================
 # BOTÃO VIP
@@ -278,7 +260,6 @@ def botoes_vip():
 
     )
 
-
 # ==============================
 # START
 # ==============================
@@ -291,7 +272,6 @@ async def start(
     if update.effective_user.id != OWNER_ID:
 
         return
-
 
     await update.message.reply_text(
 
@@ -329,7 +309,6 @@ async def start(
 
     )
 
-
 # ==============================
 # STATUS REAL
 # ==============================
@@ -342,7 +321,6 @@ def fonte_numero(texto):
     return str(texto).translate(
         str.maketrans(normal, bonito)
     )
-
 
 async def status(
     update: Update,
@@ -458,6 +436,81 @@ async def feedback(
 
     return AGUARDANDO_FEEDBACK
 # ==============================
+# RECEBER DIVULGAÇÃO NOVA (MANAGER)
+# ==============================
+
+async def receber_divulgacao_nova(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    # SE ESTIVER EM MODO ÁLBUM
+    # NÃO FAZ NADA
+    if context.user_data.get(
+        "aguardando_album"
+    ):
+        return
+
+    if not context.user_data.get(
+        "aguardando_divulgacao"
+    ):
+        return
+
+    mensagem = update.message
+
+    # TEXTO
+    if mensagem.text:
+
+        await context.bot.send_message(
+
+            chat_id=GROUP_ID,
+
+            text=mensagem.text,
+
+            reply_markup=botoes_vip()
+
+        )
+
+    # FOTO COM LEGENDA
+    elif mensagem.photo and mensagem.caption:
+
+        await context.bot.send_photo(
+
+            chat_id=GROUP_ID,
+
+            photo=mensagem.photo[-1].file_id,
+
+            caption=mensagem.caption,
+
+            reply_markup=botoes_vip()
+
+        )
+
+    else:
+
+        await update.message.reply_text(
+
+            "⚠️ Divulgação precisa ser texto ou foto com legenda."
+
+        )
+
+        return
+
+    registrar_divulgacao()
+
+    context.user_data[
+        "aguardando_divulgacao"
+    ] = False
+
+    await update.message.reply_text(
+
+        "✅ Divulgação publicada com sucesso!"
+
+    )
+# ==============================
 # RECEBER FEEDBACK
 # ==============================
 
@@ -513,6 +566,10 @@ async def receber_album(
 
         return
 
+    if not context.user_data.get("aguardando_album"):
+
+        return
+
     mensagem = update.message
 
     if not mensagem.media_group_id:
@@ -541,9 +598,25 @@ async def receber_album(
 
         albuns[grupo]["legenda"] = mensagem.caption
 
+    print(
+        "DEBUG ALBUM:",
+        grupo,
+        len(albuns[grupo]["mensagens"])
+    )
 
     await asyncio.sleep(3)
 
+    if context.user_data.get("aguardando_album"):
+
+        await enviar_album_automatico(
+
+            context,
+
+            grupo
+
+        )
+
+        context.user_data["aguardando_album"] = False
 
 # ==============================
 # DIVULGAR
@@ -555,30 +628,138 @@ async def divulgar(
 ):
 
     if update.effective_user.id != OWNER_ID:
+        return
+
+    # BOTÃO DO MANAGER
+    if update.callback_query:
+
+        query = update.callback_query
+
+        await query.answer()
+
+        await query.message.reply_text(
+            "📢 Responda a mensagem que deseja divulgar e clique novamente em DIVULGAR AGORA."
+        )
 
         return
 
-    if not update.message.reply_to_message:
+    # COMANDO /DIVULGAR
+    if update.message:
+
+        if not update.message.reply_to_message:
+
+            return
+
+        mensagem = update.message.reply_to_message
+
+        await context.bot.copy_message(
+
+            chat_id=GROUP_ID,
+
+            from_chat_id=mensagem.chat.id,
+
+            message_id=mensagem.message_id,
+
+            reply_markup=botoes_vip()
+
+        )
+
+        registrar_divulgacao()
+
+# ==============================
+# ENVIAR ÁLBUM AUTOMÁTICO
+# ==============================
+
+async def enviar_album_automatico(
+    context,
+    grupo
+):
+
+    if grupo not in albuns:
 
         return
 
-    mensagem = update.message.reply_to_message
+    midias = []
 
-    await context.bot.copy_message(
+    legenda_usuario = albuns[grupo].get(
 
-        chat_id=GROUP_ID,
+        "legenda",
 
-        from_chat_id=mensagem.chat.id,
-
-        message_id=mensagem.message_id,
-
-        reply_markup=botoes_vip()
+        ""
 
     )
 
-    registrar_divulgacao()
+    if legenda_usuario:
 
+        legenda_final = (
 
+            legenda_usuario.strip()
+
+            + "\n\n"
+
+            + LEGENDA_FIXA.strip()
+
+        )
+
+    else:
+
+        legenda_final = LEGENDA_FIXA.strip()
+
+    for item in albuns[grupo]["mensagens"]:
+
+        if item.photo:
+
+            midias.append(
+
+                InputMediaPhoto(
+
+                    media=item.photo[-1].file_id,
+
+                    caption=legenda_final
+
+                    if len(midias) == 0
+
+                    else None
+
+                )
+
+            )
+
+        elif item.video:
+
+            midias.append(
+
+                InputMediaVideo(
+
+                    media=item.video.file_id,
+
+                    caption=legenda_final
+
+                    if len(midias) == 0
+
+                    else None
+
+                )
+
+            )
+
+    if midias:
+
+        await context.bot.send_media_group(
+
+            chat_id=GROUP_ID,
+
+            media=midias
+
+        )
+
+    registrar_album(
+
+        len(midias)
+
+    )
+
+    del albuns[grupo]
 # ==============================
 # DIVULGAR ÁLBUM MANUAL
 # ==============================
@@ -634,7 +815,6 @@ async def d_album(
 
         legenda_final = LEGENDA_FIXA.strip()
 
-
     for item in albuns[grupo]["mensagens"]:
 
         if item.photo:
@@ -655,7 +835,6 @@ async def d_album(
 
             )
 
-
         elif item.video:
 
             midias.append(
@@ -674,7 +853,6 @@ async def d_album(
 
             )
 
-
     if midias:
 
         await context.bot.send_media_group(
@@ -685,21 +863,17 @@ async def d_album(
 
         )
 
-
     registrar_album(
     len(midias)
 )
 
-
     del albuns[grupo]
-
 
     await update.message.reply_text(
 
         "✅ Álbum divulgado!"
 
     )
-
 
 # ==============================
 # AGENDAR PUBLICAÇÃO
@@ -734,9 +908,7 @@ async def agendar_publicacao(
 
         return
 
-
     horario = context.args[0]
-
 
     try:
 
@@ -758,14 +930,11 @@ async def agendar_publicacao(
 
         return
 
-
     mensagem = update.message.reply_to_message
-
 
     if mensagem.media_group_id:
 
         grupo = mensagem.media_group_id
-
 
         if grupo not in albuns:
 
@@ -777,9 +946,7 @@ async def agendar_publicacao(
 
             return
 
-
         midias_album = []
-
 
         for item in albuns[grupo]["mensagens"]:
 
@@ -793,7 +960,6 @@ async def agendar_publicacao(
 
                 })
 
-
             elif item.video:
 
                 midias_album.append({
@@ -803,7 +969,6 @@ async def agendar_publicacao(
                     "file_id": item.video.file_id
 
                 })
-
 
         agendamentos.append({
 
@@ -825,13 +990,11 @@ async def agendar_publicacao(
 
         })
 
-
         salvar_agendamentos(
 
             agendamentos
 
         )
-
 
         await update.message.reply_text(
 
@@ -843,9 +1006,7 @@ async def agendar_publicacao(
 
         )
 
-
         return
-
 
     agendamentos.append({
 
@@ -859,13 +1020,11 @@ async def agendar_publicacao(
 
     })
 
-
     salvar_agendamentos(
 
         agendamentos
 
     )
-
 
     await update.message.reply_text(
 
@@ -877,7 +1036,6 @@ async def agendar_publicacao(
 
     )
 
-
 # ==============================
 # VERIFICAR AGENDAMENTOS
 # ==============================
@@ -888,11 +1046,9 @@ async def verificar_agendamentos(
 
     print("VERIFICANDO AGENDAMENTOS")
 
-
     agora = datetime.now(
         ZoneInfo("America/Sao_Paulo")
     ).strftime("%H:%M")
-
 
     for item in agendamentos.copy():
 
@@ -900,19 +1056,16 @@ async def verificar_agendamentos(
 
             continue
 
-
         try:
 
             if item.get("tipo") == "album":
 
                 midias = []
 
-
                 legenda_usuario = item.get(
                     "legenda",
                     ""
                 )
-
 
                 if legenda_usuario:
 
@@ -929,7 +1082,6 @@ async def verificar_agendamentos(
                 else:
 
                     legenda_final = LEGENDA_FIXA.strip()
-
 
                 for item_midia in item["midias"]:
 
@@ -951,7 +1103,6 @@ async def verificar_agendamentos(
 
                         )
 
-
                     elif item_midia["tipo"] == "video":
 
                         midias.append(
@@ -970,7 +1121,6 @@ async def verificar_agendamentos(
 
                         )
 
-
                 if midias:
 
                     await context.bot.send_media_group(
@@ -981,14 +1131,11 @@ async def verificar_agendamentos(
 
                     )
 
-
                 registrar_album(
                     len(midias)
                 )
 
-
                 print("ÁLBUM ENVIADO ✅")
-
 
             else:
 
@@ -1004,12 +1151,9 @@ async def verificar_agendamentos(
 
                 )
 
-
                 registrar_divulgacao()
 
-
                 print("PUBLICAÇÃO ENVIADA ✅")
-
 
             await context.bot.send_message(
 
@@ -1027,14 +1171,11 @@ async def verificar_agendamentos(
 
             )
 
-
             agendamentos.remove(item)
-
 
             salvar_agendamentos(
                 agendamentos
             )
-
 
         except Exception as e:
 
@@ -1042,7 +1183,6 @@ async def verificar_agendamentos(
                 "ERRO AO ENVIAR AGENDAMENTO:",
                 e
             )
-
 
 # ==============================
 # MENU
@@ -1082,11 +1222,9 @@ async def configurar_menu(app):
 
     ]
 
-
     await app.bot.set_my_commands(
         comandos
     )
-
 
 # ==============================
 # VIP
@@ -1110,7 +1248,6 @@ async def entrarnovip(
         reply_markup=botoes_vip()
 
     )
-
 # ==============================
 # ⚙️ BLACK MANAGER
 # ==============================
@@ -1122,7 +1259,6 @@ async def manager(
 
     if update.effective_user.id != OWNER_ID:
         return
-
 
     teclado = InlineKeyboardMarkup(
         [
@@ -1165,10 +1301,71 @@ async def manager(
         ]
     )
 
-
     await update.message.reply_text(
 
         "⚙️ BLACK MANAGER\n\n"
+        "👑 CONTROLE DE OPERAÇÕES\n\n"
+        "ESCOLHA UMA OPÇÃO:",
+
+        reply_markup=teclado
+
+    )
+# ==============================
+# ⚙️ BLACK_MANAGER_NOVO
+# ==============================
+
+async def manager_novo(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    teclado = InlineKeyboardMarkup(
+        [
+
+            [
+                InlineKeyboardButton(
+                    "📢 DIVULGAÇÃO",
+                    callback_data="novo_divulgacao"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📚 ÁLBUNS",
+                    callback_data="novo_album"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "⏰ AGENDAMENTOS",
+                    callback_data="novo_agenda"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📸 FEEDBACKS",
+                    callback_data="novo_feedback"
+                )
+            ],
+
+            [
+                InlineKeyboardButton(
+                    "📊 STATUS",
+                    callback_data="novo_status"
+                )
+            ]
+
+        ]
+    )
+
+    await update.message.reply_text(
+
+        "⚙️ BLACK MANAGER NOVO\n\n"
         "👑 CONTROLE DE OPERAÇÕES\n\n"
         "ESCOLHA UMA OPÇÃO:",
 
@@ -1192,6 +1389,156 @@ async def menu_manager(
 
         await status(update, context)
 
+    elif query.data == "manager_divulgacao":
+
+        teclado = InlineKeyboardMarkup(
+            [
+
+                [
+                    InlineKeyboardButton(
+                        "📤 DIVULGAR AGORA",
+                        callback_data="divulgar_agora"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "⏰ AGENDAR",
+                        callback_data="agendar_divulgacao"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "🔙 VOLTAR",
+                        callback_data="voltar_manager"
+                    )
+                ]
+
+            ]
+        )
+
+        await query.edit_message_text(
+
+            "📢 DIVULGAÇÃO\n\n"
+            "Escolha uma opção:",
+
+            reply_markup=teclado
+
+        )
+
+    elif query.data == "divulgar_agora":
+
+        context.user_data["aguardando_divulgacao"] = True
+
+        await query.message.reply_text(
+
+            "📢 MODO DIVULGAÇÃO ATIVADO\n\n"
+            "Envie a mensagem que deseja publicar."
+
+        )
+
+    elif query.data == "manager_album":
+
+        teclado = InlineKeyboardMarkup(
+            [
+
+                [
+                    InlineKeyboardButton(
+                        "📤 ENVIAR ÁLBUM",
+                        callback_data="enviar_album_novo"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "⏰ AGENDAR ÁLBUM",
+                        callback_data="agendar_album_novo"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "🔙 VOLTAR",
+                        callback_data="voltar_manager"
+                    )
+                ]
+
+            ]
+        )
+
+        await query.edit_message_text(
+
+            "📚 ÁLBUNS\n\n"
+            "Escolha uma opção:",
+
+            reply_markup=teclado
+
+        )
+
+    elif query.data == "enviar_album_novo":
+
+        context.user_data["aguardando_album"] = True
+
+        await query.message.reply_text(
+
+            "📚 MODO ÁLBUM ATIVADO\n\n"
+            "Envie o álbum de fotos/vídeos."
+
+        )
+
+    elif query.data == "voltar_manager":
+
+        teclado = InlineKeyboardMarkup(
+            [
+
+                [
+                    InlineKeyboardButton(
+                        "📢 DIVULGAÇÃO",
+                        callback_data="manager_divulgacao"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "📚 ÁLBUNS",
+                        callback_data="manager_album"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "⏰ AGENDAMENTOS",
+                        callback_data="manager_agenda"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "📸 FEEDBACKS",
+                        callback_data="manager_feedback"
+                    )
+                ],
+
+                [
+                    InlineKeyboardButton(
+                        "📊 STATUS",
+                        callback_data="manager_status"
+                    )
+                ]
+
+            ]
+        )
+
+        await query.edit_message_text(
+
+            "⚙️ BLACK MANAGER\n\n"
+            "👑 CONTROLE DE OPERAÇÕES\n\n"
+            "ESCOLHA UMA OPÇÃO:",
+
+            reply_markup=teclado
+
+        )
 # ==============================
 # BOT
 # ==============================
@@ -1217,7 +1564,6 @@ app.add_handler(
     )
 
 )
-
 
 app.add_handler(
 
@@ -1268,7 +1614,6 @@ app.add_handler(
 
 )
 
-
 app.add_handler(
 
     CommandHandler(
@@ -1280,7 +1625,6 @@ app.add_handler(
     )
 
 )
-
 
 app.add_handler(
 
@@ -1294,7 +1638,6 @@ app.add_handler(
 
 )
 
-
 app.add_handler(
 
     CommandHandler(
@@ -1306,7 +1649,6 @@ app.add_handler(
     )
 
 )
-
 
 app.add_handler(
 
@@ -1340,7 +1682,17 @@ app.add_handler(
 
 )
 
+app.add_handler(
 
+    MessageHandler(
+
+        filters.TEXT | filters.PHOTO,
+
+        receber_divulgacao_nova
+
+    )
+
+)
 app.add_handler(
 
     MessageHandler(
@@ -1353,7 +1705,6 @@ app.add_handler(
 
 )
 
-
 app.job_queue.run_repeating(
 
     verificar_agendamentos,
@@ -1364,8 +1715,6 @@ app.job_queue.run_repeating(
 
 )
 
-
 print("Bot iniciado ✅")
-
 
 app.run_polling()
