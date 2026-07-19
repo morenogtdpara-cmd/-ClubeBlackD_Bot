@@ -13,7 +13,20 @@ from database import init_db
 
 GROUP_ID = -1004231485932
 
+VIP_LINK = "https://t.me/ClubeBlackBot"
+
 AGUARDANDO_DIVULGACAO = set()
+
+def botoes_vip():
+
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "🔥 ENTRAR NO VIP 🔥",
+                url=VIP_LINK
+            )
+        ]
+    ])
 
 def manager_keyboard():
 
@@ -121,7 +134,7 @@ async def callbacks(
         )
 
         await query.message.reply_text(
-            "📤 Envie uma foto ou vídeo para divulgação."
+            "📤 Envie sua publicação."
         )
 
         return
@@ -197,20 +210,32 @@ async def receber_divulgacao(
 
         await context.bot.send_photo(
             chat_id=GROUP_ID,
-            photo=update.message.photo[-1].file_id
+            photo=update.message.photo[-1].file_id,
+            caption=update.message.caption,
+            reply_markup=botoes_vip()
         )
 
     elif update.message.video:
 
         await context.bot.send_video(
             chat_id=GROUP_ID,
-            video=update.message.video.file_id
+            video=update.message.video.file_id,
+            caption=update.message.caption,
+            reply_markup=botoes_vip()
+        )
+
+    elif update.message.text:
+
+        await context.bot.send_message(
+            chat_id=GROUP_ID,
+            text=update.message.text,
+            reply_markup=botoes_vip()
         )
 
     else:
 
         await update.message.reply_text(
-            "⚠️ Envie uma foto ou vídeo."
+            "⚠️ Envie texto, foto ou vídeo."
         )
 
         return
@@ -251,7 +276,11 @@ def main():
 
     app.add_handler(
         MessageHandler(
-            filters.PHOTO | filters.VIDEO,
+            (
+                filters.PHOTO
+                | filters.VIDEO
+                | filters.TEXT
+            ),
             receber_divulgacao
         )
     )
