@@ -6,9 +6,9 @@ from telegram.ext import (
     MessageHandler,
     ContextTypes,
     filters
-    import asyncio
 )
 
+import asyncio
 
 from config import BOT_TOKEN, ADMIN_ID
 from database import init_db
