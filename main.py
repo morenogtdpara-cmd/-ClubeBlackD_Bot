@@ -1385,9 +1385,11 @@ async def menu_manager(
 
     await query.answer()
 
+
     if query.data == "manager_status":
 
         await status(update, context)
+
 
     elif query.data == "manager_divulgacao":
 
@@ -1418,6 +1420,7 @@ async def menu_manager(
             ]
         )
 
+
         await query.edit_message_text(
 
             "📢 DIVULGAÇÃO\n\n"
@@ -1427,9 +1430,11 @@ async def menu_manager(
 
         )
 
+
     elif query.data == "divulgar_agora":
 
         context.user_data["aguardando_divulgacao"] = True
+
 
         await query.message.reply_text(
 
@@ -1437,6 +1442,7 @@ async def menu_manager(
             "Envie a mensagem que deseja publicar."
 
         )
+
 
     elif query.data == "manager_album":
 
@@ -1467,6 +1473,7 @@ async def menu_manager(
             ]
         )
 
+
         await query.edit_message_text(
 
             "📚 ÁLBUNS\n\n"
@@ -1476,9 +1483,11 @@ async def menu_manager(
 
         )
 
+
     elif query.data == "enviar_album_novo":
 
         context.user_data["aguardando_album"] = True
+
 
         await query.message.reply_text(
 
@@ -1486,6 +1495,20 @@ async def menu_manager(
             "Envie o álbum de fotos/vídeos."
 
         )
+
+
+    elif query.data == "manager_feedback":
+
+        context.user_data["aguardando_feedback"] = True
+
+
+        await query.message.reply_text(
+
+            "📸 MODO FEEDBACK ATIVADO\n\n"
+            "Envie a foto do feedback."
+
+        )
+
 
     elif query.data == "voltar_manager":
 
@@ -1529,6 +1552,7 @@ async def menu_manager(
 
             ]
         )
+
 
         await query.edit_message_text(
 
