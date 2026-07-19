@@ -7,6 +7,8 @@ from keyboards import painel_keyboard, vip_keyboard
 
 AGUARDANDO_DIVULGACAO = set()
 
+AGUARDANDO_ALBUM = {}
+
 
 async def start(
     update: Update,
