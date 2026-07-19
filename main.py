@@ -228,7 +228,7 @@ async def callbacks(
     await query.message.reply_text(
         texto
     )
-async def receber_album(
+async def receber_divulgacao(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -236,10 +236,16 @@ async def receber_album(
     if update.effective_user.id != ADMIN_ID:
         return
 
-    if update.effective_user.id not in AGUARDANDO_ALBUM:
+    if update.effective_user.id in AGUARDANDO_ALBUM:
+
+        await receber_album(
+            update,
+            context
+        )
+
         return
 
-    if not update.message.media_group_id:
+    if update.effective_user.id not in AGUARDANDO_DIVULGACAO:
         return
 
     if update.message.photo:
