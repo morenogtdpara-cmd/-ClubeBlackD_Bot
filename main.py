@@ -293,8 +293,6 @@ async def receber_album(
             }
         )
 
-    if len(AGUARDANDO_ALBUM[update.effective_user.id]) >= 10:
-
         await update.message.reply_text(
             "✅ Álbum recebido (10 mídias)."
         )
