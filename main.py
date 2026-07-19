@@ -82,8 +82,17 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    if query.data == "divulgar":
-        texto = "📢 Divulgação\n\n🚧 Em construção."
+   if query.data == "divulgar":
+
+    AGUARDANDO_DIVULGACAO.add(
+        query.from_user.id
+    )
+
+    await query.message.reply_text(
+        "📤 Envie uma foto ou vídeo para divulgação."
+    )
+
+    return
 
     elif query.data == "album":
         texto = "🖼️ Álbum\n\n🚧 Em construção."
