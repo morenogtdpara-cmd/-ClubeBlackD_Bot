@@ -6,7 +6,9 @@ from telegram.ext import (
     MessageHandler,
     ContextTypes,
     filters
+    import asyncio
 )
+
 
 from config import BOT_TOKEN, ADMIN_ID
 from database import init_db
@@ -228,7 +230,7 @@ async def callbacks(
     await query.message.reply_text(
         texto
     )
-async def receber_divulgacao(
+async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
@@ -236,22 +238,18 @@ async def receber_divulgacao(
     if update.effective_user.id != ADMIN_ID:
         return
 
-    if update.effective_user.id in AGUARDANDO_ALBUM:
-
-        await receber_album(
-            update,
-            context
-        )
-
+    if update.effective_user.id not in AGUARDANDO_ALBUM:
         return
 
-    if update.effective_user.id not in AGUARDANDO_DIVULGACAO:
+    if not update.message.media_group_id:
         return
+
+    grupo_id = update.message.media_group_id
 
     if update.message.photo:
 
         ALBUNS_TEMP.setdefault(
-            update.message.media_group_id,
+            grupo_id,
             []
         ).append(
             {
@@ -264,7 +262,7 @@ async def receber_divulgacao(
     elif update.message.video:
 
         ALBUNS_TEMP.setdefault(
-            update.message.media_group_id,
+            grupo_id,
             []
         ).append(
             {
@@ -274,33 +272,31 @@ async def receber_divulgacao(
             }
         )
 
-    return
-    if update.message.photo:
+    # espera o Telegram terminar de enviar o álbum
+    await asyncio.sleep(2)
 
-        AGUARDANDO_ALBUM[
-            update.effective_user.id
-        ].append(
-            {
-                "tipo": "foto",
-                "file_id": update.message.photo[-1].file_id,
-                "legenda": update.message.caption
-            }
+    medias = ALBUNS_TEMP.get(
+        grupo_id,
+        []
+    )
+
+    if medias:
+
+        await enviar_album(
+            context,
+            medias,
+            medias[0].get("legenda")
         )
 
-    elif update.message.video:
+        del ALBUNS_TEMP[grupo_id]
 
-        AGUARDANDO_ALBUM[
-            update.effective_user.id
-        ].append(
-            {
-                "tipo": "video",
-                "file_id": update.message.video.file_id,
-                "legenda": update.message.caption
-            }
+        AGUARDANDO_ALBUM.pop(
+            update.effective_user.id,
+            None
         )
 
         await update.message.reply_text(
-            "✅ Álbum recebido (10 mídias)."
+            "✅ Álbum enviado com sucesso."
         )
 async def enviar_album(
     context,
