@@ -20,8 +20,8 @@ def painel_keyboard():
                 callback_data="feedbacks"
             ),
             InlineKeyboardButton(
-                "📊 RELATÓRIO",
-                callback_data="relatorio"
+                 "⏰ AGENDAMENTO",
+                 callback_data="agendamento"
             )
         ],
         [
