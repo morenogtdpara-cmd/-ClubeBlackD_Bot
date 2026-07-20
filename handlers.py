@@ -123,30 +123,53 @@ async def callbacks(
 
     if query.data.startswith("fila_item_"):
 
-        indice = int(
-            query.data.replace(
-                "fila_item_",
-                ""
-            )
+    indice = int(
+        query.data.replace(
+            "fila_item_",
+            ""
+        )
+    )
+
+    fila = pegar_fila()
+
+    if 0 <= indice < len(fila):
+
+        item = fila[indice]
+
+        conteudo = item.get(
+            "conteudo",
+            "Sem conteúdo"
         )
 
-        fila = pegar_fila()
+        horario = item.get(
+            "horario",
+            "Sem horário"
+        )
 
-        if 0 <= indice < len(fila):
+        enviado = item.get(
+            "enviado",
+            False
+        )
 
-            item = fila[indice]
+        status = (
+            "✅ Enviado"
+            if enviado
+            else "⏳ Aguardando envio"
+        )
 
-            mensagem = (
-                "📌 DIVULGAÇÃO SELECIONADA\n\n"
-                f"{item}"
-            )
+        mensagem = (
+            "📌 DIVULGAÇÃO SELECIONADA\n\n"
+            f"📝 Conteúdo:\n{conteudo}\n\n"
+            f"⏰ Horário:\n{horario}\n\n"
+            f"📊 Status:\n{status}"
+        )
 
-            await query.message.reply_text(
-    mensagem,
-    reply_markup=fila_item_keyboard()
-)
+        await query.message.reply_text(
+            mensagem,
+            reply_markup=fila_item_keyboard()
+        )
 
-        return
+    return
 
 
     if query.data == "divulgar":
