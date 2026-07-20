@@ -1,3 +1,9 @@
 [
-    "Teste de divulgação na fila"
+    {
+        "id": 1,
+        "tipo": "texto",
+        "conteudo": "Teste de divulgação na fila",
+        "horario": "12:00",
+        "enviado": false
+    }
 ]
