@@ -22,7 +22,7 @@ from scheduler import iniciar_scheduler
 from feedback import abrir_feedback, receber_feedback
 
 ALBUM = 1
-
+FEEDBACK = 2
 
 def main():
 
@@ -104,15 +104,6 @@ def main():
             receber_divulgacao
         )
     )
-
-
-    app.add_handler(
-        MessageHandler(
-            filters.PHOTO,
-            receber_feedback
-        )
-    )
-
 
     iniciar_scheduler(app)
 
