@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import painel_keyboard, vip_keyboard, album_keyboard
-from database import adicionar_envio, adicionar_album
+from database import adicionar_envio, adicionar_album, pegar_relatorio
 
 ALBUM = 1
 
@@ -32,13 +32,56 @@ async def start(
         "✅ Bot iniciado."
     )
 
-async def manager(
+async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
     if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text(
+            "Bot privado."
+        )
         return
+
+
+    relatorio = pegar_relatorio()
+
+    envios, midias, albuns, agendados = relatorio
+
+
+    mensagem = f"""
+🥷🏾 BLACK PRIVATE
+
+👑 Bem-vindo de volta, Chefe!
+
+⚡ Sistema Ativo ⚡
+
+━━━━━━━━━━━
+
+📋 RESUMO DE HOJE
+
+👑 Envios: {envios}/30
+📱 Mídias: {midias}
+🖼️ Álbuns: {albuns}
+⏰ Agendados: {agendados}
+
+━━━━━━━━━━━
+
+📊 ESTATÍSTICAS DO DIA
+
+📤 Divulgações: {envios}
+📚 Álbuns: {albuns}
+
+━━━━━━━━━━━
+
+🥷🏾 Controle total
+⚡ Sistema protegido ⚡
+"""
+
+
+    await update.message.reply_text(
+        mensagem
+    )
 
     await update.message.reply_text(
         "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
