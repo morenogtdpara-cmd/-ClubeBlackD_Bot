@@ -130,3 +130,23 @@ def adicionar_album(midias):
 
     conn.commit()
     conn.close()
+
+
+def adicionar_album(midias):
+    criar_relatorio()
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE relatorio_diario
+        SET albuns = albuns + 1,
+            midias = midias + ?
+        WHERE data = ?
+    """, (
+        midias,
+        data_hoje(),
+    ))
+
+    conn.commit()
+    conn.close()
