@@ -34,34 +34,26 @@ async def start(
     envios, midias, albuns, agendados = relatorio
 
 
-    mensagem = f"""
-🥷🏾 BLACK PRIVATE
+    🥷🏾 𝐁𝐋𝐀𝐂𝐊 𝐏𝐑𝐈𝐕𝐀𝐓𝐄
 
-👑 Bem-vindo de volta, Chefe!
+👑 𝐁𝐞𝐦-𝐯𝐢𝐧𝐝𝐨 𝐝𝐞 𝐯𝐨𝐥𝐭𝐚, 𝐂𝐡𝐞𝐟𝐞!
 
-⚡ Sistema Ativo ⚡
+⚡ 𝐒𝐢𝐬𝐭𝐞𝐦𝐚 𝐨𝐧𝐥𝐢𝐧𝐞 𝐞 𝐩𝐫𝐨𝐭𝐞𝐠𝐢𝐝𝐨.
 
-━━━━━━━━━━━
+━━━━━━━━━━━━━━
 
-📋 RESUMO DE HOJE
+📊 𝐑𝐄𝐒𝐔𝐌𝐎 𝐃𝐎 𝐃𝐈𝐀
 
-👑 Envios: {envios}/30
-📱 Mídias: {midias}
-🖼️ Álbuns: {albuns}
-⏰ Agendados: {agendados}
+📤 𝐄𝐧𝐯𝐢𝐨𝐬: {envios}/30
+📱 𝐌í𝐝𝐢𝐚𝐬: {midias}
+🖼️ 𝐀́𝐥𝐛𝐮𝐧𝐬: {albuns}
+⏰ 𝐀𝐠𝐞𝐧𝐝𝐚𝐝𝐨𝐬: {agendados}
 
-━━━━━━━━━━━
+━━━━━━━━━━━━━━
 
-📊 ESTATÍSTICAS DO DIA
+⚙️ 𝐀𝐜𝐞𝐬𝐬𝐨 𝐥𝐢𝐛𝐞𝐫𝐚𝐝𝐨 𝐚𝐨 𝐩𝐚𝐢𝐧𝐞𝐥.
 
-📤 Divulgações: {envios}
-📚 Álbuns: {albuns}
-
-━━━━━━━━━━━
-
-🥷🏾 Controle total
-⚡ Sistema protegido ⚡
-"""
+🥷🏾 𝐂𝐨𝐧𝐭𝐫𝐨𝐥𝐞 𝐭𝐨𝐭𝐚𝐥 𝐝𝐨 𝐬𝐢𝐬𝐭𝐞𝐦𝐚.
 
 
     await update.message.reply_text(
