@@ -180,7 +180,7 @@ async def finalizar_album(
         media=lista_envio
     )
 
-        await context.bot.send_message(
+    await context.bot.send_message(
         chat_id=GROUP_ID,
         text="🔥 Entre no VIP:",
         reply_markup=vip_keyboard(VIP_LINK)
