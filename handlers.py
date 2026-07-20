@@ -247,7 +247,7 @@ async def receber_divulgacao(
     AGUARDANDO_DIVULGACAO.remove(
         user_id
     )
-
+from database import adicionar_envio
     await update.message.reply_text(
         "✅ Divulgação enviada com sucesso."
     )
