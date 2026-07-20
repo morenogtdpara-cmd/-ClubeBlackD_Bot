@@ -1,12 +1,61 @@
+from datetime import datetime
+
 from telegram.ext import Application
 
-from fila import pegar_fila
+from config import GROUP_ID, VIP_LINK
+from fila import pegar_fila, remover_da_fila
+from keyboards import vip_keyboard
+
+
+async def verificar_fila(context):
+
+    fila = pegar_fila()
+
+    if not fila:
+        return
+
+    agora = datetime.now().strftime("%H:%M")
+
+    for indice, item in enumerate(fila):
+
+        horario = item.get("horario")
+        enviado = item.get("enviado", False)
+
+        if horario == agora and not enviado:
+
+            tipo = item.get("tipo")
+
+            if tipo == "texto":
+
+                await context.bot.send_message(
+                    chat_id=GROUP_ID,
+                    text=item.get("conteudo"),
+                    reply_markup=vip_keyboard(VIP_LINK)
+                )
+
+            remover_da_fila(indice)
+
+            print(
+                f"✅ Divulgação enviada e removida | ID {item.get('id')}"
+            )
+
+            break
 
 
 def iniciar_scheduler(app: Application):
 
-    fila = pegar_fila()
+    if app.job_queue is None:
+        print(
+            "⚠️ JobQueue não disponível. Instale python-telegram-bot[job-queue]"
+        )
+        return
+
+    app.job_queue.run_repeating(
+        verificar_fila,
+        interval=60,
+        first=10
+    )
 
     print(
-        f"SCHEDULER ONLINE | Itens na fila: {len(fila)}"
+        "⏰ Scheduler online"
     )
