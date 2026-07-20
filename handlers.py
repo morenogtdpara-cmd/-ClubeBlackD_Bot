@@ -28,9 +28,14 @@ async def start(
         )
         return
 
-    await update.message.reply_text(
-        "🥷🏾 BLACK PRIVATE ONLINE"
-    )
+
+    relatorio = pegar_relatorio()
+
+    envios, midias, albuns, agendados = relatorio
+
+
+    mensagem = f"""
+🥷🏾 BLACK PRIVATE
 
 👑 Bem-vindo de volta, Chefe!
 
@@ -57,6 +62,7 @@ async def start(
 🥷🏾 Controle total
 ⚡ Sistema protegido ⚡
 """
+
 
     await update.message.reply_text(
         mensagem
