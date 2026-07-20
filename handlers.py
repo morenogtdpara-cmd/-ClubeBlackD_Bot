@@ -93,7 +93,7 @@ async def callbacks(
 
     await query.answer()
 
-    if query.data == "fila":
+    reply_markup=fila_keyboard(fila)
 
         fila = pegar_fila()
 
