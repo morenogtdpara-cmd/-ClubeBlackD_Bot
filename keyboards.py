@@ -10,7 +10,7 @@ def painel_keyboard():
                 callback_data="divulgar"
             ),
             InlineKeyboardButton(
-                "🖼️ ÁLBUM",
+                "🖼️ D/ÁLBUM",
                 callback_data="album"
             )
         ],
