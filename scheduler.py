@@ -9,17 +9,27 @@ from keyboards import vip_keyboard
 
 async def verificar_fila(context):
 
+    print("🔎 Verificando fila...")
+
     fila = pegar_fila()
+
+    print("📋 Fila atual:", fila)
+
+    agora = datetime.now().strftime("%H:%M")
+
+    print("🕒 Hora do servidor:", agora)
 
     if not fila:
         return
-
-    agora = datetime.now().strftime("%H:%M")
 
     for indice, item in enumerate(fila):
 
         horario = item.get("horario")
         enviado = item.get("enviado", False)
+
+        print(
+            f"➡️ Item {item.get('id')} | Horário: {horario} | Enviado: {enviado}"
+        )
 
         if horario == agora and not enviado:
 
