@@ -11,7 +11,17 @@ AGUARDANDO_FEEDBACK = set()
 LEGENDA_FEEDBACK = """
 🔥 FEEDBACK VIP 🔥
 
-Sua legenda fixa aqui.
+LEGENDA_FEEDBACK = """
+⭐ FEEDBACK REAL ⭐
+
+🔥 Obrigado pela confiança!
+
+💎 Conteúdo exclusivo e atualizado.
+🚀 Qualidade, novidades e atendimento todos os dias.
+
+━━━━━━━━━━━━━━
+
+🔞 Entre para o VIP:
 """
 
 
