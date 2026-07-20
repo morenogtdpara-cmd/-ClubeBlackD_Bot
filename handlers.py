@@ -12,6 +12,7 @@ from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import painel_keyboard, vip_keyboard, album_keyboard
 from database import adicionar_envio, adicionar_album, pegar_relatorio
 from fila import pegar_fila
+
 ALBUM = 1
 
 AGUARDANDO_DIVULGACAO = set()
@@ -28,11 +29,9 @@ async def start(
         )
         return
 
-
     relatorio = pegar_relatorio()
 
     envios, midias, albuns, agendados = relatorio
-
 
     
     mensagem = f"""
@@ -57,7 +56,6 @@ async def start(
 
 🥷🏾 𝐂𝐨𝐧𝐭𝐫𝐨𝐥𝐞 𝐭𝐨𝐭𝐚𝐥 𝐝𝐨 𝐬𝐢𝐬𝐭𝐞𝐦𝐚.
 """
-
 
     await update.message.reply_text(
         mensagem
@@ -97,9 +95,22 @@ async def callbacks(
 
     if query.data == "fila":
 
+        fila = pegar_fila()
+
+        if not fila:
+            mensagem = (
+                "⏰ FILA DE DIVULGAÇÃO\n\n"
+                "Nenhuma divulgação na fila."
+            )
+
+        else:
+            mensagem = "⏰ FILA DE DIVULGAÇÃO\n\n"
+
+            for item in fila:
+                mensagem += f"• {item}\n"
+
         await query.message.reply_text(
-            "⏰ FILA DE DIVULGAÇÃO\n\n"
-            "Nenhuma divulgação na fila."
+            mensagem
         )
 
         return
