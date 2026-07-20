@@ -11,7 +11,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import painel_keyboard, vip_keyboard, album_keyboard
 from database import adicionar_envio, adicionar_album, pegar_relatorio
-
+from fila import pegar_fila
 ALBUM = 1
 
 AGUARDANDO_DIVULGACAO = set()
