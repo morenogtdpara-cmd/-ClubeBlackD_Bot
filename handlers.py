@@ -184,7 +184,11 @@ async def finalizar_album(
         text="🔥 Entre no VIP:",
         reply_markup=vip_keyboard(VIP_LINK)
     )
+     adicionar_envio(1)
 
+    await update.message.reply_text(
+        "✅ Divulgação enviada com sucesso."
+    )
     await query.message.reply_text(
         "✅ Álbum enviado com sucesso."
     )
