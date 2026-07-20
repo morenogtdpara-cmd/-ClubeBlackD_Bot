@@ -9,7 +9,7 @@ from telegram import (
 from telegram.ext import ContextTypes, ConversationHandler
 
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
-from keyboards import painel_keyboard, vip_keyboard, album_keyboard, fila_keyboard
+from keyboards import painel_keyboard, vip_keyboard, album_keyboard, fila_keyboard, fila_item_keyboard
 from database import adicionar_envio, adicionar_album, pegar_relatorio
 from fila import pegar_fila
 
@@ -142,8 +142,9 @@ async def callbacks(
             )
 
             await query.message.reply_text(
-                mensagem
-            )
+    mensagem,
+    reply_markup=fila_item_keyboard()
+)
 
         return
 
