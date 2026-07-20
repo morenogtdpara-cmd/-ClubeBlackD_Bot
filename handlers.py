@@ -28,12 +28,9 @@ async def start(
         )
         return
 
-    relatorio = pegar_relatorio()
-
-    envios, midias, albuns, agendados = relatorio
-
-    mensagem = f"""
-🥷🏾 BLACK PRIVATE
+    await update.message.reply_text(
+        "🥷🏾 BLACK PRIVATE ONLINE"
+    )
 
 👑 Bem-vindo de volta, Chefe!
 
