@@ -11,7 +11,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import painel_keyboard, vip_keyboard, album_keyboard, fila_keyboard, fila_item_keyboard
 from database import adicionar_envio, adicionar_album, pegar_relatorio
-from fila import pegar_fila
+from fila import pegar_fila, remover_da_fila
 
 ALBUM = 1
 
@@ -98,6 +98,7 @@ async def callbacks(
         fila = pegar_fila()
 
         if not fila:
+
             mensagem = (
                 "⏰ FILA DE DIVULGAÇÃO\n\n"
                 "Nenhuma divulgação na fila."
@@ -108,6 +109,7 @@ async def callbacks(
             )
 
         else:
+
             mensagem = (
                 "⏰ FILA DE DIVULGAÇÃO\n\n"
                 "Escolha uma divulgação:"
@@ -168,6 +170,15 @@ async def callbacks(
                 mensagem,
                 reply_markup=fila_item_keyboard()
             )
+
+        return
+
+
+    if query.data == "fila_remover":
+
+        await query.message.reply_text(
+            "🗑 Divulgação removida da fila."
+        )
 
         return
 
