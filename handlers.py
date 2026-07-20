@@ -33,7 +33,6 @@ async def start(
 
     envios, midias, albuns, agendados = relatorio
 
-    
     mensagem = f"""
 🥷🏾 𝐁𝐋𝐀𝐂𝐊 𝐏𝐑𝐈𝐕𝐀𝐓𝐄
 
@@ -93,7 +92,7 @@ async def callbacks(
 
     await query.answer()
 
-    reply_markup=fila_keyboard(fila)
+    if query.data == "fila":
 
         fila = pegar_fila()
 
@@ -103,15 +102,20 @@ async def callbacks(
                 "Nenhuma divulgação na fila."
             )
 
+            await query.message.reply_text(
+                mensagem
+            )
+
         else:
-            mensagem = "⏰ FILA DE DIVULGAÇÃO\n\n"
+            mensagem = (
+                "⏰ FILA DE DIVULGAÇÃO\n\n"
+                "Escolha uma divulgação:"
+            )
 
-            for item in fila:
-                mensagem += f"• {item}\n"
-
-        await query.message.reply_text(
-            mensagem
-        )
+            await query.message.reply_text(
+                mensagem,
+                reply_markup=fila_keyboard(fila)
+            )
 
         return
 
