@@ -84,7 +84,7 @@ def main():
     )
 
 
-        app.add_handler(
+    app.add_handler(
         MessageHandler(
             (
                 filters.PHOTO
@@ -97,6 +97,7 @@ def main():
     )
 
 
+    # FEEDBACK (novo - separado)
     app.add_handler(
         CallbackQueryHandler(
             abrir_feedback,
