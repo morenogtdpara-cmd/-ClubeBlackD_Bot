@@ -48,3 +48,85 @@ def salvar_usuario(user_id, nome, username):
 
     conn.commit()
     conn.close()
+    from datetime import datetime
+
+
+def data_hoje():
+    return datetime.now().strftime("%d/%m/%Y")
+
+
+def criar_relatorio():
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT OR IGNORE INTO relatorio_diario
+        (data, envios, midias, albuns, agendados)
+        VALUES (?, 0, 0, 0, 0)
+    """, (
+        data_hoje(),
+    ))
+
+    conn.commit()
+    conn.close()
+
+
+def pegar_relatorio():
+    criar_relatorio()
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT envios, midias, albuns, agendados
+        FROM relatorio_diario
+        WHERE data = ?
+    """, (
+        data_hoje(),
+    ))
+
+    resultado = cursor.fetchone()
+
+    conn.close()
+
+    return resultado
+
+
+def adicionar_envio(midias=1):
+    criar_relatorio()
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE relatorio_diario
+        SET envios = envios + 1,
+            midias = midias + ?
+        WHERE data = ?
+    """, (
+        midias,
+        data_hoje(),
+    ))
+
+    conn.commit()
+    conn.close()
+
+
+def adicionar_album(midias):
+    criar_relatorio()
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE relatorio_diario
+        SET albuns = albuns + 1,
+            midias = midias + ?
+        WHERE data = ?
+    """, (
+        midias,
+        data_hoje(),
+    ))
+
+    conn.commit()
+    conn.close()
