@@ -95,6 +95,15 @@ async def callbacks(
 
     await query.answer()
 
+    if query.data == "fila":
+
+        await query.message.reply_text(
+            "⏰ FILA DE DIVULGAÇÃO\n\n"
+            "Nenhuma divulgação na fila."
+        )
+
+        return
+
     if query.data == "divulgar":
 
         AGUARDANDO_DIVULGACAO.add(
