@@ -19,7 +19,7 @@ from handlers import (
 from config import BOT_TOKEN
 from database import init_db
 from scheduler import iniciar_scheduler
-
+from handlers import abrir_feedback, receber_feedback
 
 ALBUM = 1
 
