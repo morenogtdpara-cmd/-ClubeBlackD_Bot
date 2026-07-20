@@ -20,7 +20,7 @@ def painel_keyboard():
                 callback_data="feedbacks"
             ),
             InlineKeyboardButton(
-                 "⏰ AGENDAMENTO",
+                "⏰ AGENDAMENTO",
                 callback_data="agendamento"
             )
         ],
@@ -59,3 +59,47 @@ def vip_keyboard(link):
             )
         ]
     ])
+
+
+def fila_keyboard(itens, pagina=0):
+
+    botoes = []
+
+    inicio = pagina * 6
+    fim = inicio + 6
+
+    for indice, item in enumerate(
+        itens[inicio:fim],
+        start=inicio + 1
+    ):
+        botoes.append([
+            InlineKeyboardButton(
+                f"{indice} - {item}",
+                callback_data=f"fila_item_{indice-1}"
+            )
+        ])
+
+    navegacao = []
+
+    if pagina > 0:
+        navegacao.append(
+            InlineKeyboardButton(
+                "⬅️ ANTERIOR",
+                callback_data=f"fila_pagina_{pagina-1}"
+            )
+        )
+
+    if fim < len(itens):
+        navegacao.append(
+            InlineKeyboardButton(
+                "➡️ PRÓXIMA",
+                callback_data=f"fila_pagina_{pagina+1}"
+            )
+        )
+
+    if navegacao:
+        botoes.append(navegacao)
+
+    return InlineKeyboardMarkup(botoes)
+
+
