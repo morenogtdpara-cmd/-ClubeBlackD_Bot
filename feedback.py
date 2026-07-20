@@ -1,15 +1,12 @@
 from telegram import Update
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, ConversationHandler
 
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import vip_keyboard
 
 
-AGUARDANDO_FEEDBACK = set()
+FEEDBACK = 2
 
-
-LEGENDA_FEEDBACK = """
-🔥 FEEDBACK VIP 🔥
 
 LEGENDA_FEEDBACK = """
 ⭐ FEEDBACK REAL ⭐
@@ -35,16 +32,14 @@ async def abrir_feedback(
     await query.answer()
 
     if query.from_user.id != ADMIN_ID:
-        return
-
-    AGUARDANDO_FEEDBACK.add(
-        query.from_user.id
-    )
+        return ConversationHandler.END
 
     await query.message.reply_text(
         "⭐ FEEDBACK ATIVADO\n\n"
         "📸 Envie a foto."
     )
+
+    return FEEDBACK
 
 
 async def receber_feedback(
@@ -52,13 +47,8 @@ async def receber_feedback(
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    user_id = update.effective_user.id
-
-    if user_id not in AGUARDANDO_FEEDBACK:
-        return
-
     if not update.message.photo:
-        return
+        return FEEDBACK
 
     await context.bot.send_photo(
         chat_id=GROUP_ID,
@@ -67,10 +57,8 @@ async def receber_feedback(
         reply_markup=vip_keyboard(VIP_LINK)
     )
 
-    AGUARDANDO_FEEDBACK.remove(
-        user_id
-    )
-
     await update.message.reply_text(
         "✅ Feedback enviado."
     )
+
+    return ConversationHandler.END
