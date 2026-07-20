@@ -24,6 +24,7 @@ from feedback import abrir_feedback, receber_feedback
 ALBUM = 1
 FEEDBACK = 2
 
+
 def main():
 
     init_db()
@@ -47,12 +48,27 @@ def main():
     )
 
 
-    # FEEDBACK (fica antes do callback geral)
+    feedback_handler = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                abrir_feedback,
+                pattern="^feedbacks$"
+            )
+        ],
+        states={
+            FEEDBACK: [
+                MessageHandler(
+                    filters.PHOTO,
+                    receber_feedback
+                )
+            ]
+        },
+        fallbacks=[]
+    )
+
+
     app.add_handler(
-        CallbackQueryHandler(
-            abrir_feedback,
-            pattern="^feedbacks$"
-        )
+        feedback_handler
     )
 
 
@@ -104,6 +120,7 @@ def main():
             receber_divulgacao
         )
     )
+
 
     iniciar_scheduler(app)
 
