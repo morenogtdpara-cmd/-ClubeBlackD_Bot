@@ -48,7 +48,6 @@ def salvar_usuario(user_id, nome, username):
 
     conn.commit()
     conn.close()
-    from datetime import datetime
 
 
 def data_hoje():
