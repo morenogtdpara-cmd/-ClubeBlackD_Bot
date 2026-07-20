@@ -18,6 +18,16 @@ def init_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS relatorio_diario (
+            data TEXT PRIMARY KEY,
+            envios INTEGER DEFAULT 0,
+            midias INTEGER DEFAULT 0,
+            albuns INTEGER DEFAULT 0,
+            agendados INTEGER DEFAULT 0
+        )
+    """)
+
     conn.commit()
     conn.close()
 
