@@ -21,7 +21,7 @@ def painel_keyboard():
             ),
             InlineKeyboardButton(
                  "⏰ AGENDAMENTO",
-                 callback_data="agendamento"
+                callback_data="agendamento"
             )
         ],
         [
