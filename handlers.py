@@ -10,6 +10,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import painel_keyboard, vip_keyboard, album_keyboard
+from database import adicionar_envio
 
 ALBUM = 1
 
@@ -184,11 +185,7 @@ async def finalizar_album(
         text="🔥 Entre no VIP:",
         reply_markup=vip_keyboard(VIP_LINK)
     )
-     adicionar_envio(1)
 
-    await update.message.reply_text(
-        "✅ Divulgação enviada com sucesso."
-    )
     await query.message.reply_text(
         "✅ Álbum enviado com sucesso."
     )
@@ -251,7 +248,9 @@ async def receber_divulgacao(
     AGUARDANDO_DIVULGACAO.remove(
         user_id
     )
-from database import adicionar_envio
+
+    adicionar_envio(1)
+
     await update.message.reply_text(
         "✅ Divulgação enviada com sucesso."
     )
