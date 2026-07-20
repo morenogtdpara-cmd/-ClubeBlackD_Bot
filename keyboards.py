@@ -103,3 +103,25 @@ def fila_keyboard(itens, pagina=0):
     return InlineKeyboardMarkup(botoes)
 
 
+def fila_item_keyboard():
+
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "🚀 ENVIAR AGORA",
+                callback_data="fila_enviar"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🗑 REMOVER DA FILA",
+                callback_data="fila_remover"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🔙 VOLTAR",
+                callback_data="fila"
+            )
+        ]
+    ])
