@@ -185,7 +185,7 @@ async def finalizar_album(
         text="🔥 Entre no VIP:",
         reply_markup=vip_keyboard(VIP_LINK)
     )
-
+adicionar_album(len(midias))
     await query.message.reply_text(
         "✅ Álbum enviado com sucesso."
     )
