@@ -28,26 +28,9 @@ async def start(
         )
         return
 
-    await update.message.reply_text(
-        "✅ Bot iniciado."
-    )
-
-async def start(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    if update.effective_user.id != ADMIN_ID:
-        await update.message.reply_text(
-            "Bot privado."
-        )
-        return
-
-
     relatorio = pegar_relatorio()
 
     envios, midias, albuns, agendados = relatorio
-
 
     mensagem = f"""
 🥷🏾 BLACK PRIVATE
@@ -78,10 +61,17 @@ async def start(
 ⚡ Sistema protegido ⚡
 """
 
-
     await update.message.reply_text(
         mensagem
     )
+
+async def manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    if update.effective_user.id != ADMIN_ID:
+        return
 
     await update.message.reply_text(
         "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
