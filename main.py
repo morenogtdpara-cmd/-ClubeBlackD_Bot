@@ -84,7 +84,7 @@ def main():
     )
 
 
-    app.add_handler(
+        app.add_handler(
         MessageHandler(
             (
                 filters.PHOTO
@@ -96,19 +96,22 @@ def main():
         )
     )
 
-app.add_handler(
-    CallbackQueryHandler(
-        abrir_feedback,
-        pattern="^feedbacks$"
-    )
-)
 
-app.add_handler(
-    MessageHandler(
-        filters.PHOTO,
-        receber_feedback
+    app.add_handler(
+        CallbackQueryHandler(
+            abrir_feedback,
+            pattern="^feedbacks$"
+        )
     )
-)
+
+
+    app.add_handler(
+        MessageHandler(
+            filters.PHOTO,
+            receber_feedback
+        )
+    )
+
 
     iniciar_scheduler(app)
 
