@@ -47,6 +47,15 @@ def main():
     )
 
 
+    # FEEDBACK (fica antes do callback geral)
+    app.add_handler(
+        CallbackQueryHandler(
+            abrir_feedback,
+            pattern="^feedbacks$"
+        )
+    )
+
+
     app.add_handler(
         CallbackQueryHandler(
             callbacks,
@@ -93,15 +102,6 @@ def main():
                 | filters.TEXT
             ),
             receber_divulgacao
-        )
-    )
-
-
-    # FEEDBACK (novo - separado)
-    app.add_handler(
-        CallbackQueryHandler(
-            abrir_feedback,
-            pattern="^feedbacks$"
         )
     )
 
