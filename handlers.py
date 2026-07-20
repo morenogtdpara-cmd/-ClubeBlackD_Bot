@@ -92,6 +92,7 @@ async def callbacks(
 
     await query.answer()
 
+
     if query.data == "fila":
 
         fila = pegar_fila()
@@ -119,6 +120,34 @@ async def callbacks(
 
         return
 
+
+    if query.data.startswith("fila_item_"):
+
+        indice = int(
+            query.data.replace(
+                "fila_item_",
+                ""
+            )
+        )
+
+        fila = pegar_fila()
+
+        if 0 <= indice < len(fila):
+
+            item = fila[indice]
+
+            mensagem = (
+                "📌 DIVULGAÇÃO SELECIONADA\n\n"
+                f"{item}"
+            )
+
+            await query.message.reply_text(
+                mensagem
+            )
+
+        return
+
+
     if query.data == "divulgar":
 
         AGUARDANDO_DIVULGACAO.add(
@@ -132,6 +161,7 @@ async def callbacks(
 
         return
 
+
     if query.data == "album":
 
         await query.message.reply_text(
@@ -140,6 +170,7 @@ async def callbacks(
         )
 
         return
+
 
     if query.data == "album_agora":
 
