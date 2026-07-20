@@ -121,53 +121,55 @@ async def callbacks(
         return
 
 
-    if query.data.startswith("fila_item_"):
+        if query.data.startswith("fila_item_"):
 
-    indice = int(
-        query.data.replace(
-            "fila_item_",
-            ""
-        )
-    )
-
-    fila = pegar_fila()
-
-    if 0 <= indice < len(fila):
-
-        item = fila[indice]
-
-        conteudo = item.get(
-            "conteudo",
-            "Sem conteúdo"
+        indice = int(
+            query.data.replace(
+                "fila_item_",
+                ""
+            )
         )
 
-        horario = item.get(
-            "horario",
-            "Sem horário"
-        )
+        fila = pegar_fila()
 
-        enviado = item.get(
-            "enviado",
-            False
-        )
+        if 0 <= indice < len(fila):
 
-        status = (
-            "✅ Enviado"
-            if enviado
-            else "⏳ Aguardando envio"
-        )
+            item = fila[indice]
 
-        mensagem = (
-            "📌 DIVULGAÇÃO SELECIONADA\n\n"
-            f"📝 Conteúdo:\n{conteudo}\n\n"
-            f"⏰ Horário:\n{horario}\n\n"
-            f"📊 Status:\n{status}"
-        )
+            conteudo = item.get(
+                "conteudo",
+                "Sem conteúdo"
+            )
 
-        await query.message.reply_text(
-            mensagem,
-            reply_markup=fila_item_keyboard()
-        )
+            horario = item.get(
+                "horario",
+                "Sem horário"
+            )
+
+            enviado = item.get(
+                "enviado",
+                False
+            )
+
+            status = (
+                "✅ Enviado"
+                if enviado
+                else "⏳ Aguardando envio"
+            )
+
+            mensagem = (
+                "📌 DIVULGAÇÃO SELECIONADA\n\n"
+                f"📝 Conteúdo:\n{conteudo}\n\n"
+                f"⏰ Horário:\n{horario}\n\n"
+                f"📊 Status:\n{status}"
+            )
+
+            await query.message.reply_text(
+                mensagem,
+                reply_markup=fila_item_keyboard()
+            )
+
+        return
 
     return
 
