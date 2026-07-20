@@ -72,9 +72,19 @@ async def manager(
         return
 
     await update.message.reply_text(
-        "⚡️ PAINEL DE COMANDOS\n\nEscolha uma opção:",
-        reply_markup=painel_keyboard()
-    )
+    """
+╭━━━━━━⚜️━━━━━━━━╮
+𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
+╰━━━━━━⚜️━━━━━━━━╯
+
+━━━━━━━━━━━━━━━━━━━━
+
+🎯 𝐒𝐞𝐥𝐞𝐜𝐢𝐨𝐧𝐞 𝐮𝐦𝐚 𝐨𝐩çã𝐨.
+
+━━━━━━━━━━━━━━━━━━━━
+""",
+    reply_markup=painel_keyboard()
+)
 
 async def callbacks(
     update: Update,
