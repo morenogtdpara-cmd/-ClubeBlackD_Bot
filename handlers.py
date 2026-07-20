@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import painel_keyboard, vip_keyboard, album_keyboard
-from database import adicionar_envio
+from database import adicionar_envio, adicionar_album
 
 ALBUM = 1
 
