@@ -136,32 +136,9 @@ async def callbacks(
 
             item = fila[indice]
 
-            conteudo = item.get(
-                "conteudo",
-                "Sem conteúdo"
-            )
-
-            horario = item.get(
-                "horario",
-                "Sem horário"
-            )
-
-            enviado = item.get(
-                "enviado",
-                False
-            )
-
-            status = (
-                "✅ Enviado"
-                if enviado
-                else "⏳ Aguardando envio"
-            )
-
             mensagem = (
                 "📌 DIVULGAÇÃO SELECIONADA\n\n"
-                f"📝 Conteúdo:\n{conteudo}\n\n"
-                f"⏰ Horário:\n{horario}\n\n"
-                f"📊 Status:\n{status}"
+                f"{item}"
             )
 
             await query.message.reply_text(
@@ -170,8 +147,6 @@ async def callbacks(
             )
 
         return
-
-    return
 
 
     if query.data == "divulgar":
