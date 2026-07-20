@@ -121,7 +121,7 @@ async def callbacks(
         return
 
 
-        if query.data.startswith("fila_item_"):
+    if query.data.startswith("fila_item_"):
 
         indice = int(
             query.data.replace(
