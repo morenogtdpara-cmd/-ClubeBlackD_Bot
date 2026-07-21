@@ -222,12 +222,22 @@ async def callbacks(
 
     if query.data == "album":
 
-        await query.message.reply_text(
-            "🖼️ CENTRAL DE ÁLBUM\n\nEscolha uma opção:",
-            reply_markup=album_keyboard()
-        )
+    await query.message.reply_text(
+        """
+🖼️ 𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐀́𝐋𝐁𝐔𝐌
 
-        return
+━━━━━━━━━━━━━━━━
+
+📸 𝐂𝐑𝐈𝐄 𝐄 𝐄𝐍𝐕𝐈𝐄 𝐔𝐌 𝐍𝐎𝐕𝐎 𝐀́𝐋𝐁𝐔𝐌.
+
+━━━━━━━━━━━━━━━━
+
+𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌𝐀 𝐎𝐏ÇÃ𝐎:
+""",
+        reply_markup=album_keyboard()
+    )
+
+    return
 
     if query.data == "album_agora":
 
