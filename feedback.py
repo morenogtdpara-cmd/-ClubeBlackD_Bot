@@ -9,16 +9,13 @@ FEEDBACK = 2
 
 
 LEGENDA_FEEDBACK = """
-⭐ FEEDBACK REAL ⭐
+⭐ FEEDBACK REAL ⭐️
 
-🔥 Obrigado pela confiança!
+Mais um cliente satisfeito.
 
-💎 Conteúdo exclusivo e atualizado.
-🚀 Qualidade, novidades e atendimento todos os dias.
+Quer ter acesso ao conteúdo completo?
 
-━━━━━━━━━━━━━━
-
-🔞 Entre para o VIP:
+🔥 Faça parte você também.
 """
 
 
