@@ -46,9 +46,9 @@ AGENDAMENTO_DADOS = {}
 
 
 LEGENDA_FIXA_ALBUM = (
-    "ð¥ CONTEÃDO EXCLUSIVO LIBERADO\n\n"
-    "ð Acesse nosso canal oficial:\n\n"
-    "ð¤ @ClubeBlackBot"
+    "🔥 CONTEÚDO EXCLUSIVO LIBERADO\n\n"
+    "🚀 Acesse nosso canal oficial:\n\n"
+    "🤖 @ClubeBlackBot"
 )
 
 
@@ -63,17 +63,17 @@ def montar_legenda_album(legenda_usuario):
 
 def texto_painel_album(quantidade):
     return (
-        "ð¼ï¸ ÃLBUM EM MONTAGEM\n\n"
-        f"MÃ­dias adicionadas: {quantidade}/10\n\n"
-        "Envie mais fotos ou vÃ­deos ou toque em FINALIZAR ÃLBUM."
+        "🖼️ ÁLBUM EM MONTAGEM\n\n"
+        f"Mídias adicionadas: {quantidade}/10\n\n"
+        "Envie mais fotos ou vídeos ou toque em FINALIZAR ÁLBUM."
     )
 
 
 def texto_painel_album_programado(quantidade):
     return (
-        "ð¼ï¸ ÃLBUM PROGRAMADO\n\n"
-        f"MÃ­dias adicionadas: {quantidade}/10\n\n"
-        "Envie mais fotos ou vÃ­deos ou toque em FINALIZAR ÃLBUM."
+        "🖼️ ÁLBUM PROGRAMADO\n\n"
+        f"Mídias adicionadas: {quantidade}/10\n\n"
+        "Envie mais fotos ou vídeos ou toque em FINALIZAR ÁLBUM."
     )
 
 
@@ -124,7 +124,7 @@ async def finalizar_processo(
 
     if query.from_user.id != ADMIN_ID:
         await query.answer(
-            "Acesso nÃ£o autorizado.",
+            "Acesso não autorizado.",
             show_alert=True,
         )
         return ConversationHandler.END
@@ -150,7 +150,7 @@ async def cancelar_processo(
     if query:
         if query.from_user.id != ADMIN_ID:
             await query.answer(
-                "Acesso nÃ£o autorizado.",
+                "Acesso não autorizado.",
                 show_alert=True,
             )
             return ConversationHandler.END
@@ -189,7 +189,7 @@ async def callbacks(
 
     if query.from_user.id != ADMIN_ID:
         await query.answer(
-            "Acesso nÃ£o autorizado.",
+            "Acesso não autorizado.",
             show_alert=True,
         )
         return
@@ -221,16 +221,16 @@ async def callbacks(
             await editar_painel(
                 update,
                 context,
-                "ð PUBLICAÃÃES PROGRAMADAS\n\n"
-                "Nenhuma publicaÃ§Ã£o programada.",
+                "📋 PUBLICAÇÕES PROGRAMADAS\n\n"
+                "Nenhuma publicação programada.",
                 voltar_keyboard(),
             )
         else:
             await editar_painel(
                 update,
                 context,
-                "ð PUBLICAÃÃES PROGRAMADAS\n\n"
-                "Selecione uma publicaÃ§Ã£o:",
+                "📋 PUBLICAÇÕES PROGRAMADAS\n\n"
+                "Selecione uma publicação:",
                 fila_keyboard(fila),
             )
 
@@ -243,8 +243,8 @@ async def callbacks(
         await editar_painel(
             update,
             context,
-            "ð PUBLICAÃÃES PROGRAMADAS\n\n"
-            "Selecione uma publicaÃ§Ã£o:",
+            "📋 PUBLICAÇÕES PROGRAMADAS\n\n"
+            "Selecione uma publicação:",
             fila_keyboard(fila, pagina),
         )
         return
@@ -257,14 +257,14 @@ async def callbacks(
             await editar_painel(
                 update,
                 context,
-                "â ï¸ PublicaÃ§Ã£o nÃ£o encontrada.",
+                "⚠️ Publicação não encontrada.",
                 voltar_keyboard(),
             )
             return
 
         item = fila[indice]
-        tipo = item.get("tipo", "publicaÃ§Ã£o").upper()
-        horario = item.get("horario", "SEM HORÃRIO")
+        tipo = item.get("tipo", "publicação").upper()
+        horario = item.get("horario", "SEM HORÁRIO")
         data_salva = item.get("data", "")
 
         try:
@@ -282,7 +282,7 @@ async def callbacks(
                 or "Sem legenda personalizada"
             )
             detalhes = (
-                f"MÃ­dias: {quantidade}\n\n"
+                f"Mídias: {quantidade}\n\n"
                 f"Legenda:\n{legenda}"
             )
         else:
@@ -290,12 +290,12 @@ async def callbacks(
                 item.get("conteudo", "").strip()
                 or "Sem legenda"
             )
-            detalhes = f"ConteÃºdo:\n{conteudo}"
+            detalhes = f"Conteúdo:\n{conteudo}"
 
         mensagem = (
-            "ð PUBLICAÃÃO PROGRAMADA\n\n"
+            "📌 PUBLICAÇÃO PROGRAMADA\n\n"
             f"Data: {data_exibicao}\n"
-            f"HorÃ¡rio: {horario}\n"
+            f"Horário: {horario}\n"
             f"Formato: {tipo}\n\n"
             f"{detalhes}"
         )
@@ -316,7 +316,7 @@ async def callbacks(
             await editar_painel(
                 update,
                 context,
-                "â ï¸ PublicaÃ§Ã£o nÃ£o encontrada.",
+                "⚠️ Publicação não encontrada.",
                 voltar_keyboard(),
             )
             return
@@ -326,8 +326,8 @@ async def callbacks(
         await editar_painel(
             update,
             context,
-            "ðï¸ PUBLICAÃÃO CANCELADA\n\n"
-            "A publicaÃ§Ã£o foi removida das programadas.",
+            "🗑️ PUBLICAÇÃO CANCELADA\n\n"
+            "A publicação foi removida das programadas.",
             processo_finalizado_keyboard(),
         )
         return
@@ -339,9 +339,9 @@ async def callbacks(
         await editar_painel(
             update,
             context,
-            "ð¢ DIVULGAÃÃO IMEDIATA\n\n"
-            "Envie um texto, uma foto ou um vÃ­deo.\n\n"
-            "A publicaÃ§Ã£o serÃ¡ enviada imediatamente para o grupo.",
+            "📢 DIVULGAÇÃO IMEDIATA\n\n"
+            "Envie um texto, uma foto ou um vídeo.\n\n"
+            "A publicação será enviada imediatamente para o grupo.",
             cancelar_processo_keyboard(),
         )
         return
@@ -350,8 +350,8 @@ async def callbacks(
         await editar_painel(
             update,
             context,
-            "ð¼ï¸ CENTRAL DE ÃLBUM\n\n"
-            "Crie e envie um novo Ã¡lbum.",
+            "🖼️ CENTRAL DE ÁLBUM\n\n"
+            "Crie e envie um novo álbum.",
             album_keyboard(),
         )
         return
@@ -367,7 +367,7 @@ async def abrir_album(
 
     if query.from_user.id != ADMIN_ID:
         await query.answer(
-            "Acesso nÃ£o autorizado.",
+            "Acesso não autorizado.",
             show_alert=True,
         )
         return ConversationHandler.END
@@ -397,7 +397,7 @@ async def abrir_agendamento(
 
     if query.from_user.id != ADMIN_ID:
         await query.answer(
-            "Acesso nÃ£o autorizado.",
+            "Acesso não autorizado.",
             show_alert=True,
         )
         return ConversationHandler.END
@@ -410,8 +410,8 @@ async def abrir_agendamento(
     await editar_painel(
         update,
         context,
-        "â° NOVO AGENDAMENTO\n\n"
-        "Escolha o tipo de publicaÃ§Ã£o:",
+        "⏰ NOVO AGENDAMENTO\n\n"
+        "Escolha o tipo de publicação:",
         agendamento_tipo_keyboard(),
     )
 
@@ -432,8 +432,8 @@ async def escolher_agendamento_unica(
     await editar_painel(
         update,
         context,
-        "ð PUBLICAÃÃO ÃNICA\n\n"
-        "Envie um texto, uma foto ou um vÃ­deo.",
+        "📄 PUBLICAÇÃO ÚNICA\n\n"
+        "Envie um texto, uma foto ou um vídeo.",
         cancelar_agendamento_keyboard(),
     )
 
@@ -494,8 +494,8 @@ async def receber_agendamento_publicacao(
         await editar_painel(
             update,
             context,
-            "â ï¸ TIPO NÃO SUPORTADO\n\n"
-            "Envie um texto, uma foto ou um vÃ­deo.",
+            "⚠️ TIPO NÃO SUPORTADO\n\n"
+            "Envie um texto, uma foto ou um vídeo.",
             cancelar_agendamento_keyboard(),
         )
         return AGENDAMENTO_PUBLICACAO
@@ -505,7 +505,7 @@ async def receber_agendamento_publicacao(
     await editar_painel(
         update,
         context,
-        "â° ESCOLHA O HORÃRIO\n\n"
+        "⏰ ESCOLHA O HORÁRIO\n\n"
         "Digite no formato 20:30.",
         cancelar_agendamento_keyboard(),
     )
@@ -528,7 +528,7 @@ async def receber_agendamento_album(
         await editar_painel(
             update,
             context,
-            "â ï¸ O agendamento do Ã¡lbum foi perdido.\n\n"
+            "⚠️ O agendamento do álbum foi perdido.\n\n"
             "Finalize para voltar ao painel.",
             processo_finalizado_keyboard(),
         )
@@ -540,8 +540,8 @@ async def receber_agendamento_album(
         await editar_painel(
             update,
             context,
-            "â ï¸ LIMITE ATINGIDO\n\n"
-            "O Ã¡lbum pode ter no mÃ¡ximo 10 mÃ­dias.",
+            "⚠️ LIMITE ATINGIDO\n\n"
+            "O álbum pode ter no máximo 10 mídias.",
             finalizar_agendamento_album_keyboard(),
         )
         return AGENDAMENTO_ALBUM
@@ -566,7 +566,7 @@ async def receber_agendamento_album(
         await editar_painel(
             update,
             context,
-            "â ï¸ Envie somente fotos ou vÃ­deos.",
+            "⚠️ Envie somente fotos ou vídeos.",
             finalizar_agendamento_album_keyboard(),
         )
         return AGENDAMENTO_ALBUM
@@ -596,7 +596,7 @@ async def finalizar_agendamento_album(
 
     if len(midias) < 2:
         await query.answer(
-            "O Ã¡lbum precisa ter pelo menos 2 mÃ­dias.",
+            "O álbum precisa ter pelo menos 2 mídias.",
             show_alert=True,
         )
         return AGENDAMENTO_ALBUM
@@ -606,7 +606,7 @@ async def finalizar_agendamento_album(
     await editar_painel(
         update,
         context,
-        "â° ESCOLHA O HORÃRIO\n\n"
+        "⏰ ESCOLHA O HORÁRIO\n\n"
         "Digite no formato 20:30.",
         cancelar_agendamento_keyboard(),
     )
@@ -634,7 +634,7 @@ async def receber_horario_agendamento(
         await editar_painel(
             update,
             context,
-            "â ï¸ HORÃRIO INVÃLIDO\n\n"
+            "⚠️ HORÁRIO INVÁLIDO\n\n"
             "Digite no formato 20:30.",
             cancelar_agendamento_keyboard(),
         )
@@ -653,8 +653,8 @@ async def receber_horario_agendamento(
         await editar_painel(
             update,
             context,
-            "â ï¸ HORÃRIO JÃ PASSOU\n\n"
-            "Digite um horÃ¡rio mais Ã  frente.",
+            "⚠️ HORÁRIO JÁ PASSOU\n\n"
+            "Digite um horário mais à frente.",
             cancelar_agendamento_keyboard(),
         )
         return AGENDAMENTO_HORARIO
@@ -665,7 +665,7 @@ async def receber_horario_agendamento(
         await editar_painel(
             update,
             context,
-            "â ï¸ PublicaÃ§Ã£o nÃ£o encontrada.",
+            "⚠️ Publicação não encontrada.",
             processo_finalizado_keyboard(),
         )
         return ConversationHandler.END
@@ -682,17 +682,17 @@ async def receber_horario_agendamento(
 
     if item.get("tipo") == "album":
         formato = (
-            f"ÃLBUM â¢ {len(item.get('midias', []))} MÃDIAS"
+            f"ÁLBUM • {len(item.get('midias', []))} MÍDIAS"
         )
     else:
-        formato = item.get("tipo", "PUBLICAÃÃO").upper()
+        formato = item.get("tipo", "PUBLICAÇÃO").upper()
 
     await editar_painel(
         update,
         context,
-        "â PUBLICAÃÃO PROGRAMADA\n\n"
+        "✅ PUBLICAÇÃO PROGRAMADA\n\n"
         f"Data: {agora.strftime('%d/%m/%Y')}\n"
-        f"HorÃ¡rio: {horario_programado.strftime('%H:%M')}\n"
+        f"Horário: {horario_programado.strftime('%H:%M')}\n"
         f"Formato: {formato}\n\n"
         "Toque abaixo para apagar as mensagens usadas e voltar ao painel.",
         processo_finalizado_keyboard(),
@@ -716,8 +716,8 @@ async def receber_album(
         await editar_painel(
             update,
             context,
-            "â ï¸ LIMITE ATINGIDO\n\n"
-            "O Ã¡lbum pode ter no mÃ¡ximo 10 mÃ­dias.",
+            "⚠️ LIMITE ATINGIDO\n\n"
+            "O álbum pode ter no máximo 10 mídias.",
             finalizar_album_keyboard(),
         )
         return ALBUM
@@ -742,7 +742,7 @@ async def receber_album(
         await editar_painel(
             update,
             context,
-            "â ï¸ Envie somente fotos ou vÃ­deos.",
+            "⚠️ Envie somente fotos ou vídeos.",
             finalizar_album_keyboard(),
         )
         return ALBUM
@@ -770,7 +770,7 @@ async def finalizar_album(
 
     if len(midias) < 2:
         await query.answer(
-            "O Ã¡lbum precisa ter pelo menos 2 mÃ­dias.",
+            "O álbum precisa ter pelo menos 2 mídias.",
             show_alert=True,
         )
         return ALBUM
@@ -807,7 +807,7 @@ async def finalizar_album(
         await editar_painel(
             update,
             context,
-            "â ERRO AO ENVIAR ÃLBUM\n\n"
+            "❌ ERRO AO ENVIAR ÁLBUM\n\n"
             f"{erro}\n\n"
             "Tente finalizar novamente ou cancele o processo.",
             finalizar_album_keyboard(),
@@ -821,8 +821,8 @@ async def finalizar_album(
     await editar_painel(
         update,
         context,
-        "â ÃLBUM ENVIADO\n\n"
-        "O Ã¡lbum foi publicado com sucesso.\n\n"
+        "✅ ÁLBUM ENVIADO\n\n"
+        "O álbum foi publicado com sucesso.\n\n"
         "Toque abaixo para apagar as mensagens usadas e voltar ao painel.",
         processo_finalizado_keyboard(),
     )
@@ -875,8 +875,8 @@ async def receber_divulgacao(
             await editar_painel(
                 update,
                 context,
-                "â ï¸ TIPO NÃO SUPORTADO\n\n"
-                "Envie um texto, uma foto ou um vÃ­deo.",
+                "⚠️ TIPO NÃO SUPORTADO\n\n"
+                "Envie um texto, uma foto ou um vídeo.",
                 cancelar_processo_keyboard(),
             )
             return
@@ -884,7 +884,7 @@ async def receber_divulgacao(
         await editar_painel(
             update,
             context,
-            "â ERRO AO ENVIAR DIVULGAÃÃO\n\n"
+            "❌ ERRO AO ENVIAR DIVULGAÇÃO\n\n"
             f"{erro}\n\n"
             "Envie novamente ou cancele o processo.",
             cancelar_processo_keyboard(),
@@ -897,8 +897,8 @@ async def receber_divulgacao(
     await editar_painel(
         update,
         context,
-        "â DIVULGAÃÃO ENVIADA\n\n"
-        "A publicaÃ§Ã£o foi enviada para o grupo.\n\n"
+        "✅ DIVULGAÇÃO ENVIADA\n\n"
+        "A publicação foi enviada para o grupo.\n\n"
         "Toque abaixo para apagar as mensagens usadas e voltar ao painel.",
         processo_finalizado_keyboard(),
     )
@@ -917,4 +917,3 @@ async def apagar_mensagem_avulsa(
         update.effective_message.message_id,
     )
     await mostrar_painel_principal(update, context)
-    
