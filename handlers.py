@@ -69,13 +69,19 @@ async def manager(
         return
 
     await update.message.reply_text(
-"""
+        """
+🥷🏾 𝐁𝐋𝐀𝐂𝐊 𝐏𝐑𝐈𝐕𝐀𝐓𝐄
+
 ⚜️ 𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
 
+━━━━━━━━━━━━━━━━
+
 𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌 𝐒𝐄𝐑𝐕𝐈Ç𝐎:
+
+━━━━━━━━━━━━━━━━
 """,
-reply_markup=painel_keyboard()
-)
+        reply_markup=painel_keyboard()
+    )
 
 async def callbacks(
     update: Update,
