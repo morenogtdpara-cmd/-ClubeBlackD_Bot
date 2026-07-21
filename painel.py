@@ -3,7 +3,6 @@ from telegram.error import BadRequest, TelegramError
 from telegram.ext import ContextTypes
 
 from database import (
-    limpar_mensagens_temporarias_db,
     listar_mensagens_temporarias,
     pegar_painel,
     pegar_relatorio,
@@ -38,6 +37,18 @@ async def apagar_mensagem_segura(bot, chat_id, message_id):
             message_id=message_id,
         )
         return True
+
+    except BadRequest as erro:
+        texto_erro = str(erro).lower()
+
+        if (
+            "message to delete not found" in texto_erro
+            or "message not found" in texto_erro
+        ):
+            return True
+
+        return False
+
     except TelegramError:
         return False
 
@@ -67,21 +78,23 @@ async def limpar_mensagens_temporarias(
 
     for message_id in mensagens:
         if message_id == painel_id:
-            remover_mensagem_temporaria(chat_id, message_id)
+            remover_mensagem_temporaria(
+                chat_id,
+                message_id,
+            )
             continue
 
-        await apagar_mensagem_segura(
+        apagada = await apagar_mensagem_segura(
             context.bot,
             chat_id,
             message_id,
         )
 
-        remover_mensagem_temporaria(
-            chat_id,
-            message_id,
-        )
-
-    limpar_mensagens_temporarias_db(chat_id)
+        if apagada:
+            remover_mensagem_temporaria(
+                chat_id,
+                message_id,
+            )
 
 
 async def editar_painel(
@@ -99,21 +112,22 @@ async def editar_painel(
     painel_id = pegar_painel(chat_id)
     query = update.callback_query
 
-    if painel_id is None and query and query.message:
-        painel_id = query.message.message_id
-        salvar_painel(chat_id, painel_id)
+    if query and query.message:
+        mensagem_clicada_id = query.message.message_id
 
-    if (
-        query
-        and query.message
-        and painel_id
-        and query.message.message_id != painel_id
-    ):
-        await apagar_mensagem_segura(
-            context.bot,
-            chat_id,
-            query.message.message_id,
-        )
+        if painel_id != mensagem_clicada_id:
+            if painel_id:
+                await apagar_mensagem_segura(
+                    context.bot,
+                    chat_id,
+                    painel_id,
+                )
+
+            painel_id = mensagem_clicada_id
+            salvar_painel(
+                chat_id,
+                painel_id,
+            )
 
     if painel_id:
         try:
@@ -124,11 +138,22 @@ async def editar_painel(
                 reply_markup=reply_markup,
             )
             return painel_id
+
         except BadRequest as erro:
             if "message is not modified" in str(erro).lower():
                 return painel_id
+
         except TelegramError:
             pass
+
+        painel_apagado = await apagar_mensagem_segura(
+            context.bot,
+            chat_id,
+            painel_id,
+        )
+
+        if not painel_apagado:
+            return painel_id
 
     nova_mensagem = await context.bot.send_message(
         chat_id=chat_id,
@@ -153,3 +178,4 @@ async def mostrar_painel_principal(
         context,
         texto_painel_principal(),
         painel_keyboard(),
+    )
