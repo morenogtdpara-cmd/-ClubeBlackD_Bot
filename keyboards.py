@@ -1,4 +1,7 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup
+)
 
 
 def painel_keyboard():
@@ -20,13 +23,13 @@ def painel_keyboard():
                 callback_data="feedbacks"
             ),
             InlineKeyboardButton(
-                "🗓️ 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎",
+                "⏰ 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎",
                 callback_data="agendamento"
             )
         ],
         [
             InlineKeyboardButton(
-                "📋 𝐅𝐈𝐋𝐀 𝐃𝐄 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎",
+                "📋 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎𝐒",
                 callback_data="fila"
             )
         ]
@@ -63,48 +66,64 @@ def vip_keyboard(link):
     ])
 
 
-def fila_keyboard(itens, pagina=0):
+def cancelar_agendamento_keyboard():
+
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "❌ 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐑 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎",
+                callback_data="cancelar_agendamento"
+            )
+        ]
+    ])
+
+
+def voltar_keyboard():
+
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀𝐎 𝐏𝐀𝐈𝐍𝐄𝐋",
+                callback_data="voltar"
+            )
+        ]
+    ])
+
+
+def fila_keyboard(
+    itens,
+    pagina=0
+):
 
     botoes = []
 
     inicio = pagina * 6
     fim = inicio + 6
 
+    nomes_tipos = {
+        "texto": "TEXTO",
+        "foto": "FOTO",
+        "video": "VÍDEO"
+    }
+
     for indice_real, item in enumerate(
         itens[inicio:fim],
         start=inicio
     ):
 
-        numero = indice_real + 1
+        horario = item.get(
+            "horario",
+            "--:--"
+        )
 
-        tipo = item.get(
-            "tipo",
-            "divulgação"
-        ).upper()
-
-        conteudo = item.get(
-            "conteudo",
-            ""
-        ).strip()
-
-        if conteudo:
-
-            resumo = conteudo.replace(
-                "\n",
-                " "
-            )
-
-            if len(resumo) > 25:
-                resumo = resumo[:25] + "…"
-
-            titulo = resumo.upper()
-
-        else:
-            titulo = tipo
+        tipo = nomes_tipos.get(
+            item.get("tipo"),
+            "PUBLICAÇÃO"
+        )
 
         botoes.append([
             InlineKeyboardButton(
-                f"📌 {numero}. {titulo}",
+                f"⏰ {horario} • {tipo}",
                 callback_data=f"fila_item_{indice_real}"
             )
         ])
@@ -124,7 +143,7 @@ def fila_keyboard(itens, pagina=0):
 
         navegacao.append(
             InlineKeyboardButton(
-                "𝐏𝐑𝐎́𝐗𝐈𝐌𝐀 ➡️",
+                "𝐏𝐑Ó𝐗𝐈𝐌𝐀 ➡️",
                 callback_data=f"fila_pagina_{pagina + 1}"
             )
         )
@@ -139,27 +158,25 @@ def fila_keyboard(itens, pagina=0):
         )
     ])
 
-    return InlineKeyboardMarkup(botoes)
+    return InlineKeyboardMarkup(
+        botoes
+    )
 
 
-def fila_item_keyboard():
+def fila_item_keyboard(
+    indice
+):
 
     return InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
-                "🚀 𝐄𝐍𝐕𝐈𝐀𝐑 𝐀𝐆𝐎𝐑𝐀",
-                callback_data="fila_enviar"
+                "🗑️ 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐑 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎",
+                callback_data=f"fila_remover_{indice}"
             )
         ],
         [
             InlineKeyboardButton(
-                "🗑️ 𝐑𝐄𝐌𝐎𝐕𝐄𝐑 𝐃𝐀 𝐅𝐈𝐋𝐀",
-                callback_data="fila_remover"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀̀ 𝐅𝐈𝐋𝐀",
+                "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀𝐎𝐒 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎𝐒",
                 callback_data="fila"
             )
         ]
