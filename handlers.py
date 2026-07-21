@@ -115,6 +115,27 @@ async def callbacks(
 
     await query.answer()
 
+    # VOLTAR AO PAINEL PRINCIPAL
+    if query.data == "voltar":
+
+        await query.edit_message_text(
+            """
+🥷🏾 𝐁𝐋𝐀𝐂𝐊 𝐏𝐑𝐈𝐕𝐀𝐓𝐄
+
+⚜️ 𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
+
+━━━━━━━━━━━━━━━━
+
+𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌 𝐒𝐄𝐑𝐕𝐈Ç𝐎:
+
+━━━━━━━━━━━━━━━━
+""",
+            reply_markup=painel_keyboard()
+        )
+
+        return
+
+    # FILA
     if query.data == "fila":
 
         fila = pegar_fila()
@@ -136,6 +157,7 @@ async def callbacks(
 
         return
 
+    # ITEM DA FILA
     if query.data.startswith("fila_item_"):
 
         indice = int(
@@ -168,6 +190,7 @@ async def callbacks(
 
         return
 
+    # ENVIAR ITEM DA FILA
     if query.data == "fila_enviar":
 
         fila = pegar_fila()
@@ -222,6 +245,7 @@ async def callbacks(
 
         return
 
+    # REMOVER ITEM DA FILA
     if query.data == "fila_remover":
 
         remover_da_fila(0)
@@ -232,6 +256,7 @@ async def callbacks(
 
         return
 
+    # MODO DIVULGAÇÃO
     if query.data == "divulgar":
 
         AGUARDANDO_DIVULGACAO.add(
@@ -245,6 +270,7 @@ async def callbacks(
 
         return
 
+    # CENTRAL DE ÁLBUM
     if query.data == "album":
 
         await query.message.reply_text(
@@ -264,13 +290,17 @@ async def callbacks(
 
         return
 
+    # INICIAR NOVO ÁLBUM
     if query.data == "album_agora":
 
         ALBUM_MIDIAS[query.from_user.id] = []
 
         await query.message.reply_text(
-            "🖼️ MODO ÁLBUM ATIVADO\n\n"
-            "📤 Envie as fotos ou vídeos."
+            """
+🖼️ 𝐌𝐎𝐃𝐎 𝐀́𝐋𝐁𝐔𝐌 𝐀𝐓𝐈𝐕𝐀𝐃𝐎
+
+📤 𝐄𝐍𝐕𝐈𝐄 𝐀𝐒 𝐅𝐎𝐓𝐎𝐒 𝐎𝐔 𝐕Í𝐃𝐄𝐎𝐒.
+"""
         )
 
         return ALBUM
@@ -307,14 +337,18 @@ async def receber_album(
     finalizar = InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
-                "✅ FINALIZAR ÁLBUM",
+                "✅ 𝐅𝐈𝐍𝐀𝐋𝐈𝐙𝐀𝐑 𝐀́𝐋𝐁𝐔𝐌",
                 callback_data="finalizar_album"
             )
         ]
     ])
 
+    quantidade = len(
+        ALBUM_MIDIAS[user_id]
+    )
+
     await update.message.reply_text(
-        f"✅ Mídia adicionada ({len(ALBUM_MIDIAS[user_id])})",
+        f"✅ 𝐌Í𝐃𝐈𝐀 𝐀𝐃𝐈𝐂𝐈𝐎𝐍𝐀𝐃𝐀 ({quantidade})",
         reply_markup=finalizar
     )
 
@@ -340,7 +374,7 @@ async def finalizar_album(
     if not midias:
 
         await query.message.reply_text(
-            "⚠️ Nenhuma mídia no álbum."
+            "⚠️ 𝐍𝐄𝐍𝐇𝐔𝐌𝐀 𝐌Í𝐃𝐈𝐀 𝐍𝐎 𝐀́𝐋𝐁𝐔𝐌."
         )
 
         return ConversationHandler.END
@@ -381,7 +415,7 @@ async def finalizar_album(
     )
 
     await query.message.reply_text(
-        "✅ Álbum enviado com sucesso."
+        "✅ 𝐀́𝐋𝐁𝐔𝐌 𝐄𝐍𝐕𝐈𝐀𝐃𝐎 𝐂𝐎𝐌 𝐒𝐔𝐂𝐄𝐒𝐒𝐎."
     )
 
     ALBUM_MIDIAS.pop(
