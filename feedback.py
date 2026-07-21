@@ -15,7 +15,7 @@ Mais um cliente satisfeito.
 
 Quer ter acesso ao conteúdo completo?
 
-🔥 Faça parte você também.
+💦 Faça parte você também.
 """
 
 
