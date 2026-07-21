@@ -46,6 +46,24 @@ async def verificar_fila(context):
                     reply_markup=vip_keyboard(VIP_LINK)
                 )
 
+            elif tipo == "foto":
+
+                await context.bot.send_photo(
+                    chat_id=GROUP_ID,
+                    photo=item.get("arquivo"),
+                    caption=item.get("legenda"),
+                    reply_markup=vip_keyboard(VIP_LINK)
+                )
+
+            elif tipo == "video":
+
+                await context.bot.send_video(
+                    chat_id=GROUP_ID,
+                    video=item.get("arquivo"),
+                    caption=item.get("legenda"),
+                    reply_markup=vip_keyboard(VIP_LINK)
+                )
+
             remover_da_fila(indice)
 
             print(
