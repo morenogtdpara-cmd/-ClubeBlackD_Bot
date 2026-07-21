@@ -1,50 +1,56 @@
 from telegram.ext import (
     Application,
-    CommandHandler,
     CallbackQueryHandler,
-    MessageHandler,
+    CommandHandler,
     ConversationHandler,
+    MessageHandler,
     filters,
-)
-
-from handlers import (
-    start,
-    manager,
-    callbacks,
-    receber_divulgacao,
-    receber_album,
-    finalizar_album,
-    abrir_agendamento,
-    escolher_agendamento_unica,
-    escolher_agendamento_album,
-    receber_agendamento_publicacao,
-    receber_agendamento_album,
-    finalizar_agendamento_album,
-    receber_horario_agendamento,
-    cancelar_agendamento,
-    ALBUM,
-    AGENDAMENTO_ESCOLHA,
-    AGENDAMENTO_PUBLICACAO,
-    AGENDAMENTO_ALBUM,
-    AGENDAMENTO_HORARIO,
 )
 
 from config import BOT_TOKEN
 from database import init_db
+from feedback import FEEDBACK, abrir_feedback, receber_feedback
+from handlers import (
+    AGENDAMENTO_ALBUM,
+    AGENDAMENTO_ESCOLHA,
+    AGENDAMENTO_HORARIO,
+    AGENDAMENTO_PUBLICACAO,
+    ALBUM,
+    abrir_agendamento,
+    abrir_album,
+    apagar_mensagem_avulsa,
+    callbacks,
+    cancelar_processo,
+    escolher_agendamento_album,
+    escolher_agendamento_unica,
+    finalizar_agendamento_album,
+    finalizar_album,
+    manager,
+    receber_agendamento_album,
+    receber_agendamento_publicacao,
+    receber_album,
+    receber_divulgacao,
+    receber_horario_agendamento,
+    start,
+)
 from scheduler import iniciar_scheduler
-from feedback import abrir_feedback, receber_feedback
 
 
-FEEDBACK = 2
+def fallbacks_comuns():
+    return [
+        CallbackQueryHandler(
+            cancelar_processo,
+            pattern=r"^(cancelar_processo|cancelar_agendamento)$",
+        ),
+        CommandHandler("cancelar", cancelar_processo),
+        CommandHandler("manager", manager),
+        CommandHandler("start", start),
+    ]
 
 
 def main():
     init_db()
-
     app = Application.builder().token(BOT_TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("manager", manager))
 
     feedback_handler = ConversationHandler(
         entry_points=[
@@ -56,28 +62,26 @@ def main():
         states={
             FEEDBACK: [
                 MessageHandler(
-                    filters.PHOTO,
+                    filters.ALL & ~filters.COMMAND,
                     receber_feedback,
                 )
             ]
         },
-        fallbacks=[],
+        fallbacks=fallbacks_comuns(),
         allow_reentry=True,
     )
-
-    app.add_handler(feedback_handler)
 
     album_handler = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                callbacks,
+                abrir_album,
                 pattern=r"^album_agora$",
             )
         ],
         states={
             ALBUM: [
                 MessageHandler(
-                    filters.PHOTO | filters.VIDEO,
+                    filters.ALL & ~filters.COMMAND,
                     receber_album,
                 ),
                 CallbackQueryHandler(
@@ -86,11 +90,9 @@ def main():
                 ),
             ]
         },
-        fallbacks=[],
+        fallbacks=fallbacks_comuns(),
         allow_reentry=True,
     )
-
-    app.add_handler(album_handler)
 
     agendamento_handler = ConversationHandler(
         entry_points=[
@@ -112,15 +114,13 @@ def main():
             ],
             AGENDAMENTO_PUBLICACAO: [
                 MessageHandler(
-                    filters.PHOTO
-                    | filters.VIDEO
-                    | (filters.TEXT & ~filters.COMMAND),
+                    filters.ALL & ~filters.COMMAND,
                     receber_agendamento_publicacao,
                 )
             ],
             AGENDAMENTO_ALBUM: [
                 MessageHandler(
-                    filters.PHOTO | filters.VIDEO,
+                    filters.ALL & ~filters.COMMAND,
                     receber_agendamento_album,
                 ),
                 CallbackQueryHandler(
@@ -130,38 +130,24 @@ def main():
             ],
             AGENDAMENTO_HORARIO: [
                 MessageHandler(
-                    filters.TEXT & ~filters.COMMAND,
+                    filters.ALL & ~filters.COMMAND,
                     receber_horario_agendamento,
                 )
             ],
         },
-        fallbacks=[
-            CallbackQueryHandler(
-                cancelar_agendamento,
-                pattern=r"^cancelar_agendamento$",
-            )
-        ],
+        fallbacks=fallbacks_comuns(),
         allow_reentry=True,
     )
 
+    app.add_handler(feedback_handler)
+    app.add_handler(album_handler)
     app.add_handler(agendamento_handler)
 
-    app.add_handler(
-        CallbackQueryHandler(
-            callbacks,
-            pattern=(
-                r"^(?!(?:"
-                r"album_agora|"
-                r"finalizar_album|"
-                r"agendamento|"
-                r"agendar_unica|"
-                r"agendar_album|"
-                r"finalizar_album_agendamento|"
-                r"cancelar_agendamento"
-                r")$).*"
-            ),
-        )
-    )
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("manager", manager))
+    app.add_handler(CommandHandler("cancelar", cancelar_processo))
+
+    app.add_handler(CallbackQueryHandler(callbacks))
 
     app.add_handler(
         MessageHandler(
@@ -172,6 +158,20 @@ def main():
         )
     )
 
+    app.add_handler(
+        MessageHandler(
+            filters.ALL & ~filters.COMMAND,
+            apagar_mensagem_avulsa,
+        )
+    )
+
+    app.add_handler(
+        MessageHandler(
+            filters.COMMAND,
+            apagar_mensagem_avulsa,
+        )
+    )
+
     iniciar_scheduler(app)
 
     print("BOT ONLINE")
@@ -179,4 +179,3 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
