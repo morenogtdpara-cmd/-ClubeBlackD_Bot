@@ -3,90 +3,192 @@ from zoneinfo import ZoneInfo
 
 from telegram.ext import Application
 
-from config import GROUP_ID, VIP_LINK
-from fila import pegar_fila, remover_da_fila
+from config import (
+    GROUP_ID,
+    VIP_LINK
+)
+
+from fila import (
+    pegar_fila,
+    remover_da_fila
+)
+
 from keyboards import vip_keyboard
+from database import adicionar_envio
 
 
-async def verificar_fila(context):
-
-    print("🔎 Verificando fila...")
+async def verificar_fila(
+    context
+):
 
     fila = pegar_fila()
-
-    print("📋 Fila atual:", fila)
-
-    agora = datetime.now(
-        ZoneInfo("America/Sao_Paulo")
-    ).strftime("%H:%M")
-
-    print("🕒 Hora de Brasília:", agora)
 
     if not fila:
         return
 
-    for indice, item in enumerate(fila):
+    fuso = ZoneInfo(
+        "America/Sao_Paulo"
+    )
 
-        horario = item.get("horario")
-        enviado = item.get("enviado", False)
+    agora = datetime.now(
+        fuso
+    )
 
-        print(
-            f"➡️ Item {item.get('id')} | Horário: {horario} | Enviado: {enviado}"
+    indices_enviados = []
+
+    for indice, item in enumerate(
+        fila
+    ):
+
+        if item.get(
+            "enviado",
+            False
+        ):
+            continue
+
+        data = item.get(
+            "data"
         )
 
-        if horario == agora and not enviado:
+        horario = item.get(
+            "horario"
+        )
 
-            tipo = item.get("tipo")
+        if not data or not horario:
+
+            print(
+                "⚠️ Item sem data ou horário:",
+                item
+            )
+
+            continue
+
+        try:
+
+            momento_agendado = datetime.strptime(
+                f"{data} {horario}",
+                "%Y-%m-%d %H:%M"
+            ).replace(
+                tzinfo=fuso
+            )
+
+        except ValueError:
+
+            print(
+                "⚠️ Data ou horário inválido:",
+                item
+            )
+
+            continue
+
+        if momento_agendado > agora:
+            continue
+
+        tipo = item.get(
+            "tipo"
+        )
+
+        conteudo = item.get(
+            "conteudo",
+            ""
+        )
+
+        arquivo = item.get(
+            "arquivo"
+        )
+
+        try:
 
             if tipo == "texto":
 
                 await context.bot.send_message(
                     chat_id=GROUP_ID,
-                    text=item.get("conteudo"),
-                    reply_markup=vip_keyboard(VIP_LINK)
+                    text=conteudo,
+                    reply_markup=vip_keyboard(
+                        VIP_LINK
+                    )
                 )
 
             elif tipo == "foto":
 
                 await context.bot.send_photo(
                     chat_id=GROUP_ID,
-                    photo=item.get("arquivo"),
-                    caption=item.get("legenda"),
-                    reply_markup=vip_keyboard(VIP_LINK)
+                    photo=arquivo,
+                    caption=conteudo or None,
+                    reply_markup=vip_keyboard(
+                        VIP_LINK
+                    )
                 )
 
             elif tipo == "video":
 
                 await context.bot.send_video(
                     chat_id=GROUP_ID,
-                    video=item.get("arquivo"),
-                    caption=item.get("legenda"),
-                    reply_markup=vip_keyboard(VIP_LINK)
+                    video=arquivo,
+                    caption=conteudo or None,
+                    reply_markup=vip_keyboard(
+                        VIP_LINK
+                    )
                 )
 
-            remover_da_fila(indice)
+            else:
+
+                print(
+                    "⚠️ Tipo inválido:",
+                    tipo
+                )
+
+                continue
+
+        except Exception as erro:
 
             print(
-                f"✅ Divulgação enviada e removida | ID {item.get('id')}"
+                "❌ Erro ao enviar agendamento:",
+                erro
             )
 
-            break
+            continue
+
+        adicionar_envio(
+            1
+        )
+
+        indices_enviados.append(
+            indice
+        )
+
+        print(
+            f"✅ Agendamento enviado: {item.get('id')}"
+        )
+
+    for indice in reversed(
+        indices_enviados
+    ):
+
+        remover_da_fila(
+            indice
+        )
 
 
-def iniciar_scheduler(app: Application):
+def iniciar_scheduler(
+    app: Application
+):
 
     if app.job_queue is None:
+
         print(
-            "⚠️ JobQueue não disponível. Instale python-telegram-bot[job-queue]"
+            "⚠️ JobQueue não disponível. "
+            "Instale python-telegram-bot[job-queue]"
         )
+
         return
 
     app.job_queue.run_repeating(
         verificar_fila,
-        interval=60,
-        first=10
+        interval=30,
+        first=5
     )
 
     print(
-        "⏰ Scheduler online"
+        "⏰ SCHEDULER ONLINE"
     )
