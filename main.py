@@ -13,7 +13,13 @@ from handlers import (
     callbacks,
     receber_divulgacao,
     receber_album,
-    finalizar_album
+    finalizar_album,
+    receber_agendamento_publicacao,
+    receber_horario_agendamento,
+    cancelar_agendamento,
+    ALBUM,
+    AGENDAMENTO_PUBLICACAO,
+    AGENDAMENTO_HORARIO
 )
 
 from config import BOT_TOKEN
@@ -21,7 +27,7 @@ from database import init_db
 from scheduler import iniciar_scheduler
 from feedback import abrir_feedback, receber_feedback
 
-ALBUM = 1
+
 FEEDBACK = 2
 
 
@@ -29,8 +35,9 @@ def main():
 
     init_db()
 
-    app = Application.builder().token(BOT_TOKEN).build()
-
+    app = Application.builder().token(
+        BOT_TOKEN
+    ).build()
 
     app.add_handler(
         CommandHandler(
@@ -39,7 +46,6 @@ def main():
         )
     )
 
-
     app.add_handler(
         CommandHandler(
             "manager",
@@ -47,12 +53,11 @@ def main():
         )
     )
 
-
     feedback_handler = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
                 abrir_feedback,
-                pattern="^feedbacks$"
+                pattern=r"^feedbacks$"
             )
         ],
         states={
@@ -63,28 +68,19 @@ def main():
                 )
             ]
         },
-        fallbacks=[]
+        fallbacks=[],
+        allow_reentry=True
     )
-
 
     app.add_handler(
         feedback_handler
     )
 
-
-    app.add_handler(
-        CallbackQueryHandler(
-            callbacks,
-            pattern="^(?!album_agora$|finalizar_album$).*"
-        )
-    )
-
-
     album_handler = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
                 callbacks,
-                pattern="^album_agora$"
+                pattern=r"^album_agora$"
             )
         ],
         states={
@@ -92,41 +88,97 @@ def main():
                 MessageHandler(
                     filters.PHOTO | filters.VIDEO,
                     receber_album
+                ),
+                CallbackQueryHandler(
+                    finalizar_album,
+                    pattern=r"^finalizar_album$"
                 )
             ]
         },
-        fallbacks=[
-            CallbackQueryHandler(
-                finalizar_album,
-                pattern="^finalizar_album$"
-            )
-        ]
+        fallbacks=[],
+        allow_reentry=True
     )
-
 
     app.add_handler(
         album_handler
     )
 
+    agendamento_handler = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                callbacks,
+                pattern=r"^agendamento$"
+            )
+        ],
+        states={
+            AGENDAMENTO_PUBLICACAO: [
+                MessageHandler(
+                    (
+                        filters.PHOTO
+                        | filters.VIDEO
+                        | (
+                            filters.TEXT
+                            & ~filters.COMMAND
+                        )
+                    ),
+                    receber_agendamento_publicacao
+                )
+            ],
+            AGENDAMENTO_HORARIO: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    receber_horario_agendamento
+                )
+            ]
+        },
+        fallbacks=[
+            CallbackQueryHandler(
+                cancelar_agendamento,
+                pattern=r"^cancelar_agendamento$"
+            )
+        ],
+        allow_reentry=True
+    )
+
+    app.add_handler(
+        agendamento_handler
+    )
+
+    app.add_handler(
+        CallbackQueryHandler(
+            callbacks,
+            pattern=(
+                r"^(?!(?:"
+                r"album_agora|"
+                r"finalizar_album|"
+                r"agendamento|"
+                r"cancelar_agendamento"
+                r")$).*"
+            )
+        )
+    )
 
     app.add_handler(
         MessageHandler(
             (
                 filters.PHOTO
                 | filters.VIDEO
-                | filters.AUDIO
-                | filters.TEXT
+                | (
+                    filters.TEXT
+                    & ~filters.COMMAND
+                )
             ),
             receber_divulgacao
         )
     )
 
+    iniciar_scheduler(
+        app
+    )
 
-    iniciar_scheduler(app)
-
-
-    print("BOT ONLINE")
-
+    print(
+        "BOT ONLINE"
+    )
 
     app.run_polling()
 
