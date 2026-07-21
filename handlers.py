@@ -45,7 +45,7 @@ AGENDAMENTO_DADOS = {}
 
 
 LEGENDA_FIXA_ALBUM = (
-    "🔥 CONTEÚDO EXCLUSIVO LIBERADO 🔥\n\n"
+    "🔥 CONTEÚDO EXCLUSIVO LIBERADO \n\n"
     "🚀 Acesse nosso canal oficial:\n\n"
     "🤖 @ClubeBlackBot"
 )
