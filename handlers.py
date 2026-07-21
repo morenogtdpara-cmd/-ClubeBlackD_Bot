@@ -26,7 +26,6 @@ from keyboards import (
 )
 
 from database import adicionar_envio, adicionar_album, pegar_relatorio
-
 from fila import pegar_fila, remover_da_fila, adicionar_na_fila
 
 
@@ -40,22 +39,19 @@ AGUARDANDO_DIVULGACAO = set()
 ALBUM_MIDIAS = {}
 AGENDAMENTO_DADOS = {}
 
-# LEGENDA FIXA DOS ÁLBUNS ENVIADOS AO GRUPO
-LEGENDA_FIXA_ALBUM = "🔥 Conteúdo completo no VIP. Clique no botão abaixo."
+LEGENDA_FIXA_ALBUM = (
+    "🔥 CONTEÚDO EXCLUSIVO\n\n"
+    "Veja o conteúdo completo no VIP:\n"
+    f"{VIP_LINK}"
+)
 
 
 def texto_painel():
-    return """
-🥷🏾 𝐁𝐋𝐀𝐂𝐊 𝐏𝐑𝐈𝐕𝐀𝐓𝐄
-
-⚜️ 𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
-
-━━━━━━━━━━━━━━━━
-
-𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌 𝐒𝐄𝐑𝐕𝐈Ç𝐎:
-
-━━━━━━━━━━━━━━━━
-"""
+    return (
+        "🥷🏾 BLACK PRIVATE\n\n"
+        "⚜️ CENTRAL DE OPERAÇÕES\n\n"
+        "Selecione um serviço:"
+    )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -66,28 +62,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     envios, midias, albuns, _ = pegar_relatorio()
     programadas = len(pegar_fila())
 
-    mensagem = f"""
-🥷🏾 𝐁𝐋𝐀𝐂𝐊 𝐏𝐑𝐈𝐕𝐀𝐓𝐄
-
-👑 𝐁𝐞𝐦-𝐯𝐢𝐧𝐝𝐨 𝐝𝐞 𝐯𝐨𝐥𝐭𝐚, 𝐂𝐡𝐞𝐟𝐞!
-
-⚡ 𝐒𝐢𝐬𝐭𝐞𝐦𝐚 𝐨𝐧𝐥𝐢𝐧𝐞 𝐞 𝐩𝐫𝐨𝐭𝐞𝐠𝐢𝐝𝐨.
-
-━━━━━━━━━━━━━━
-
-📊 𝐑𝐄𝐒𝐔𝐌𝐎 𝐃𝐎 𝐃𝐈𝐀
-
-📤 𝐄𝐧𝐯𝐢𝐨𝐬: {envios}/30
-📱 𝐌í𝐝𝐢𝐚𝐬: {midias}
-🖼️ 𝐀́𝐥𝐛𝐮𝐧𝐬: {albuns}
-⏰ 𝐏𝐫𝐨𝐠𝐫𝐚𝐦𝐚𝐝𝐚𝐬: {programadas}
-
-━━━━━━━━━━━━━━
-
-⚙️ 𝐀𝐜𝐞𝐬𝐬𝐨 𝐥𝐢𝐛𝐞𝐫𝐚𝐝𝐨 𝐚𝐨 𝐩𝐚𝐢𝐧𝐞𝐥 𝐝𝐞 𝐜𝐨𝐧𝐭𝐫𝐨𝐥𝐞.
-
-🥷🏾 𝐂𝐨𝐧𝐭𝐫𝐨𝐥𝐞 𝐭𝐨𝐭𝐚𝐥 𝐝𝐨 𝐬𝐢𝐬𝐭𝐞𝐦𝐚.
-"""
+    mensagem = (
+        "🥷🏾 BLACK PRIVATE\n\n"
+        "👑 Bem-vindo de volta, Chefe.\n"
+        "⚡ Sistema online e protegido.\n\n"
+        "📊 RESUMO DO DIA\n\n"
+        f"📤 Envios: {envios}/30\n"
+        f"📱 Mídias: {midias}\n"
+        f"🖼️ Álbuns: {albuns}\n"
+        f"⏰ Programadas: {programadas}\n\n"
+        "⚙️ Acesso liberado ao painel de controle."
+    )
 
     await update.message.reply_text(mensagem)
 
@@ -120,24 +105,14 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not fila:
             await query.message.reply_text(
-                """
-📋 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÕ𝐄𝐒 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀𝐒
-
-━━━━━━━━━━━━━━━━
-
-⚠️ 𝐍𝐄𝐍𝐇𝐔𝐌𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀.
-""",
+                "📋 PUBLICAÇÕES PROGRAMADAS\n\n"
+                "Nenhuma publicação programada.",
                 reply_markup=voltar_keyboard(),
             )
         else:
             await query.message.reply_text(
-                """
-📋 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÕ𝐄𝐒 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀𝐒
-
-━━━━━━━━━━━━━━━━
-
-𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎:
-""",
+                "📋 PUBLICAÇÕES PROGRAMADAS\n\n"
+                "Selecione uma publicação:",
                 reply_markup=fila_keyboard(fila),
             )
         return
@@ -147,13 +122,8 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         fila = pegar_fila()
 
         await query.edit_message_text(
-            """
-📋 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÕ𝐄𝐒 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀𝐒
-
-━━━━━━━━━━━━━━━━
-
-𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎:
-""",
+            "📋 PUBLICAÇÕES PROGRAMADAS\n\n"
+            "Selecione uma publicação:",
             reply_markup=fila_keyboard(fila, pagina),
         )
         return
@@ -164,7 +134,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not 0 <= indice < len(fila):
             await query.message.reply_text(
-                "⚠️ 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐍Ã𝐎 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐀."
+                "⚠️ Publicação não encontrada."
             )
             return
 
@@ -183,24 +153,18 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if item.get("tipo") == "album":
             quantidade = len(item.get("midias", []))
-            detalhes = f"🖼️ 𝐌Í𝐃𝐈𝐀𝐒: {quantidade}"
+            detalhes = f"Mídias: {quantidade}"
         else:
-            conteudo = item.get("conteudo", "").strip() or "SEM LEGENDA"
-            detalhes = f"📝 𝐂𝐎𝐍𝐓𝐄Ú𝐃𝐎:\n\n{conteudo}"
+            conteudo = item.get("conteudo", "").strip() or "Sem legenda"
+            detalhes = f"Conteúdo:\n{conteudo}"
 
-        mensagem = f"""
-📌 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀
-
-━━━━━━━━━━━━━━━━
-
-📅 𝐃𝐀𝐓𝐀: {data_exibicao}
-
-⏰ 𝐇𝐎𝐑Á𝐑𝐈𝐎: {horario}
-
-📦 𝐅𝐎𝐑𝐌𝐀𝐓𝐎: {tipo}
-
-{detalhes}
-"""
+        mensagem = (
+            "📌 PUBLICAÇÃO PROGRAMADA\n\n"
+            f"Data: {data_exibicao}\n"
+            f"Horário: {horario}\n"
+            f"Formato: {tipo}\n\n"
+            f"{detalhes}"
+        )
 
         await query.message.reply_text(
             mensagem,
@@ -214,20 +178,15 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not 0 <= indice < len(fila):
             await query.message.reply_text(
-                "⚠️ 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐍Ã𝐎 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐀."
+                "⚠️ Publicação não encontrada."
             )
             return
 
         remover_da_fila(indice)
 
         await query.edit_message_text(
-            """
-🗑️ 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐃𝐀
-
-━━━━━━━━━━━━━━━━
-
-✅ 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐅𝐎𝐈 𝐑𝐄𝐌𝐎𝐕𝐈𝐃𝐀 𝐃𝐀𝐒 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀𝐒.
-""",
+            "🗑️ PUBLICAÇÃO CANCELADA\n\n"
+            "A publicação foi removida das programadas.",
             reply_markup=voltar_keyboard(),
         )
         return
@@ -237,31 +196,15 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         AGUARDANDO_DIVULGACAO.add(user_id)
 
         await query.message.reply_text(
-            """
-📢 𝐌𝐎𝐃𝐎 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎 𝐀𝐓𝐈𝐕𝐀𝐃𝐎
-
-━━━━━━━━━━━━━━━━
-
-📤 𝐄𝐍𝐕𝐈𝐄 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎.
-
-⚡ 𝐄𝐋𝐀 𝐒𝐄𝐑Á 𝐄𝐍𝐕𝐈𝐀𝐃𝐀 𝐈𝐌𝐄𝐃𝐈𝐀𝐓𝐀𝐌𝐄𝐍𝐓𝐄.
-"""
+            "📢 DIVULGAÇÃO IMEDIATA\n\n"
+            "Envie a publicação. Ela será enviada imediatamente para o grupo."
         )
         return
 
     if query.data == "album":
         await query.message.reply_text(
-            """
-🖼️ 𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐀́𝐋𝐁𝐔𝐌
-
-━━━━━━━━━━━━━━━━
-
-📸 𝐂𝐑𝐈𝐄 𝐄 𝐄𝐍𝐕𝐈𝐄 𝐔𝐌 𝐍𝐎𝐕𝐎 𝐀́𝐋𝐁𝐔𝐌.
-
-━━━━━━━━━━━━━━━━
-
-𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌𝐀 𝐎𝐏ÇÃ𝐎:
-""",
+            "🖼️ CENTRAL DE ÁLBUM\n\n"
+            "Crie e envie um novo álbum.",
             reply_markup=album_keyboard(),
         )
         return
@@ -271,13 +214,8 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ALBUM_MIDIAS[user_id] = []
 
         await query.message.reply_text(
-            """
-🖼️ 𝐌𝐎𝐃𝐎 𝐀́𝐋𝐁𝐔𝐌 𝐀𝐓𝐈𝐕𝐀𝐃𝐎
-
-━━━━━━━━━━━━━━━━
-
-📤 𝐄𝐍𝐕𝐈𝐄 𝐀𝐒 𝐅𝐎𝐓𝐎𝐒 𝐎𝐔 𝐕Í𝐃𝐄𝐎𝐒.
-"""
+            "🖼️ NOVO ÁLBUM\n\n"
+            "Envie as fotos ou vídeos. Quando terminar, toque em FINALIZAR ÁLBUM."
         )
         return ALBUM
 
@@ -294,13 +232,8 @@ async def abrir_agendamento(
     AGENDAMENTO_DADOS[user_id] = {}
 
     await query.message.reply_text(
-        """
-⏰ 𝐍𝐎𝐕𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀
-
-━━━━━━━━━━━━━━━━
-
-𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐎 𝐅𝐎𝐑𝐌𝐀𝐓𝐎:
-""",
+        "⏰ NOVO AGENDAMENTO\n\n"
+        "Escolha o tipo de publicação:",
         reply_markup=agendamento_tipo_keyboard(),
     )
 
@@ -319,19 +252,8 @@ async def escolher_agendamento_unica(
     }
 
     await query.edit_message_text(
-        """
-📄 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 Ú𝐍𝐈𝐂𝐀
-
-━━━━━━━━━━━━━━━━
-
-📤 𝐄𝐍𝐕𝐈𝐄 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎.
-
-𝐏𝐎𝐃𝐄 𝐒𝐄𝐑:
-
-📝 𝐓𝐄𝐗𝐓𝐎
-📸 𝐔𝐌𝐀 𝐅𝐎𝐓𝐎
-🎥 𝐔𝐌 𝐕Í𝐃𝐄𝐎
-""",
+        "📄 PUBLICAÇÃO ÚNICA\n\n"
+        "Envie um texto, uma foto ou um vídeo.",
         reply_markup=cancelar_agendamento_keyboard(),
     )
 
@@ -353,15 +275,9 @@ async def escolher_agendamento_album(
     }
 
     await query.edit_message_text(
-        """
-🖼️ 𝐀́𝐋𝐁𝐔𝐌 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐎
-
-━━━━━━━━━━━━━━━━
-
-📤 𝐄𝐍𝐕𝐈𝐄 𝐃𝐄 𝟐 𝐀 𝟏𝟎 𝐅𝐎𝐓𝐎𝐒 𝐎𝐔 𝐕Í𝐃𝐄𝐎𝐒.
-
-✅ 𝐐𝐔𝐀𝐍𝐃𝐎 𝐓𝐄𝐑𝐌𝐈𝐍𝐀𝐑, 𝐂𝐋𝐈𝐐𝐔𝐄 𝐄𝐌 𝐅𝐈𝐍𝐀𝐋𝐈𝐙𝐀𝐑.
-""",
+        "🖼️ ÁLBUM PROGRAMADO\n\n"
+        "Envie de 2 a 10 fotos ou vídeos.\n\n"
+        "Quando terminar, toque em FINALIZAR ÁLBUM.",
         reply_markup=cancelar_agendamento_keyboard(),
     )
 
@@ -395,11 +311,8 @@ async def receber_agendamento_publicacao(
 
     else:
         await update.message.reply_text(
-            """
-⚠️ 𝐓𝐈𝐏𝐎 𝐃𝐄 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐍Ã𝐎 𝐒𝐔𝐏𝐎𝐑𝐓𝐀𝐃𝐎.
-
-𝐄𝐍𝐕𝐈𝐄 𝐔𝐌 𝐓𝐄𝐗𝐓𝐎, 𝐔𝐌𝐀 𝐅𝐎𝐓𝐎 𝐎𝐔 𝐔𝐌 𝐕Í𝐃𝐄𝐎.
-""",
+            "⚠️ TIPO NÃO SUPORTADO\n\n"
+            "Envie um texto, uma foto ou um vídeo.",
             reply_markup=cancelar_agendamento_keyboard(),
         )
         return AGENDAMENTO_PUBLICACAO
@@ -407,15 +320,8 @@ async def receber_agendamento_publicacao(
     AGENDAMENTO_DADOS[user_id] = item
 
     await update.message.reply_text(
-        """
-⏰ 𝐄𝐒𝐂𝐎𝐋𝐇𝐀 𝐎 𝐇𝐎𝐑Á𝐑𝐈𝐎
-
-━━━━━━━━━━━━━━━━
-
-𝐃𝐈𝐆𝐈𝐓𝐄 𝐎 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐍𝐎 𝐅𝐎𝐑𝐌𝐀𝐓𝐎:
-
-20:30
-""",
+        "⏰ ESCOLHA O HORÁRIO\n\n"
+        "Digite no formato 20:30.",
         reply_markup=cancelar_agendamento_keyboard(),
     )
 
@@ -431,7 +337,7 @@ async def receber_agendamento_album(
 
     if not item or item.get("modo") != "album":
         await update.message.reply_text(
-            "⚠️ 𝐈𝐍𝐈𝐂𝐈𝐄 𝐎 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎 𝐃𝐎 𝐀́𝐋𝐁𝐔𝐌 𝐍𝐎𝐕𝐀𝐌𝐄𝐍𝐓𝐄."
+            "⚠️ Inicie o agendamento do álbum novamente."
         )
         return ConversationHandler.END
 
@@ -439,7 +345,8 @@ async def receber_agendamento_album(
 
     if len(midias) >= 10:
         await update.message.reply_text(
-            "⚠️ 𝐎 𝐋𝐈𝐌𝐈𝐓𝐄 𝐃𝐎 𝐀́𝐋𝐁𝐔𝐌 É 𝐃𝐄 𝟏𝟎 𝐌Í𝐃𝐈𝐀𝐒.",
+            "⚠️ LIMITE ATINGIDO\n\n"
+            "O álbum pode ter no máximo 10 mídias.",
             reply_markup=finalizar_agendamento_album_keyboard(),
         )
         return AGENDAMENTO_ALBUM
@@ -464,7 +371,7 @@ async def receber_agendamento_album(
 
     else:
         await update.message.reply_text(
-            "⚠️ 𝐄𝐍𝐕𝐈𝐄 𝐒𝐎𝐌𝐄𝐍𝐓𝐄 𝐅𝐎𝐓𝐎𝐒 𝐎𝐔 𝐕Í𝐃𝐄𝐎𝐒.",
+            "⚠️ Envie somente fotos ou vídeos.",
             reply_markup=finalizar_agendamento_album_keyboard(),
         )
         return AGENDAMENTO_ALBUM
@@ -475,7 +382,7 @@ async def receber_agendamento_album(
     quantidade = len(midias)
 
     await update.message.reply_text(
-        f"✅ 𝐌Í𝐃𝐈𝐀 𝐀𝐃𝐈𝐂𝐈𝐎𝐍𝐀𝐃𝐀 ({quantidade}/10)",
+        f"✅ MÍDIA ADICIONADA ({quantidade}/10)",
         reply_markup=finalizar_agendamento_album_keyboard(),
     )
 
@@ -494,21 +401,15 @@ async def finalizar_agendamento_album(
 
     if len(midias) < 2:
         await query.message.reply_text(
-            "⚠️ 𝐎 𝐀́𝐋𝐁𝐔𝐌 𝐏𝐑𝐄𝐂𝐈𝐒𝐀 𝐓𝐄𝐑 𝐏𝐄𝐋𝐎 𝐌𝐄𝐍𝐎𝐒 𝟐 𝐌Í𝐃𝐈𝐀𝐒.",
+            "⚠️ ÁLBUM INCOMPLETO\n\n"
+            "O álbum precisa ter pelo menos 2 mídias.",
             reply_markup=finalizar_agendamento_album_keyboard(),
         )
         return AGENDAMENTO_ALBUM
 
     await query.message.reply_text(
-        """
-⏰ 𝐄𝐒𝐂𝐎𝐋𝐇𝐀 𝐎 𝐇𝐎𝐑Á𝐑𝐈𝐎
-
-━━━━━━━━━━━━━━━━
-
-𝐃𝐈𝐆𝐈𝐓𝐄 𝐎 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐍𝐎 𝐅𝐎𝐑𝐌𝐀𝐓𝐎:
-
-20:30
-""",
+        "⏰ ESCOLHA O HORÁRIO\n\n"
+        "Digite no formato 20:30.",
         reply_markup=cancelar_agendamento_keyboard(),
     )
 
@@ -526,13 +427,8 @@ async def receber_horario_agendamento(
         horario_recebido = datetime.strptime(horario_texto, "%H:%M")
     except ValueError:
         await update.message.reply_text(
-            """
-⚠️ 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐈𝐍𝐕Á𝐋𝐈𝐃𝐎.
-
-𝐃𝐈𝐆𝐈𝐓𝐄 𝐍𝐄𝐒𝐓𝐄 𝐅𝐎𝐑𝐌𝐀𝐓𝐎:
-
-20:30
-""",
+            "⚠️ HORÁRIO INVÁLIDO\n\n"
+            "Digite no formato 20:30.",
             reply_markup=cancelar_agendamento_keyboard(),
         )
         return AGENDAMENTO_HORARIO
@@ -549,11 +445,8 @@ async def receber_horario_agendamento(
 
     if horario_programado <= agora:
         await update.message.reply_text(
-            """
-⚠️ 𝐄𝐒𝐒𝐄 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐉Á 𝐏𝐀𝐒𝐒𝐎𝐔.
-
-𝐃𝐈𝐆𝐈𝐓𝐄 𝐔𝐌 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐌𝐀𝐈𝐒 𝐀̀ 𝐅𝐑𝐄𝐍𝐓𝐄.
-""",
+            "⚠️ HORÁRIO JÁ PASSOU\n\n"
+            "Digite um horário mais à frente.",
             reply_markup=cancelar_agendamento_keyboard(),
         )
         return AGENDAMENTO_HORARIO
@@ -562,7 +455,7 @@ async def receber_horario_agendamento(
 
     if not item:
         await update.message.reply_text(
-            "⚠️ 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐍Ã𝐎 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐀."
+            "⚠️ Publicação não encontrada."
         )
         return ConversationHandler.END
 
@@ -582,17 +475,10 @@ async def receber_horario_agendamento(
         formato = item.get("tipo", "PUBLICAÇÃO").upper()
 
     await update.message.reply_text(
-        f"""
-✅ 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀
-
-━━━━━━━━━━━━━━━━
-
-📅 𝐃𝐀𝐓𝐀: {agora.strftime('%d/%m/%Y')}
-
-⏰ 𝐇𝐎𝐑Á𝐑𝐈𝐎: {horario_programado.strftime('%H:%M')}
-
-📦 𝐅𝐎𝐑𝐌𝐀𝐓𝐎: {formato}
-""",
+        "✅ PUBLICAÇÃO PROGRAMADA\n\n"
+        f"Data: {agora.strftime('%d/%m/%Y')}\n"
+        f"Horário: {horario_programado.strftime('%H:%M')}\n"
+        f"Formato: {formato}",
         reply_markup=voltar_keyboard(),
     )
 
@@ -609,13 +495,8 @@ async def cancelar_agendamento(
     AGENDAMENTO_DADOS.pop(query.from_user.id, None)
 
     await query.edit_message_text(
-        """
-❌ 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀ÇÃ𝐎 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐃𝐀
-
-━━━━━━━━━━━━━━━━
-
-𝐍𝐄𝐍𝐇𝐔𝐌𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐅𝐎𝐈 𝐒𝐀𝐋𝐕𝐀.
-""",
+        "❌ PROGRAMAÇÃO CANCELADA\n\n"
+        "Nenhuma publicação foi salva.",
         reply_markup=painel_keyboard(),
     )
 
@@ -651,7 +532,7 @@ async def receber_album(
         [
             [
                 InlineKeyboardButton(
-                    "✅ 𝐅𝐈𝐍𝐀𝐋𝐈𝐙𝐀𝐑 𝐀́𝐋𝐁𝐔𝐌",
+                    "✅ FINALIZAR ÁLBUM",
                     callback_data="finalizar_album",
                 )
             ]
@@ -661,7 +542,7 @@ async def receber_album(
     quantidade = len(ALBUM_MIDIAS[user_id])
 
     await update.message.reply_text(
-        f"✅ 𝐌Í𝐃𝐈𝐀 𝐀𝐃𝐈𝐂𝐈𝐎𝐍𝐀𝐃𝐀 ({quantidade})",
+        f"✅ MÍDIA ADICIONADA ({quantidade})",
         reply_markup=finalizar,
     )
 
@@ -680,7 +561,8 @@ async def finalizar_album(
 
     if len(midias) < 2:
         await query.message.reply_text(
-            "⚠️ 𝐎 𝐀́𝐋𝐁𝐔𝐌 𝐏𝐑𝐄𝐂𝐈𝐒𝐀 𝐓𝐄𝐑 𝐏𝐄𝐋𝐎 𝐌𝐄𝐍𝐎𝐒 𝟐 𝐌Í𝐃𝐈𝐀𝐒."
+            "⚠️ ÁLBUM INCOMPLETO\n\n"
+            "O álbum precisa ter pelo menos 2 mídias."
         )
         return ALBUM
 
@@ -704,24 +586,16 @@ async def finalizar_album(
                 )
             )
 
-    mensagens_enviadas = await context.bot.send_media_group(
+    await context.bot.send_media_group(
         chat_id=GROUP_ID,
         media=lista_envio,
     )
 
-    try:
-        await context.bot.edit_message_reply_markup(
-            chat_id=GROUP_ID,
-            message_id=mensagens_enviadas[-1].message_id,
-            reply_markup=vip_keyboard(VIP_LINK),
-        )
-    except Exception as erro:
-        print("⚠️ Álbum enviado, mas o botão VIP não foi anexado:", erro)
-
     adicionar_album(len(lista_envio))
 
     await query.message.reply_text(
-        "✅ 𝐀́𝐋𝐁𝐔𝐌 𝐄𝐍𝐕𝐈𝐀𝐃𝐎 𝐂𝐎𝐌 𝐒𝐔𝐂𝐄𝐒𝐒𝐎."
+        "✅ ÁLBUM ENVIADO\n\n"
+        "O álbum foi publicado com sucesso."
     )
 
     ALBUM_MIDIAS.pop(user_id, None)
@@ -762,11 +636,8 @@ async def receber_divulgacao(
 
     else:
         await update.message.reply_text(
-            """
-⚠️ 𝐓𝐈𝐏𝐎 𝐃𝐄 𝐌𝐄𝐍𝐒𝐀𝐆𝐄𝐌 𝐍Ã𝐎 𝐒𝐔𝐏𝐎𝐑𝐓𝐀𝐃𝐎.
-
-𝐄𝐍𝐕𝐈𝐄 𝐔𝐌 𝐓𝐄𝐗𝐓𝐎, 𝐔𝐌𝐀 𝐅𝐎𝐓𝐎 𝐎𝐔 𝐔𝐌 𝐕Í𝐃𝐄𝐎.
-"""
+            "⚠️ TIPO NÃO SUPORTADO\n\n"
+            "Envie um texto, uma foto ou um vídeo."
         )
         return
 
@@ -774,9 +645,6 @@ async def receber_divulgacao(
     adicionar_envio(1)
 
     await update.message.reply_text(
-        """
-✅ 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎 𝐄𝐍𝐕𝐈𝐀𝐃𝐀 𝐂𝐎𝐌 𝐒𝐔𝐂𝐄𝐒𝐒𝐎.
-
-⚡ 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐅𝐎𝐈 𝐄𝐍𝐕𝐈𝐀𝐃𝐀 𝐃𝐈𝐑𝐄𝐓𝐀𝐌𝐄𝐍𝐓𝐄 𝐏𝐀𝐑𝐀 𝐎 𝐆𝐑𝐔𝐏𝐎.
-"""
+        "✅ DIVULGAÇÃO ENVIADA\n\n"
+        "A publicação foi enviada para o grupo."
     )
