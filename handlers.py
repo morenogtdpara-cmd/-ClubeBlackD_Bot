@@ -240,61 +240,138 @@ async def callbacks(
 
         return ALBUM
 
-async def receber_divulgacao(
+async def receber_album(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
     user_id = update.effective_user.id
 
-    if user_id not in AGUARDANDO_DIVULGACAO:
-        return
+    if user_id not in ALBUM_MIDIAS:
+        ALBUM_MIDIAS[user_id] = []
 
-    item = {
-        "conteudo": "",
-        "tipo": "",
-        "arquivo": None,
-        "horario": "Agora",
-        "enviado": False
-    }
 
     if update.message.photo:
 
-        item["tipo"] = "foto"
-        item["arquivo"] = update.message.photo[-1].file_id
-        item["conteudo"] = update.message.caption or ""
+        ALBUM_MIDIAS[user_id].append(
+            {
+                "tipo": "foto",
+                "id": update.message.photo[-1].file_id
+            }
+        )
+
 
     elif update.message.video:
 
-        item["tipo"] = "video"
-        item["arquivo"] = update.message.video.file_id
-        item["conteudo"] = update.message.caption or ""
-
-    elif update.message.audio:
-
-        item["tipo"] = "audio"
-        item["arquivo"] = update.message.audio.file_id
-        item["conteudo"] = update.message.caption or ""
-
-    elif update.message.text:
-
-        item["tipo"] = "texto"
-        item["conteudo"] = update.message.text
-
-    else:
-
-        await update.message.reply_text(
-            "⚠️ Tipo de mensagem não suportado."
+        ALBUM_MIDIAS[user_id].append(
+            {
+                "tipo": "video",
+                "id": update.message.video.file_id
+            }
         )
 
-        return
 
-    adicionar_na_fila(item)
+    finalizar = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "✅ FINALIZAR ÁLBUM",
+                callback_data="finalizar_album"
+            )
+        ]
+    ])
 
-    AGUARDANDO_DIVULGACAO.remove(
-        user_id
-    )
 
     await update.message.reply_text(
-        "⏳ Divulgação adicionada na fila."
+        f"✅ Mídia adicionada ({len(ALBUM_MIDIAS[user_id])})",
+        reply_markup=finalizar
     )
+
+
+    return ALBUM
+
+
+
+async def finalizar_album(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+
+    user_id = query.from_user.id
+
+
+    midias = ALBUM_MIDIAS.get(
+        user_id,
+        []
+    )
+
+
+    if not midias:
+
+        await query.message.reply_text(
+            "⚠️ Nenhuma mídia no álbum."
+        )
+
+        return ConversationHandler.END
+
+
+
+    lista_envio = []
+
+
+    for item in midias:
+
+
+        if item["tipo"] == "foto":
+
+            lista_envio.append(
+                InputMediaPhoto(
+                    media=item["id"]
+                )
+            )
+
+
+        elif item["tipo"] == "video":
+
+            lista_envio.append(
+                InputMediaVideo(
+                    media=item["id"]
+                )
+            )
+
+
+
+    await context.bot.send_media_group(
+        chat_id=GROUP_ID,
+        media=lista_envio
+    )
+
+
+    await context.bot.send_message(
+        chat_id=GROUP_ID,
+        text="🔥 Entre no VIP:",
+        reply_markup=vip_keyboard(VIP_LINK)
+    )
+
+
+    adicionar_album(
+        len(midias)
+    )
+
+
+    await query.message.reply_text(
+        "✅ Álbum enviado com sucesso."
+    )
+
+
+    ALBUM_MIDIAS.pop(
+        user_id,
+        None
+    )
+
+
+    return ConversationHandler.END
