@@ -53,6 +53,51 @@ def album_keyboard():
     )
 
 
+def finalizar_album_keyboard():
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "✅ FINALIZAR ÁLBUM",
+                    callback_data="finalizar_album",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "❌ CANCELAR E LIMPAR",
+                    callback_data="cancelar_processo",
+                )
+            ],
+        ]
+    )
+
+
+def processo_finalizado_keyboard():
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "✅ FINALIZAR E LIMPAR",
+                    callback_data="finalizar_processo",
+                )
+            ]
+        ]
+    )
+
+
+def cancelar_processo_keyboard():
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "❌ CANCELAR E LIMPAR",
+                    callback_data="cancelar_processo",
+                )
+            ]
+        ]
+    )
+
+
 def vip_keyboard(link):
     return InlineKeyboardMarkup(
         [
@@ -84,7 +129,7 @@ def agendamento_tipo_keyboard():
             [
                 InlineKeyboardButton(
                     "↩️ VOLTAR AO PAINEL",
-                    callback_data="cancelar_agendamento",
+                    callback_data="cancelar_processo",
                 )
             ],
         ]
@@ -102,8 +147,8 @@ def finalizar_agendamento_album_keyboard():
             ],
             [
                 InlineKeyboardButton(
-                    "❌ CANCELAR",
-                    callback_data="cancelar_agendamento",
+                    "❌ CANCELAR E LIMPAR",
+                    callback_data="cancelar_processo",
                 )
             ],
         ]
@@ -111,16 +156,7 @@ def finalizar_agendamento_album_keyboard():
 
 
 def cancelar_agendamento_keyboard():
-    return InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "❌ CANCELAR",
-                    callback_data="cancelar_agendamento",
-                )
-            ]
-        ]
-    )
+    return cancelar_processo_keyboard()
 
 
 def voltar_keyboard():
@@ -153,7 +189,10 @@ def fila_keyboard(itens, pagina=0):
         start=inicio,
     ):
         horario = item.get("horario", "--:--")
-        tipo = nomes_tipos.get(item.get("tipo"), "PUBLICAÇÃO")
+        tipo = nomes_tipos.get(
+            item.get("tipo"),
+            "PUBLICAÇÃO",
+        )
 
         if item.get("tipo") == "album":
             quantidade = len(item.get("midias", []))
