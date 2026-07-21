@@ -375,3 +375,64 @@ async def finalizar_album(
 
 
     return ConversationHandler.END
+    
+async def receber_divulgacao(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    user_id = update.effective_user.id
+
+    if user_id not in AGUARDANDO_DIVULGACAO:
+        return
+
+
+    item = {
+        "conteudo": "",
+        "tipo": "",
+        "arquivo": None,
+        "horario": "Agora",
+        "enviado": False
+    }
+
+
+    if update.message.photo:
+
+        item["tipo"] = "foto"
+        item["arquivo"] = update.message.photo[-1].file_id
+        item["conteudo"] = update.message.caption or ""
+
+
+    elif update.message.video:
+
+        item["tipo"] = "video"
+        item["arquivo"] = update.message.video.file_id
+        item["conteudo"] = update.message.caption or ""
+
+
+    elif update.message.text:
+
+        item["tipo"] = "texto"
+        item["conteudo"] = update.message.text
+
+
+    else:
+
+        await update.message.reply_text(
+            "⚠️ Tipo de mensagem não suportado."
+        )
+
+        return
+
+
+    adicionar_na_fila(item)
+
+
+    AGUARDANDO_DIVULGACAO.remove(
+        user_id
+    )
+
+
+    await update.message.reply_text(
+        "⏳ Divulgação adicionada na fila."
+    )
