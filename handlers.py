@@ -40,6 +40,9 @@ AGUARDANDO_DIVULGACAO = set()
 ALBUM_MIDIAS = {}
 AGENDAMENTO_DADOS = {}
 
+# LEGENDA FIXA DOS ÁLBUNS ENVIADOS AO GRUPO
+LEGENDA_FIXA_ALBUM = "🔥 Conteúdo completo no VIP. Clique no botão abaixo."
+
 
 def texto_painel():
     return """
@@ -683,22 +686,37 @@ async def finalizar_album(
 
     lista_envio = []
 
-    for item in midias[:10]:
-        if item["tipo"] == "foto":
-            lista_envio.append(InputMediaPhoto(media=item["id"]))
-        elif item["tipo"] == "video":
-            lista_envio.append(InputMediaVideo(media=item["id"]))
+    for indice, item in enumerate(midias[:10]):
+        legenda = LEGENDA_FIXA_ALBUM if indice == 0 else None
 
-    await context.bot.send_media_group(
+        if item["tipo"] == "foto":
+            lista_envio.append(
+                InputMediaPhoto(
+                    media=item["id"],
+                    caption=legenda,
+                )
+            )
+        elif item["tipo"] == "video":
+            lista_envio.append(
+                InputMediaVideo(
+                    media=item["id"],
+                    caption=legenda,
+                )
+            )
+
+    mensagens_enviadas = await context.bot.send_media_group(
         chat_id=GROUP_ID,
         media=lista_envio,
     )
 
-    await context.bot.send_message(
-        chat_id=GROUP_ID,
-        text="🔥 𝐄𝐍𝐓𝐑𝐄 𝐍𝐎 𝐕𝐈𝐏:",
-        reply_markup=vip_keyboard(VIP_LINK),
-    )
+    try:
+        await context.bot.edit_message_reply_markup(
+            chat_id=GROUP_ID,
+            message_id=mensagens_enviadas[-1].message_id,
+            reply_markup=vip_keyboard(VIP_LINK),
+        )
+    except Exception as erro:
+        print("⚠️ Álbum enviado, mas o botão VIP não foi anexado:", erro)
 
     adicionar_album(len(lista_envio))
 
