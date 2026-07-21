@@ -72,7 +72,7 @@ async def manager(
 """
 ⚜️𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
 
-Escolha uma opção:
+𝐄𝐒𝐂𝐎𝐋𝐇𝐀 𝐔𝐌𝐀 𝐎𝐏ÇÃO:
 """,
 reply_markup=painel_keyboard()
 )
