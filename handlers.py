@@ -70,15 +70,9 @@ async def manager(
 
     await update.message.reply_text(
 """
-╭━━━━━━⚜️━━━━━━━━╮
-𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
-╰━━━━━━⚜️━━━━━━━━╯
+⚜️𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
 
-━━━━━━━━━━━━━━━━━
-
-🎯 𝐒𝐞𝐥𝐞𝐜𝐢𝐨𝐧𝐞 𝐮𝐦𝐚 𝐟𝐮𝐧çã𝐨 𝐚𝐛𝐚𝐢𝐱𝐨:
-
-━━━━━━━━━━━━━━━━━
+Escolha uma opção:
 """,
 reply_markup=painel_keyboard()
 )
