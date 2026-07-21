@@ -917,3 +917,4 @@ async def apagar_mensagem_avulsa(
         update.effective_message.message_id,
     )
     await mostrar_painel_principal(update, context)
+    
