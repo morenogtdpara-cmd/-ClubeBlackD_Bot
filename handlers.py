@@ -1,3 +1,6 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from telegram import (
     Update,
     InlineKeyboardButton,
@@ -22,7 +25,9 @@ from keyboards import (
     vip_keyboard,
     album_keyboard,
     fila_keyboard,
-    fila_item_keyboard
+    fila_item_keyboard,
+    cancelar_agendamento_keyboard,
+    voltar_keyboard
 )
 
 from database import (
@@ -33,14 +38,18 @@ from database import (
 
 from fila import (
     pegar_fila,
-    remover_da_fila
+    remover_da_fila,
+    adicionar_na_fila
 )
 
 
 ALBUM = 1
+AGENDAMENTO_PUBLICACAO = 3
+AGENDAMENTO_HORARIO = 4
 
 AGUARDANDO_DIVULGACAO = set()
 ALBUM_MIDIAS = {}
+AGENDAMENTO_DADOS = {}
 
 
 async def start(
@@ -58,7 +67,11 @@ async def start(
 
     relatorio = pegar_relatorio()
 
-    envios, midias, albuns, agendados = relatorio
+    envios, midias, albuns, _ = relatorio
+
+    agendados = len(
+        pegar_fila()
+    )
 
     mensagem = f"""
 🥷🏾 𝐁𝐋𝐀𝐂𝐊 𝐏𝐑𝐈𝐕𝐀𝐓𝐄
@@ -121,7 +134,9 @@ async def callbacks(
 
     await query.answer()
 
-    # VOLTAR AO PAINEL PRINCIPAL
+    user_id = query.from_user.id
+
+    # VOLTAR AO PAINEL
     if query.data == "voltar":
 
         await query.edit_message_text(
@@ -141,7 +156,35 @@ async def callbacks(
 
         return
 
-    # FILA
+    # ABRIR AGENDAMENTO
+    if query.data == "agendamento":
+
+        AGUARDANDO_DIVULGACAO.discard(
+            user_id
+        )
+
+        AGENDAMENTO_DADOS[user_id] = {}
+
+        await query.message.reply_text(
+            """
+⏰ 𝐍𝐎𝐕𝐎 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎
+
+━━━━━━━━━━━━━━━━
+
+📤 𝐄𝐍𝐕𝐈𝐄 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐐𝐔𝐄 𝐃𝐄𝐒𝐄𝐉𝐀 𝐀𝐆𝐄𝐍𝐃𝐀𝐑.
+
+𝐏𝐎𝐃𝐄 𝐒𝐄𝐑:
+
+📝 𝐓𝐄𝐗𝐓𝐎
+📸 𝐅𝐎𝐓𝐎
+🎥 𝐕Í𝐃𝐄𝐎
+""",
+            reply_markup=cancelar_agendamento_keyboard()
+        )
+
+        return AGENDAMENTO_PUBLICACAO
+
+    # ABRIR FILA DE AGENDAMENTOS
     if query.data == "fila":
 
         fila = pegar_fila()
@@ -150,30 +193,61 @@ async def callbacks(
 
             await query.message.reply_text(
                 """
-📋 𝐅𝐈𝐋𝐀 𝐃𝐄 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎
+📋 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎𝐒
 
 ━━━━━━━━━━━━━━━━
 
-⚠️ 𝐍𝐄𝐍𝐇𝐔𝐌𝐀 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎 𝐍𝐀 𝐅𝐈𝐋𝐀.
-"""
+⚠️ 𝐍𝐄𝐍𝐇𝐔𝐌𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐀𝐆𝐄𝐍𝐃𝐀𝐃𝐀.
+""",
+                reply_markup=voltar_keyboard()
             )
 
         else:
 
             await query.message.reply_text(
                 """
-📋 𝐅𝐈𝐋𝐀 𝐃𝐄 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎
+📋 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎𝐒
 
 ━━━━━━━━━━━━━━━━
 
-𝐄𝐒𝐂𝐎𝐋𝐇𝐀 𝐔𝐌𝐀 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎:
+𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎:
 """,
-                reply_markup=fila_keyboard(fila)
+                reply_markup=fila_keyboard(
+                    fila
+                )
             )
 
         return
 
-    # ITEM DA FILA
+    # PAGINAÇÃO
+    if query.data.startswith("fila_pagina_"):
+
+        pagina = int(
+            query.data.replace(
+                "fila_pagina_",
+                ""
+            )
+        )
+
+        fila = pegar_fila()
+
+        await query.edit_message_text(
+            """
+📋 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎𝐒
+
+━━━━━━━━━━━━━━━━
+
+𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐄 𝐔𝐌 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎:
+""",
+            reply_markup=fila_keyboard(
+                fila,
+                pagina
+            )
+        )
+
+        return
+
+    # VISUALIZAR AGENDAMENTO
     if query.data.startswith("fila_item_"):
 
         indice = int(
@@ -185,109 +259,124 @@ async def callbacks(
 
         fila = pegar_fila()
 
-        if 0 <= indice < len(fila):
-
-            item = fila[indice]
-
-            mensagem = (
-                "📌 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎 𝐒𝐄𝐋𝐄𝐂𝐈𝐎𝐍𝐀𝐃𝐀\n\n"
-                "━━━━━━━━━━━━━━━━\n\n"
-                f"📝 𝐂𝐎𝐍𝐓𝐄Ú𝐃𝐎:\n"
-                f"{item.get('conteudo', 'Sem conteúdo')}\n\n"
-                f"⏰ 𝐇𝐎𝐑Á𝐑𝐈𝐎:\n"
-                f"{item.get('horario', 'Sem horário')}\n\n"
-                f"📊 𝐒𝐓𝐀𝐓𝐔𝐒:\n"
-                f"{'✅ ENVIADO' if item.get('enviado') else '⏳ AGUARDANDO ENVIO'}"
-            )
+        if not 0 <= indice < len(fila):
 
             await query.message.reply_text(
-                mensagem,
-                reply_markup=fila_item_keyboard()
-            )
-
-        return
-
-    # ENVIAR ITEM DA FILA
-    if query.data == "fila_enviar":
-
-        fila = pegar_fila()
-
-        if not fila:
-
-            await query.message.reply_text(
-                "⚠️ 𝐅𝐈𝐋𝐀 𝐕𝐀𝐙𝐈𝐀."
+                "⚠️ 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎 𝐍Ã𝐎 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎."
             )
 
             return
 
-        item = fila[0]
+        item = fila[indice]
 
-        tipo = item.get("tipo")
-        arquivo = item.get("arquivo")
-        conteudo = item.get("conteudo", "")
+        tipo = item.get(
+            "tipo",
+            "publicação"
+        ).upper()
 
-        if tipo == "foto":
+        conteudo = item.get(
+            "conteudo",
+            ""
+        )
 
-            await context.bot.send_photo(
-                chat_id=GROUP_ID,
-                photo=arquivo,
-                caption=conteudo,
-                reply_markup=vip_keyboard(VIP_LINK)
+        if not conteudo:
+            conteudo = "SEM LEGENDA"
+
+        data_salva = item.get(
+            "data",
+            ""
+        )
+
+        try:
+
+            data_exibicao = datetime.strptime(
+                data_salva,
+                "%Y-%m-%d"
+            ).strftime(
+                "%d/%m/%Y"
             )
 
-        elif tipo == "video":
+        except ValueError:
 
-            await context.bot.send_video(
-                chat_id=GROUP_ID,
-                video=arquivo,
-                caption=conteudo,
-                reply_markup=vip_keyboard(VIP_LINK)
-            )
+            data_exibicao = data_salva or "SEM DATA"
 
-        elif tipo == "texto":
+        horario = item.get(
+            "horario",
+            "SEM HORÁRIO"
+        )
 
-            await context.bot.send_message(
-                chat_id=GROUP_ID,
-                text=conteudo,
-                reply_markup=vip_keyboard(VIP_LINK)
-            )
+        mensagem = f"""
+📌 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐀𝐆𝐄𝐍𝐃𝐀𝐃𝐀
 
-        remover_da_fila(0)
+━━━━━━━━━━━━━━━━
 
-        adicionar_envio(1)
+📅 𝐃𝐀𝐓𝐀: {data_exibicao}
+
+⏰ 𝐇𝐎𝐑Á𝐑𝐈𝐎: {horario}
+
+📦 𝐓𝐈𝐏𝐎: {tipo}
+
+📝 𝐂𝐎𝐍𝐓𝐄Ú𝐃𝐎:
+
+{conteudo}
+"""
 
         await query.message.reply_text(
-            "🚀 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎 𝐄𝐍𝐕𝐈𝐀𝐃𝐀 𝐄 𝐑𝐄𝐌𝐎𝐕𝐈𝐃𝐀 𝐃𝐀 𝐅𝐈𝐋𝐀."
+            mensagem,
+            reply_markup=fila_item_keyboard(
+                indice
+            )
         )
 
         return
 
-    # REMOVER ITEM DA FILA
-    if query.data == "fila_remover":
+    # CANCELAR AGENDAMENTO DA FILA
+    if query.data.startswith("fila_remover_"):
+
+        indice = int(
+            query.data.replace(
+                "fila_remover_",
+                ""
+            )
+        )
 
         fila = pegar_fila()
 
-        if not fila:
+        if not 0 <= indice < len(fila):
 
             await query.message.reply_text(
-                "⚠️ 𝐅𝐈𝐋𝐀 𝐕𝐀𝐙𝐈𝐀."
+                "⚠️ 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎 𝐍Ã𝐎 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎."
             )
 
             return
 
-        remover_da_fila(0)
+        remover_da_fila(
+            indice
+        )
 
-        await query.message.reply_text(
-            "🗑️ 𝐃𝐈𝐕𝐔𝐋𝐆𝐀ÇÃ𝐎 𝐑𝐄𝐌𝐎𝐕𝐈𝐃𝐀 𝐃𝐀 𝐅𝐈𝐋𝐀."
+        await query.edit_message_text(
+            """
+🗑️ 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐃𝐎.
+
+━━━━━━━━━━━━━━━━
+
+✅ 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐅𝐎𝐈 𝐑𝐄𝐌𝐎𝐕𝐈𝐃𝐀 𝐃𝐀 𝐅𝐈𝐋𝐀.
+""",
+            reply_markup=voltar_keyboard()
         )
 
         return
 
-    # ATIVAR MODO DIVULGAÇÃO
+    # DIVULGAÇÃO IMEDIATA
     if query.data == "divulgar":
 
+        AGENDAMENTO_DADOS.pop(
+            user_id,
+            None
+        )
+
         AGUARDANDO_DIVULGACAO.add(
-            query.from_user.id
+            user_id
         )
 
         await query.message.reply_text(
@@ -324,10 +413,14 @@ async def callbacks(
 
         return
 
-    # INICIAR NOVO ÁLBUM
+    # INICIAR ÁLBUM
     if query.data == "album_agora":
 
-        ALBUM_MIDIAS[query.from_user.id] = []
+        AGUARDANDO_DIVULGACAO.discard(
+            user_id
+        )
+
+        ALBUM_MIDIAS[user_id] = []
 
         await query.message.reply_text(
             """
@@ -340,6 +433,216 @@ async def callbacks(
         )
 
         return ALBUM
+
+
+async def receber_agendamento_publicacao(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    user_id = update.effective_user.id
+
+    item = {
+        "tipo": "",
+        "arquivo": None,
+        "conteudo": ""
+    }
+
+    if update.message.photo:
+
+        item["tipo"] = "foto"
+        item["arquivo"] = update.message.photo[-1].file_id
+        item["conteudo"] = update.message.caption or ""
+
+    elif update.message.video:
+
+        item["tipo"] = "video"
+        item["arquivo"] = update.message.video.file_id
+        item["conteudo"] = update.message.caption or ""
+
+    elif update.message.text:
+
+        item["tipo"] = "texto"
+        item["conteudo"] = update.message.text
+
+    else:
+
+        await update.message.reply_text(
+            """
+⚠️ 𝐓𝐈𝐏𝐎 𝐃𝐄 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐍Ã𝐎 𝐒𝐔𝐏𝐎𝐑𝐓𝐀𝐃𝐎.
+
+𝐄𝐍𝐕𝐈𝐄 𝐔𝐌 𝐓𝐄𝐗𝐓𝐎, 𝐔𝐌𝐀 𝐅𝐎𝐓𝐎 𝐎𝐔 𝐔𝐌 𝐕Í𝐃𝐄𝐎.
+"""
+        )
+
+        return AGENDAMENTO_PUBLICACAO
+
+    AGENDAMENTO_DADOS[user_id] = item
+
+    await update.message.reply_text(
+        """
+⏰ 𝐄𝐒𝐂𝐎𝐋𝐇𝐀 𝐎 𝐇𝐎𝐑Á𝐑𝐈𝐎
+
+━━━━━━━━━━━━━━━━
+
+𝐃𝐈𝐆𝐈𝐓𝐄 𝐎 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐍𝐎 𝐅𝐎𝐑𝐌𝐀𝐓𝐎:
+
+20:30
+
+⚠️ 𝐎 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐃𝐄𝐕𝐄 𝐒𝐄𝐑 𝐃𝐄 𝐇𝐎𝐉𝐄 𝐄 𝐀𝐈𝐍𝐃𝐀 𝐍Ã𝐎 𝐏𝐎𝐃𝐄 𝐓𝐄𝐑 𝐏𝐀𝐒𝐒𝐀𝐃𝐎.
+""",
+        reply_markup=cancelar_agendamento_keyboard()
+    )
+
+    return AGENDAMENTO_HORARIO
+
+
+async def receber_horario_agendamento(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    user_id = update.effective_user.id
+
+    horario_texto = (
+        update.message.text or ""
+    ).strip()
+
+    try:
+
+        horario_recebido = datetime.strptime(
+            horario_texto,
+            "%H:%M"
+        )
+
+    except ValueError:
+
+        await update.message.reply_text(
+            """
+⚠️ 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐈𝐍𝐕Á𝐋𝐈𝐃𝐎.
+
+𝐃𝐈𝐆𝐈𝐓𝐄 𝐍𝐄𝐒𝐓𝐄 𝐅𝐎𝐑𝐌𝐀𝐓𝐎:
+
+20:30
+""",
+            reply_markup=cancelar_agendamento_keyboard()
+        )
+
+        return AGENDAMENTO_HORARIO
+
+    fuso = ZoneInfo(
+        "America/Sao_Paulo"
+    )
+
+    agora = datetime.now(
+        fuso
+    )
+
+    horario_agendado = agora.replace(
+        hour=horario_recebido.hour,
+        minute=horario_recebido.minute,
+        second=0,
+        microsecond=0
+    )
+
+    if horario_agendado <= agora:
+
+        await update.message.reply_text(
+            """
+⚠️ 𝐄𝐒𝐒𝐄 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐉Á 𝐏𝐀𝐒𝐒𝐎𝐔.
+
+𝐃𝐈𝐆𝐈𝐓𝐄 𝐔𝐌 𝐇𝐎𝐑Á𝐑𝐈𝐎 𝐌𝐀𝐈𝐒 𝐀̀ 𝐅𝐑𝐄𝐍𝐓𝐄.
+""",
+            reply_markup=cancelar_agendamento_keyboard()
+        )
+
+        return AGENDAMENTO_HORARIO
+
+    item = AGENDAMENTO_DADOS.get(
+        user_id
+    )
+
+    if not item:
+
+        await update.message.reply_text(
+            """
+⚠️ 𝐍Ã𝐎 𝐅𝐎𝐈 𝐏𝐎𝐒𝐒Í𝐕𝐄𝐋 𝐋𝐎𝐂𝐀𝐋𝐈𝐙𝐀𝐑 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎.
+
+𝐈𝐍𝐈𝐂𝐈𝐄 𝐎 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎 𝐍𝐎𝐕𝐀𝐌𝐄𝐍𝐓𝐄.
+"""
+        )
+
+        return ConversationHandler.END
+
+    item["id"] = agora.strftime(
+        "%Y%m%d%H%M%S%f"
+    )
+
+    item["data"] = agora.strftime(
+        "%Y-%m-%d"
+    )
+
+    item["horario"] = horario_agendado.strftime(
+        "%H:%M"
+    )
+
+    item["enviado"] = False
+
+    item["criado_em"] = agora.isoformat()
+
+    adicionar_na_fila(
+        item
+    )
+
+    AGENDAMENTO_DADOS.pop(
+        user_id,
+        None
+    )
+
+    await update.message.reply_text(
+        f"""
+✅ 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎 𝐂𝐎𝐍𝐅𝐈𝐑𝐌𝐀𝐃𝐎
+
+━━━━━━━━━━━━━━━━
+
+📅 𝐃𝐀𝐓𝐀: {agora.strftime('%d/%m/%Y')}
+
+⏰ 𝐇𝐎𝐑Á𝐑𝐈𝐎: {horario_agendado.strftime('%H:%M')}
+
+📋 𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐅𝐎𝐈 𝐀𝐃𝐈𝐂𝐈𝐎𝐍𝐀𝐃𝐀 𝐀𝐎𝐒 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎𝐒.
+""",
+        reply_markup=voltar_keyboard()
+    )
+
+    return ConversationHandler.END
+
+
+async def cancelar_agendamento(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    AGENDAMENTO_DADOS.pop(
+        query.from_user.id,
+        None
+    )
+
+    await query.edit_message_text(
+        """
+❌ 𝐀𝐆𝐄𝐍𝐃𝐀𝐌𝐄𝐍𝐓𝐎 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐃𝐎.
+
+━━━━━━━━━━━━━━━━
+
+𝐍𝐄𝐍𝐇𝐔𝐌𝐀 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 𝐅𝐎𝐈 𝐀𝐃𝐈𝐂𝐈𝐎𝐍𝐀𝐃𝐀 𝐀̀ 𝐅𝐈𝐋𝐀.
+""",
+        reply_markup=painel_keyboard()
+    )
+
+    return ConversationHandler.END
 
 
 async def receber_album(
@@ -472,7 +775,6 @@ async def receber_divulgacao(
     if user_id not in AGUARDANDO_DIVULGACAO:
         return
 
-    # FOTO
     if update.message.photo:
 
         await context.bot.send_photo(
@@ -482,7 +784,6 @@ async def receber_divulgacao(
             reply_markup=vip_keyboard(VIP_LINK)
         )
 
-    # VÍDEO
     elif update.message.video:
 
         await context.bot.send_video(
@@ -492,7 +793,6 @@ async def receber_divulgacao(
             reply_markup=vip_keyboard(VIP_LINK)
         )
 
-    # TEXTO
     elif update.message.text:
 
         await context.bot.send_message(
@@ -501,7 +801,6 @@ async def receber_divulgacao(
             reply_markup=vip_keyboard(VIP_LINK)
         )
 
-    # TIPO NÃO SUPORTADO
     else:
 
         await update.message.reply_text(
