@@ -11,7 +11,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 from config import ADMIN_ID, GROUP_ID, VIP_LINK
 from keyboards import painel_keyboard, vip_keyboard, album_keyboard, fila_keyboard, fila_item_keyboard
 from database import adicionar_envio, adicionar_album, pegar_relatorio
-from fila import pegar_fila, remover_da_fila
+from fila import pegar_fila, remover_da_fila, adicionar_na_fila
 
 ALBUM = 1
 
@@ -69,7 +69,7 @@ async def manager(
         return
 
     await update.message.reply_text(
-    """
+"""
 ╭━━━━━━⚜️━━━━━━━━╮
 𝐂𝐄𝐍𝐓𝐑𝐀𝐋 𝐃𝐄 𝐎𝐏𝐄𝐑𝐀ÇÕ𝐄𝐒
 ╰━━━━━━⚜️━━━━━━━━╯
@@ -80,7 +80,7 @@ async def manager(
 
 ━━━━━━━━━━━━━━━━━
 """,
-    reply_markup=painel_keyboard()
+reply_markup=painel_keyboard()
 )
 
 async def callbacks(
@@ -92,36 +92,26 @@ async def callbacks(
 
     await query.answer()
 
-
     if query.data == "fila":
 
         fila = pegar_fila()
 
         if not fila:
 
-            mensagem = (
+            await query.message.reply_text(
                 "⏰ FILA DE DIVULGAÇÃO\n\n"
                 "Nenhuma divulgação na fila."
             )
 
-            await query.message.reply_text(
-                mensagem
-            )
-
         else:
 
-            mensagem = (
-                "⏰ FILA DE DIVULGAÇÃO\n\n"
-                "Escolha uma divulgação:"
-            )
-
             await query.message.reply_text(
-                mensagem,
+                "⏰ FILA DE DIVULGAÇÃO\n\n"
+                "Escolha uma divulgação:",
                 reply_markup=fila_keyboard(fila)
             )
 
         return
-
 
     if query.data.startswith("fila_item_"):
 
@@ -138,32 +128,12 @@ async def callbacks(
 
             item = fila[indice]
 
-            conteudo = item.get(
-                "conteudo",
-                "Sem conteúdo"
-            )
-
-            horario = item.get(
-                "horario",
-                "Sem horário"
-            )
-
-            enviado = item.get(
-                "enviado",
-                False
-            )
-
-            status = (
-                "✅ Enviado"
-                if enviado
-                else "⏳ Aguardando envio"
-            )
-
             mensagem = (
                 "📌 DIVULGAÇÃO SELECIONADA\n\n"
-                f"📝 Conteúdo:\n{conteudo}\n\n"
-                f"⏰ Horário:\n{horario}\n\n"
-                f"📊 Status:\n{status}"
+                f"📝 Conteúdo:\n{item.get('conteudo', 'Sem conteúdo')}\n\n"
+                f"⏰ Horário:\n{item.get('horario', 'Sem horário')}\n\n"
+                f"📊 Status:\n"
+                f"{'✅ Enviado' if item.get('enviado') else '⏳ Aguardando envio'}"
             )
 
             await query.message.reply_text(
@@ -173,15 +143,69 @@ async def callbacks(
 
         return
 
+    if query.data == "fila_enviar":
+
+        fila = pegar_fila()
+
+        if not fila:
+
+            await query.message.reply_text(
+                "⚠️ Fila vazia."
+            )
+
+            return
+
+        item = fila[0]
+
+        tipo = item.get("tipo")
+        arquivo = item.get("arquivo")
+        conteudo = item.get("conteudo", "")
+
+        if tipo == "foto":
+
+            await context.bot.send_photo(
+                chat_id=GROUP_ID,
+                photo=arquivo,
+                caption=conteudo,
+                reply_markup=vip_keyboard(VIP_LINK)
+            )
+
+        elif tipo == "video":
+
+            await context.bot.send_video(
+                chat_id=GROUP_ID,
+                video=arquivo,
+                caption=conteudo,
+                reply_markup=vip_keyboard(VIP_LINK)
+            )
+
+        elif tipo == "texto":
+
+            await context.bot.send_message(
+                chat_id=GROUP_ID,
+                text=conteudo,
+                reply_markup=vip_keyboard(VIP_LINK)
+            )
+
+        remover_da_fila(0)
+
+        adicionar_envio(1)
+
+        await query.message.reply_text(
+            "🚀 Divulgação enviada e removida da fila."
+        )
+
+        return
 
     if query.data == "fila_remover":
+
+        remover_da_fila(0)
 
         await query.message.reply_text(
             "🗑 Divulgação removida da fila."
         )
 
         return
-
 
     if query.data == "divulgar":
 
@@ -196,7 +220,6 @@ async def callbacks(
 
         return
 
-
     if query.data == "album":
 
         await query.message.reply_text(
@@ -205,7 +228,6 @@ async def callbacks(
         )
 
         return
-
 
     if query.data == "album_agora":
 
@@ -218,118 +240,6 @@ async def callbacks(
 
         return ALBUM
 
-async def receber_album(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    user_id = update.effective_user.id
-
-    if user_id not in ALBUM_MIDIAS:
-        ALBUM_MIDIAS[user_id] = []
-
-    if update.message.photo:
-
-        ALBUM_MIDIAS[user_id].append(
-            {
-                "tipo": "foto",
-                "id": update.message.photo[-1].file_id
-            }
-        )
-
-    elif update.message.video:
-
-        ALBUM_MIDIAS[user_id].append(
-            {
-                "tipo": "video",
-                "id": update.message.video.file_id
-            }
-        )
-
-    finalizar = InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton(
-                "✅ FINALIZAR ÁLBUM",
-                callback_data="finalizar_album"
-            )
-        ]
-    ])
-
-    await update.message.reply_text(
-        f"✅ Mídia adicionada ({len(ALBUM_MIDIAS[user_id])})",
-        reply_markup=finalizar
-    )
-
-    return ALBUM
-
-async def finalizar_album(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
-
-    query = update.callback_query
-
-    await query.answer()
-
-    user_id = query.from_user.id
-
-    midias = ALBUM_MIDIAS.get(
-        user_id,
-        []
-    )
-
-    if not midias:
-
-        await query.message.reply_text(
-            "⚠️ Nenhuma mídia no álbum."
-        )
-
-        return ConversationHandler.END
-
-    lista_envio = []
-
-    for item in midias:
-
-        if item["tipo"] == "foto":
-
-            lista_envio.append(
-                InputMediaPhoto(
-                    media=item["id"]
-                )
-            )
-
-        elif item["tipo"] == "video":
-
-            lista_envio.append(
-                InputMediaVideo(
-                    media=item["id"]
-                )
-            )
-
-    await context.bot.send_media_group(
-        chat_id=GROUP_ID,
-        media=lista_envio
-    )
-
-    await context.bot.send_message(
-        chat_id=GROUP_ID,
-        text="🔥 Entre no VIP:",
-        reply_markup=vip_keyboard(VIP_LINK)
-    )
-
-    adicionar_album(len(midias))
-
-    await query.message.reply_text(
-        "✅ Álbum enviado com sucesso."
-    )
-
-    ALBUM_MIDIAS.pop(
-        user_id,
-        None
-    )
-
-    return ConversationHandler.END
-
 async def receber_divulgacao(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -340,50 +250,51 @@ async def receber_divulgacao(
     if user_id not in AGUARDANDO_DIVULGACAO:
         return
 
+    item = {
+        "conteudo": "",
+        "tipo": "",
+        "arquivo": None,
+        "horario": "Agora",
+        "enviado": False
+    }
+
     if update.message.photo:
 
-        await context.bot.send_photo(
-            chat_id=GROUP_ID,
-            photo=update.message.photo[-1].file_id,
-            caption=update.message.caption,
-            reply_markup=vip_keyboard(VIP_LINK)
-        )
+        item["tipo"] = "foto"
+        item["arquivo"] = update.message.photo[-1].file_id
+        item["conteudo"] = update.message.caption or ""
 
     elif update.message.video:
 
-        await context.bot.send_video(
-            chat_id=GROUP_ID,
-            video=update.message.video.file_id,
-            caption=update.message.caption,
-            reply_markup=vip_keyboard(VIP_LINK)
-        )
+        item["tipo"] = "video"
+        item["arquivo"] = update.message.video.file_id
+        item["conteudo"] = update.message.caption or ""
 
     elif update.message.audio:
 
-        await context.bot.send_audio(
-            chat_id=GROUP_ID,
-            audio=update.message.audio.file_id,
-            caption=update.message.caption,
-            reply_markup=vip_keyboard(VIP_LINK)
-        )
+        item["tipo"] = "audio"
+        item["arquivo"] = update.message.audio.file_id
+        item["conteudo"] = update.message.caption or ""
 
     elif update.message.text:
 
-        await context.bot.send_message(
-            chat_id=GROUP_ID,
-            text=update.message.text,
-            reply_markup=vip_keyboard(VIP_LINK)
-        )
+        item["tipo"] = "texto"
+        item["conteudo"] = update.message.text
 
     else:
+
+        await update.message.reply_text(
+            "⚠️ Tipo de mensagem não suportado."
+        )
+
         return
+
+    adicionar_na_fila(item)
 
     AGUARDANDO_DIVULGACAO.remove(
         user_id
     )
 
-    adicionar_envio(1)
-
     await update.message.reply_text(
-        "✅ Divulgação enviada com sucesso."
+        "⏳ Divulgação adicionada na fila."
     )
