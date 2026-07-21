@@ -1,4 +1,5 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from telegram.ext import Application
 
@@ -15,9 +16,11 @@ async def verificar_fila(context):
 
     print("📋 Fila atual:", fila)
 
-    agora = datetime.now().strftime("%H:%M")
+    agora = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    ).strftime("%H:%M")
 
-    print("🕒 Hora do servidor:", agora)
+    print("🕒 Hora de Brasília:", agora)
 
     if not fila:
         return
