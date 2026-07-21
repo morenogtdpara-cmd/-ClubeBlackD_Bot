@@ -10,8 +10,11 @@ from keyboards import vip_keyboard
 from database import adicionar_envio, adicionar_album
 
 
-# LEGENDA FIXA DOS ÁLBUNS ENVIADOS AO GRUPO
-LEGENDA_FIXA_ALBUM = "🔥 Conteúdo completo no VIP. Clique no botão abaixo."
+LEGENDA_FIXA_ALBUM = (
+    "🔥 CONTEÚDO EXCLUSIVO\n\n"
+    "Veja o conteúdo completo no VIP:\n"
+    f"{VIP_LINK}"
+)
 
 
 async def verificar_fila(context):
@@ -85,11 +88,7 @@ async def verificar_fila(context):
                 lista_envio = []
 
                 for indice_midia, midia in enumerate(midias):
-                    legenda = (
-                        LEGENDA_FIXA_ALBUM
-                        if indice_midia == 0
-                        else None
-                    )
+                    legenda = LEGENDA_FIXA_ALBUM if indice_midia == 0 else None
 
                     if midia.get("tipo") == "foto":
                         lista_envio.append(
@@ -111,23 +110,10 @@ async def verificar_fila(context):
                     print("⚠️ Álbum sem mídias válidas:", item)
                     continue
 
-                mensagens_enviadas = await context.bot.send_media_group(
+                await context.bot.send_media_group(
                     chat_id=GROUP_ID,
                     media=lista_envio,
                 )
-
-                try:
-                    await context.bot.edit_message_reply_markup(
-                        chat_id=GROUP_ID,
-                        message_id=mensagens_enviadas[-1].message_id,
-                        reply_markup=vip_keyboard(VIP_LINK),
-                    )
-                except Exception as erro_botao:
-                    print(
-                        "⚠️ Álbum programado enviado, mas o botão VIP "
-                        "não foi anexado:",
-                        erro_botao,
-                    )
 
                 adicionar_album(len(lista_envio))
 
