@@ -36,14 +36,60 @@ AGENDAMENTO_ALBUM = 5
 AGENDAMENTO_HORARIO = 6
 
 AGUARDANDO_DIVULGACAO = set()
+
 ALBUM_MIDIAS = {}
+ALBUM_LEGENDAS = {}
+ALBUM_PAINEIS = {}
+
 AGENDAMENTO_DADOS = {}
 
+
 LEGENDA_FIXA_ALBUM = (
-    "🔥 CONTEÚDO EXCLUSIVO\n\n"
-    "Veja o conteúdo completo no VIP:\n"
-    f"{VIP_LINK}"
+    "🔥 CONTEÚDO EXCLUSIVO LIBERADO 🔥\n\n"
+    "🚀 Acesse nosso canal oficial:\n\n"
+    "🤖 @ClubeBlackBot"
 )
+
+
+def montar_legenda_album(legenda_usuario):
+    legenda_usuario = (legenda_usuario or "").strip()
+
+    if legenda_usuario:
+        return (
+            f"{legenda_usuario}\n\n"
+            f"{LEGENDA_FIXA_ALBUM}"
+        )
+
+    return LEGENDA_FIXA_ALBUM
+
+
+def finalizar_album_keyboard():
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "✅ FINALIZAR ÁLBUM",
+                    callback_data="finalizar_album",
+                )
+            ]
+        ]
+    )
+
+
+def texto_painel_album(quantidade):
+    return (
+        "🖼️ ÁLBUM EM MONTAGEM\n\n"
+        f"Mídias adicionadas: {quantidade}/10\n\n"
+        "Envie mais fotos ou vídeos ou toque em FINALIZAR ÁLBUM."
+    )
+
+
+def texto_painel_album_programado(quantidade):
+    return (
+        "🖼️ ÁLBUM PROGRAMADO\n\n"
+        f"Mídias adicionadas: {quantidade}/10\n\n"
+        "Envie mais fotos ou vídeos ou toque em FINALIZAR ÁLBUM."
+    )
 
 
 def texto_painel():
@@ -54,7 +100,10 @@ def texto_painel():
     )
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
     if update.effective_user.id != ADMIN_ID:
         await update.message.reply_text("Bot privado.")
         return
@@ -77,7 +126,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(mensagem)
 
 
-async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def manager(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
     if update.effective_user.id != ADMIN_ID:
         return
 
@@ -87,7 +139,10 @@ async def manager(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def callbacks(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
     query = update.callback_query
     await query.answer()
 
@@ -115,10 +170,14 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Selecione uma publicação:",
                 reply_markup=fila_keyboard(fila),
             )
+
         return
 
     if query.data.startswith("fila_pagina_"):
-        pagina = int(query.data.replace("fila_pagina_", ""))
+        pagina = int(
+            query.data.replace("fila_pagina_", "")
+        )
+
         fila = pegar_fila()
 
         await query.edit_message_text(
@@ -126,10 +185,14 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Selecione uma publicação:",
             reply_markup=fila_keyboard(fila, pagina),
         )
+
         return
 
     if query.data.startswith("fila_item_"):
-        indice = int(query.data.replace("fila_item_", ""))
+        indice = int(
+            query.data.replace("fila_item_", "")
+        )
+
         fila = pegar_fila()
 
         if not 0 <= indice < len(fila):
@@ -152,11 +215,28 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             data_exibicao = data_salva or "SEM DATA"
 
         if item.get("tipo") == "album":
-            quantidade = len(item.get("midias", []))
-            detalhes = f"Mídias: {quantidade}"
+            quantidade = len(
+                item.get("midias", [])
+            )
+
+            legenda = (
+                item.get("conteudo", "").strip()
+                or "Sem legenda personalizada"
+            )
+
+            detalhes = (
+                f"Mídias: {quantidade}\n\n"
+                f"Legenda:\n{legenda}"
+            )
         else:
-            conteudo = item.get("conteudo", "").strip() or "Sem legenda"
-            detalhes = f"Conteúdo:\n{conteudo}"
+            conteudo = (
+                item.get("conteudo", "").strip()
+                or "Sem legenda"
+            )
+
+            detalhes = (
+                f"Conteúdo:\n{conteudo}"
+            )
 
         mensagem = (
             "📌 PUBLICAÇÃO PROGRAMADA\n\n"
@@ -170,10 +250,14 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             mensagem,
             reply_markup=fila_item_keyboard(indice),
         )
+
         return
 
     if query.data.startswith("fila_remover_"):
-        indice = int(query.data.replace("fila_remover_", ""))
+        indice = int(
+            query.data.replace("fila_remover_", "")
+        )
+
         fila = pegar_fila()
 
         if not 0 <= indice < len(fila):
@@ -189,6 +273,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "A publicação foi removida das programadas.",
             reply_markup=voltar_keyboard(),
         )
+
         return
 
     if query.data == "divulgar":
@@ -199,6 +284,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📢 DIVULGAÇÃO IMEDIATA\n\n"
             "Envie a publicação. Ela será enviada imediatamente para o grupo."
         )
+
         return
 
     if query.data == "album":
@@ -207,16 +293,25 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Crie e envie um novo álbum.",
             reply_markup=album_keyboard(),
         )
+
         return
 
     if query.data == "album_agora":
         AGUARDANDO_DIVULGACAO.discard(user_id)
-        ALBUM_MIDIAS[user_id] = []
 
-        await query.message.reply_text(
-            "🖼️ NOVO ÁLBUM\n\n"
-            "Envie as fotos ou vídeos. Quando terminar, toque em FINALIZAR ÁLBUM."
+        ALBUM_MIDIAS[user_id] = []
+        ALBUM_LEGENDAS[user_id] = ""
+
+        mensagem_painel = await query.message.reply_text(
+            texto_painel_album(0),
+            reply_markup=finalizar_album_keyboard(),
         )
+
+        ALBUM_PAINEIS[user_id] = {
+            "chat_id": mensagem_painel.chat.id,
+            "message_id": mensagem_painel.message_id,
+        }
+
         return ALBUM
 
 
@@ -228,6 +323,7 @@ async def abrir_agendamento(
     await query.answer()
 
     user_id = query.from_user.id
+
     AGUARDANDO_DIVULGACAO.discard(user_id)
     AGENDAMENTO_DADOS[user_id] = {}
 
@@ -267,18 +363,20 @@ async def escolher_agendamento_album(
     query = update.callback_query
     await query.answer()
 
-    AGENDAMENTO_DADOS[query.from_user.id] = {
+    user_id = query.from_user.id
+
+    AGENDAMENTO_DADOS[user_id] = {
         "modo": "album",
         "tipo": "album",
         "midias": [],
         "conteudo": "",
+        "painel_chat_id": query.message.chat.id,
+        "painel_message_id": query.message.message_id,
     }
 
     await query.edit_message_text(
-        "🖼️ ÁLBUM PROGRAMADO\n\n"
-        "Envie de 2 a 10 fotos ou vídeos.\n\n"
-        "Quando terminar, toque em FINALIZAR ÁLBUM.",
-        reply_markup=cancelar_agendamento_keyboard(),
+        texto_painel_album_programado(0),
+        reply_markup=finalizar_agendamento_album_keyboard(),
     )
 
     return AGENDAMENTO_ALBUM
@@ -315,6 +413,7 @@ async def receber_agendamento_publicacao(
             "Envie um texto, uma foto ou um vídeo.",
             reply_markup=cancelar_agendamento_keyboard(),
         )
+
         return AGENDAMENTO_PUBLICACAO
 
     AGENDAMENTO_DADOS[user_id] = item
@@ -339,6 +438,7 @@ async def receber_agendamento_album(
         await update.message.reply_text(
             "⚠️ Inicie o agendamento do álbum novamente."
         )
+
         return ConversationHandler.END
 
     midias = item.setdefault("midias", [])
@@ -346,17 +446,20 @@ async def receber_agendamento_album(
     if len(midias) >= 10:
         await update.message.reply_text(
             "⚠️ LIMITE ATINGIDO\n\n"
-            "O álbum pode ter no máximo 10 mídias.",
-            reply_markup=finalizar_agendamento_album_keyboard(),
+            "O álbum pode ter no máximo 10 mídias."
         )
+
         return AGENDAMENTO_ALBUM
+
+    legenda_recebida = (
+        update.message.caption or ""
+    ).strip()
 
     if update.message.photo:
         midias.append(
             {
                 "tipo": "foto",
                 "id": update.message.photo[-1].file_id,
-                "caption": update.message.caption or "",
             }
         )
 
@@ -365,26 +468,41 @@ async def receber_agendamento_album(
             {
                 "tipo": "video",
                 "id": update.message.video.file_id,
-                "caption": update.message.caption or "",
             }
         )
 
     else:
         await update.message.reply_text(
-            "⚠️ Envie somente fotos ou vídeos.",
-            reply_markup=finalizar_agendamento_album_keyboard(),
+            "⚠️ Envie somente fotos ou vídeos."
         )
+
         return AGENDAMENTO_ALBUM
 
-    if not item.get("conteudo") and update.message.caption:
-        item["conteudo"] = update.message.caption
+    if not item.get("conteudo") and legenda_recebida:
+        item["conteudo"] = legenda_recebida
 
     quantidade = len(midias)
 
-    await update.message.reply_text(
-        f"✅ MÍDIA ADICIONADA ({quantidade}/10)",
-        reply_markup=finalizar_agendamento_album_keyboard(),
-    )
+    painel_chat_id = item.get("painel_chat_id")
+    painel_message_id = item.get("painel_message_id")
+
+    if painel_chat_id and painel_message_id:
+        try:
+            await context.bot.edit_message_text(
+                chat_id=painel_chat_id,
+                message_id=painel_message_id,
+                text=texto_painel_album_programado(
+                    quantidade
+                ),
+                reply_markup=finalizar_agendamento_album_keyboard(),
+            )
+        except Exception as erro:
+            print(
+                "⚠️ Erro ao atualizar painel do álbum programado:",
+                erro,
+            )
+
+    AGENDAMENTO_DADOS[user_id] = item
 
     return AGENDAMENTO_ALBUM
 
@@ -396,18 +514,22 @@ async def finalizar_agendamento_album(
     query = update.callback_query
     await query.answer()
 
-    item = AGENDAMENTO_DADOS.get(query.from_user.id, {})
+    item = AGENDAMENTO_DADOS.get(
+        query.from_user.id,
+        {},
+    )
+
     midias = item.get("midias", [])
 
     if len(midias) < 2:
-        await query.message.reply_text(
-            "⚠️ ÁLBUM INCOMPLETO\n\n"
+        await query.answer(
             "O álbum precisa ter pelo menos 2 mídias.",
-            reply_markup=finalizar_agendamento_album_keyboard(),
+            show_alert=True,
         )
+
         return AGENDAMENTO_ALBUM
 
-    await query.message.reply_text(
+    await query.edit_message_text(
         "⏰ ESCOLHA O HORÁRIO\n\n"
         "Digite no formato 20:30.",
         reply_markup=cancelar_agendamento_keyboard(),
@@ -421,16 +543,22 @@ async def receber_horario_agendamento(
     context: ContextTypes.DEFAULT_TYPE,
 ):
     user_id = update.effective_user.id
-    horario_texto = (update.message.text or "").strip()
+    horario_texto = (
+        update.message.text or ""
+    ).strip()
 
     try:
-        horario_recebido = datetime.strptime(horario_texto, "%H:%M")
+        horario_recebido = datetime.strptime(
+            horario_texto,
+            "%H:%M",
+        )
     except ValueError:
         await update.message.reply_text(
             "⚠️ HORÁRIO INVÁLIDO\n\n"
             "Digite no formato 20:30.",
             reply_markup=cancelar_agendamento_keyboard(),
         )
+
         return AGENDAMENTO_HORARIO
 
     fuso = ZoneInfo("America/Sao_Paulo")
@@ -449,6 +577,7 @@ async def receber_horario_agendamento(
             "Digite um horário mais à frente.",
             reply_markup=cancelar_agendamento_keyboard(),
         )
+
         return AGENDAMENTO_HORARIO
 
     item = AGENDAMENTO_DADOS.get(user_id)
@@ -457,12 +586,25 @@ async def receber_horario_agendamento(
         await update.message.reply_text(
             "⚠️ Publicação não encontrada."
         )
+
         return ConversationHandler.END
 
     item.pop("modo", None)
-    item["id"] = agora.strftime("%Y%m%d%H%M%S%f")
-    item["data"] = agora.strftime("%Y-%m-%d")
-    item["horario"] = horario_programado.strftime("%H:%M")
+    item.pop("painel_chat_id", None)
+    item.pop("painel_message_id", None)
+
+    item["id"] = agora.strftime(
+        "%Y%m%d%H%M%S%f"
+    )
+
+    item["data"] = agora.strftime(
+        "%Y-%m-%d"
+    )
+
+    item["horario"] = horario_programado.strftime(
+        "%H:%M"
+    )
+
     item["enviado"] = False
     item["criado_em"] = agora.isoformat()
 
@@ -470,9 +612,15 @@ async def receber_horario_agendamento(
     AGENDAMENTO_DADOS.pop(user_id, None)
 
     if item.get("tipo") == "album":
-        formato = f"ÁLBUM • {len(item.get('midias', []))} MÍDIAS"
+        formato = (
+            f"ÁLBUM • "
+            f"{len(item.get('midias', []))} MÍDIAS"
+        )
     else:
-        formato = item.get("tipo", "PUBLICAÇÃO").upper()
+        formato = item.get(
+            "tipo",
+            "PUBLICAÇÃO",
+        ).upper()
 
     await update.message.reply_text(
         "✅ PUBLICAÇÃO PROGRAMADA\n\n"
@@ -492,7 +640,10 @@ async def cancelar_agendamento(
     query = update.callback_query
     await query.answer()
 
-    AGENDAMENTO_DADOS.pop(query.from_user.id, None)
+    AGENDAMENTO_DADOS.pop(
+        query.from_user.id,
+        None,
+    )
 
     await query.edit_message_text(
         "❌ PROGRAMAÇÃO CANCELADA\n\n"
@@ -512,8 +663,22 @@ async def receber_album(
     if user_id not in ALBUM_MIDIAS:
         ALBUM_MIDIAS[user_id] = []
 
+    midias = ALBUM_MIDIAS[user_id]
+
+    if len(midias) >= 10:
+        await update.message.reply_text(
+            "⚠️ LIMITE ATINGIDO\n\n"
+            "O álbum pode ter no máximo 10 mídias."
+        )
+
+        return ALBUM
+
+    legenda_recebida = (
+        update.message.caption or ""
+    ).strip()
+
     if update.message.photo:
-        ALBUM_MIDIAS[user_id].append(
+        midias.append(
             {
                 "tipo": "foto",
                 "id": update.message.photo[-1].file_id,
@@ -521,30 +686,44 @@ async def receber_album(
         )
 
     elif update.message.video:
-        ALBUM_MIDIAS[user_id].append(
+        midias.append(
             {
                 "tipo": "video",
                 "id": update.message.video.file_id,
             }
         )
 
-    finalizar = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "✅ FINALIZAR ÁLBUM",
-                    callback_data="finalizar_album",
-                )
-            ]
-        ]
-    )
+    else:
+        await update.message.reply_text(
+            "⚠️ Envie somente fotos ou vídeos."
+        )
 
-    quantidade = len(ALBUM_MIDIAS[user_id])
+        return ALBUM
 
-    await update.message.reply_text(
-        f"✅ MÍDIA ADICIONADA ({quantidade})",
-        reply_markup=finalizar,
-    )
+    if (
+        not ALBUM_LEGENDAS.get(user_id)
+        and legenda_recebida
+    ):
+        ALBUM_LEGENDAS[user_id] = legenda_recebida
+
+    quantidade = len(midias)
+    painel = ALBUM_PAINEIS.get(user_id)
+
+    if painel:
+        try:
+            await context.bot.edit_message_text(
+                chat_id=painel["chat_id"],
+                message_id=painel["message_id"],
+                text=texto_painel_album(
+                    quantidade
+                ),
+                reply_markup=finalizar_album_keyboard(),
+            )
+        except Exception as erro:
+            print(
+                "⚠️ Erro ao atualizar painel do álbum:",
+                erro,
+            )
 
     return ALBUM
 
@@ -560,16 +739,30 @@ async def finalizar_album(
     midias = ALBUM_MIDIAS.get(user_id, [])
 
     if len(midias) < 2:
-        await query.message.reply_text(
-            "⚠️ ÁLBUM INCOMPLETO\n\n"
-            "O álbum precisa ter pelo menos 2 mídias."
+        await query.answer(
+            "O álbum precisa ter pelo menos 2 mídias.",
+            show_alert=True,
         )
+
         return ALBUM
+
+    legenda_usuario = ALBUM_LEGENDAS.get(
+        user_id,
+        "",
+    )
+
+    legenda_completa = montar_legenda_album(
+        legenda_usuario
+    )
 
     lista_envio = []
 
     for indice, item in enumerate(midias[:10]):
-        legenda = LEGENDA_FIXA_ALBUM if indice == 0 else None
+        legenda = (
+            legenda_completa
+            if indice == 0
+            else None
+        )
 
         if item["tipo"] == "foto":
             lista_envio.append(
@@ -578,6 +771,7 @@ async def finalizar_album(
                     caption=legenda,
                 )
             )
+
         elif item["tipo"] == "video":
             lista_envio.append(
                 InputMediaVideo(
@@ -586,19 +780,32 @@ async def finalizar_album(
                 )
             )
 
-    await context.bot.send_media_group(
-        chat_id=GROUP_ID,
-        media=lista_envio,
+    try:
+        await context.bot.send_media_group(
+            chat_id=GROUP_ID,
+            media=lista_envio,
+        )
+    except Exception as erro:
+        await query.message.reply_text(
+            "❌ ERRO AO ENVIAR ÁLBUM\n\n"
+            f"{erro}"
+        )
+
+        return ALBUM
+
+    adicionar_album(
+        len(lista_envio)
     )
 
-    adicionar_album(len(lista_envio))
-
-    await query.message.reply_text(
+    await query.edit_message_text(
         "✅ ÁLBUM ENVIADO\n\n"
         "O álbum foi publicado com sucesso."
     )
 
     ALBUM_MIDIAS.pop(user_id, None)
+    ALBUM_LEGENDAS.pop(user_id, None)
+    ALBUM_PAINEIS.pop(user_id, None)
+
     return ConversationHandler.END
 
 
@@ -639,6 +846,7 @@ async def receber_divulgacao(
             "⚠️ TIPO NÃO SUPORTADO\n\n"
             "Envie um texto, uma foto ou um vídeo."
         )
+
         return
 
     AGUARDANDO_DIVULGACAO.discard(user_id)
