@@ -6,27 +6,27 @@ def painel_keyboard():
         [
             [
                 InlineKeyboardButton(
-                    "📢 𝐃𝐈𝐕𝐔𝐋𝐆𝐀𝐑",
+                    "📢 DIVULGAR",
                     callback_data="divulgar",
                 ),
                 InlineKeyboardButton(
-                    "🖼️ 𝐀́𝐋𝐁𝐔𝐌",
+                    "🖼️ ÁLBUM",
                     callback_data="album",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    "⭐ 𝐅𝐄𝐄𝐃𝐁𝐀𝐂𝐊𝐒",
+                    "⭐ FEEDBACKS",
                     callback_data="feedbacks",
                 ),
                 InlineKeyboardButton(
-                    "⏰ 𝐀𝐆𝐄𝐍𝐃𝐀𝐑",
+                    "⏰ AGENDAR",
                     callback_data="agendamento",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    "📋 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀𝐒",
+                    "📋 PROGRAMADAS",
                     callback_data="fila",
                 )
             ],
@@ -39,13 +39,13 @@ def album_keyboard():
         [
             [
                 InlineKeyboardButton(
-                    "📤 𝐂𝐑𝐈𝐀𝐑 𝐍𝐎𝐕𝐎 𝐀́𝐋𝐁𝐔𝐌",
+                    "📤 CRIAR NOVO ÁLBUM",
                     callback_data="album_agora",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀𝐎 𝐏𝐀𝐈𝐍𝐄𝐋",
+                    "↩️ VOLTAR AO PAINEL",
                     callback_data="voltar",
                 )
             ],
@@ -58,7 +58,7 @@ def vip_keyboard(link):
         [
             [
                 InlineKeyboardButton(
-                    "🔥 𝐄𝐍𝐓𝐑𝐀𝐑 𝐍𝐎 𝐕𝐈𝐏 🔥",
+                    "🔥 ENTRAR NO VIP 🔥",
                     url=link,
                 )
             ]
@@ -71,19 +71,19 @@ def agendamento_tipo_keyboard():
         [
             [
                 InlineKeyboardButton(
-                    "📄 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎 Ú𝐍𝐈𝐂𝐀",
+                    "📄 PUBLICAÇÃO ÚNICA",
                     callback_data="agendar_unica",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "🖼️ 𝐀́𝐋𝐁𝐔𝐌",
+                    "🖼️ ÁLBUM",
                     callback_data="agendar_album",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀𝐎 𝐏𝐀𝐈𝐍𝐄𝐋",
+                    "↩️ VOLTAR AO PAINEL",
                     callback_data="cancelar_agendamento",
                 )
             ],
@@ -96,13 +96,13 @@ def finalizar_agendamento_album_keyboard():
         [
             [
                 InlineKeyboardButton(
-                    "✅ 𝐅𝐈𝐍𝐀𝐋𝐈𝐙𝐀𝐑 𝐀́𝐋𝐁𝐔𝐌",
+                    "✅ FINALIZAR ÁLBUM",
                     callback_data="finalizar_album_agendamento",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "❌ 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐑",
+                    "❌ CANCELAR",
                     callback_data="cancelar_agendamento",
                 )
             ],
@@ -115,7 +115,7 @@ def cancelar_agendamento_keyboard():
         [
             [
                 InlineKeyboardButton(
-                    "❌ 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐑",
+                    "❌ CANCELAR",
                     callback_data="cancelar_agendamento",
                 )
             ]
@@ -128,7 +128,7 @@ def voltar_keyboard():
         [
             [
                 InlineKeyboardButton(
-                    "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀𝐎 𝐏𝐀𝐈𝐍𝐄𝐋",
+                    "↩️ VOLTAR AO PAINEL",
                     callback_data="voltar",
                 )
             ]
@@ -175,7 +175,7 @@ def fila_keyboard(itens, pagina=0):
     if pagina > 0:
         navegacao.append(
             InlineKeyboardButton(
-                "⬅️ 𝐀𝐍𝐓𝐄𝐑𝐈𝐎𝐑",
+                "⬅️ ANTERIOR",
                 callback_data=f"fila_pagina_{pagina - 1}",
             )
         )
@@ -183,7 +183,7 @@ def fila_keyboard(itens, pagina=0):
     if fim < len(itens):
         navegacao.append(
             InlineKeyboardButton(
-                "𝐏𝐑Ó𝐗𝐈𝐌𝐀 ➡️",
+                "PRÓXIMA ➡️",
                 callback_data=f"fila_pagina_{pagina + 1}",
             )
         )
@@ -194,7 +194,7 @@ def fila_keyboard(itens, pagina=0):
     botoes.append(
         [
             InlineKeyboardButton(
-                "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀𝐎 𝐏𝐀𝐈𝐍𝐄𝐋",
+                "↩️ VOLTAR AO PAINEL",
                 callback_data="voltar",
             )
         ]
@@ -208,13 +208,13 @@ def fila_item_keyboard(indice):
         [
             [
                 InlineKeyboardButton(
-                    "🗑️ 𝐂𝐀𝐍𝐂𝐄𝐋𝐀𝐑 𝐏𝐔𝐁𝐋𝐈𝐂𝐀ÇÃ𝐎",
+                    "🗑️ CANCELAR PUBLICAÇÃO",
                     callback_data=f"fila_remover_{indice}",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "↩️ 𝐕𝐎𝐋𝐓𝐀𝐑 𝐀̀𝐒 𝐏𝐑𝐎𝐆𝐑𝐀𝐌𝐀𝐃𝐀𝐒",
+                    "↩️ VOLTAR ÀS PROGRAMADAS",
                     callback_data="fila",
                 )
             ],
